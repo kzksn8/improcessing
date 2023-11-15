@@ -1,52 +1,63 @@
-document.getElementById('drop_zone').addEventListener('drop', handleDrop, false);
-document.getElementById('remove_bg_button').addEventListener('click', removeBackground, false);
+// CSRFトークンをクッキーから取得する関数
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// CSRFトークンを取得
+const csrftoken = getCookie('csrftoken');
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('drop_zone').addEventListener('dragover', handleDragOver, false);
+    document.getElementById('drop_zone').addEventListener('drop', handleDrop, false);
+    document.getElementById('remove_bg_button').addEventListener('click', function() {
+        removeBackground(document.getElementById('file_input').files[0]);
+    }, false);
+});
+
+function handleDragOver(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+}
 
 function handleDrop(e) {
     e.stopPropagation();
     e.preventDefault();
-    var files = e.dataTransfer.files; // ドロップされたファイルを取得
-    // ここでファイルを処理
-}
-
-function removeBackground() {
-    // 画像ファイルをFormDataとして送信
-    var formData = new FormData();
-    formData.append('image', /* ドロップされた画像ファイル */);
-
-    fetch('/imageapp/remove-background/', {
-        method: 'POST',
-        body: formData
-    }).then(response => response.json())
-      .then(data => {
-          // 処理された画像を表示
-          // ダウンロードとキャンセルのボタンを表示
-      }).catch(error => console.error(error));
-}
-
-// ユーザーがドラッグ＆ドロップで画像をアップロードする際の処理を具体化
-
-function handleDrop(e) {
-    e.stopPropagation();
-    e.preventDefault();
-
     var files = e.dataTransfer.files;
     if (files.length > 0) {
-        var file = files[0];
-        if (file.type.match('image.*')) {
-            var formData = new FormData();
-            formData.append('image', file);
-            removeBackground(formData);
-        }
+        document.getElementById('file_input').files = files;
+        removeBackground(files[0]);
     }
 }
 
-// サーバーからのレスポンスを処理
+function removeBackground(file) {
+    if (!file.type.match('image.*')) {
+        alert('画像ファイルを選択してください。');
+        return;
+    }
 
-function removeBackground(formData) {
-    fetch('/imageapp/remove-background/', {
+    var formData = new FormData();
+    formData.append('image', file);
+
+    fetch('remove-background/', {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrftoken
+        }
     })
+    .then(handleErrors)
     .then(response => response.json())
     .then(data => {
         var outputImage = document.getElementById('output_image');
@@ -55,10 +66,11 @@ function removeBackground(formData) {
         document.getElementById('download_button').style.display = 'block';
         document.getElementById('cancel_button').style.display = 'block';
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        alert('エラーが発生しました。画像の背景を削除できませんでした。');
+    });
 }
-
-// ダウンロードボタンにイベントリスナーを追加し、処理された画像をダウンロードする機能を実装
 
 document.getElementById('download_button').addEventListener('click', function() {
     var outputImage = document.getElementById('output_image').src;
@@ -70,36 +82,18 @@ document.getElementById('download_button').addEventListener('click', function() 
     document.body.removeChild(link);
 });
 
-// キャンセルボタンのイベントリスナーを追加し、処理をリセット
-
 document.getElementById('cancel_button').addEventListener('click', function() {
-    document.getElementById('output_image').style.display = 'none';
+    var outputImage = document.getElementById('output_image');
+    outputImage.style.display = 'none';
+    outputImage.src = '';
     document.getElementById('download_button').style.display = 'none';
     document.getElementById('cancel_button').style.display = 'none';
+    document.getElementById('file_input').value = '';
 });
-
-// アップロードや処理の際に発生する可能性のあるエラーを適切にハンドリング
-// 例えば、ネットワークエラーやサーバーのレスポンスエラーに対してユーザーに通知
 
 function handleErrors(response) {
     if (!response.ok) {
         throw Error(response.statusText);
     }
     return response;
-}
-
-function removeBackground(formData) {
-    fetch('/imageapp/remove-background/', {
-        method: 'POST',
-        body: formData
-    })
-    .then(handleErrors)
-    .then(response => response.json())
-    .then(data => {
-        // 成功時の処理
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('エラーが発生しました。');
-    });
 }

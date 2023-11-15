@@ -16,9 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from . import views
+from .views import index, remove_background
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('remove_background/', views.remove_background, name='remove_background'),
+    path('', index, name='index'),
+    path('remove-background/', remove_background, name='remove_background'),
 ]
