@@ -4,6 +4,10 @@ from django.views.decorators.csrf import csrf_exempt
 from rembg import remove
 import io
 from PIL import Image
+from django.shortcuts import render
+
+def index(request):
+    return render(request, 'index.html')
 
 @csrf_exempt
 def remove_background(request):
@@ -24,3 +28,4 @@ def remove_background(request):
         return JsonResponse({'image': img_byte_arr})
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
+    

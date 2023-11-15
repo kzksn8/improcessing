@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>Image Background Remover</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
     <div id="drop_zone">ここに画像をドロップ</div>
@@ -12,6 +12,6 @@
     <img id="output_image" style="display:none;">
     <button id="download_button" style="display:none;">ダウンロード</button>
     <button id="cancel_button" style="display:none;">キャンセル</button>
-    <script src="script.js"></script>
+    <script src="{% static 'script.js' %}"></script>
 </body>
 </html>
