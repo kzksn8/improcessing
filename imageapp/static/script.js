@@ -17,36 +17,30 @@ function getCookie(name) {
 // CSRFトークンを取得
 const csrftoken = getCookie('csrftoken');
 
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('drop_zone').addEventListener('dragover', handleDragOver, false);
-    document.getElementById('drop_zone').addEventListener('drop', handleDrop, false);
-    document.getElementById('remove_bg_button').addEventListener('click', function() {
-        removeBackground(document.getElementById('file_input').files[0]);
-    }, false);
-});
-
+// ドラッグオーバー時のデフォルト処理を無効化
 function handleDragOver(e) {
     e.stopPropagation();
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy';
+    e.dataTransfer.dropEffect = 'copy'; // ドラッグされたデータがコピーされることを示す
 }
 
+// ドロップ時の処理
 function handleDrop(e) {
     e.stopPropagation();
     e.preventDefault();
     var files = e.dataTransfer.files;
     if (files.length > 0) {
-        document.getElementById('file_input').files = files;
-        removeBackground(files[0]);
+        var file = files[0];
+        if (file.type.match('image.*')) {
+            removeBackground(file);
+        } else {
+            alert('画像ファイルを選択してください。');
+        }
     }
 }
 
+// バックグラウンドを削除する関数
 function removeBackground(file) {
-    if (!file.type.match('image.*')) {
-        alert('画像ファイルを選択してください。');
-        return;
-    }
-
     var formData = new FormData();
     formData.append('image', file);
 
@@ -60,11 +54,7 @@ function removeBackground(file) {
     .then(handleErrors)
     .then(response => response.json())
     .then(data => {
-        var outputImage = document.getElementById('output_image');
-        outputImage.src = 'data:image/png;base64,' + data.image;
-        outputImage.style.display = 'block';
-        document.getElementById('download_button').style.display = 'block';
-        document.getElementById('cancel_button').style.display = 'block';
+        triggerDownload(data.image); // ダウンロードを開始する
     })
     .catch(error => {
         console.error('Error:', error);
@@ -72,28 +62,27 @@ function removeBackground(file) {
     });
 }
 
-document.getElementById('download_button').addEventListener('click', function() {
-    var outputImage = document.getElementById('output_image').src;
-    var link = document.createElement('a');
-    link.href = outputImage;
-    link.download = 'processed_image.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-});
-
-document.getElementById('cancel_button').addEventListener('click', function() {
-    var outputImage = document.getElementById('output_image');
-    outputImage.style.display = 'none';
-    outputImage.src = '';
-    document.getElementById('download_button').style.display = 'none';
-    document.getElementById('cancel_button').style.display = 'none';
-    document.getElementById('file_input').value = '';
-});
-
+// エラーハンドリング関数
 function handleErrors(response) {
     if (!response.ok) {
         throw Error(response.statusText);
     }
     return response;
 }
+
+// Base64エンコードされた画像データをダウンロードする関数
+function triggerDownload(base64Data) {
+    var link = document.createElement('a');
+    link.href = 'data:image/png;base64,' + base64Data;
+    link.download = 'processed_image.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// イベントリスナーを設定
+document.addEventListener('DOMContentLoaded', function () {
+    var dropZone = document.getElementById('drop_zone');
+    dropZone.addEventListener('dragover', handleDragOver, false);
+    dropZone.addEventListener('drop', handleDrop, false);
+});
