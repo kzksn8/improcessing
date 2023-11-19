@@ -1,8 +1,24 @@
-#drop_zone {
+/* #drop_zone {
     border: 2px dashed #ccc;
     padding: 20px;
     text-align: center;
-}
+} */
+
+#drop_zone {
+    width: 300px;  /* 横幅を300ピクセルに設定 */
+    height: 200px; /* 縦幅を200ピクセルに設定 */
+    border: 2px dashed #ccc; /* 枠線を点線で表示 */
+    border-radius: 5px; /* 角を丸くする */
+    display: flex;
+    align-items: center; /* 中央に内容を配置 */
+    justify-content: center; /* 中央に内容を配置 */
+    text-align: center;
+    cursor: pointer; /* カーソルをポインターに変更 */
+  }
+
+  #drop_zone:hover {
+    border-color: #333; /* ホバー時の枠線の色を変更 */
+  }
 
 button {
     margin: 10px;
