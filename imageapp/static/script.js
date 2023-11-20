@@ -29,17 +29,31 @@ function handleDrop(e) {
     e.stopPropagation();
     e.preventDefault();
     var files = e.dataTransfer.files;
-    if (files.length > 0) {
+
+    // ファイルが1つのみであることを確認
+    if (files.length === 1) {
         var file = files[0];
         if (file.type.match('image.*')) {
-            // ファイルをフォームに設定し、「背景削除」ボタンを表示
+            // ファイルをフォームに設定し、「背景削除」ボタンと「リセット」ボタンを表示
             document.getElementById('file_input').files = files;
             document.getElementById('remove_bg_button').style.display = 'block';
-            document.getElementById('cancel_button').style.display = 'block'; // 「キャンセル」ボタンも表示
+            document.getElementById('cancel_button').style.display = 'block';
         } else {
             alert('画像ファイルを選択してください。');
         }
+    } else {
+        // 複数のファイルがドロップされた場合の処理
+        alert('アップロードできる画像は1つのみです。');
+        resetForm();
     }
+}
+
+// フォームをリセットする関数
+function resetForm() {
+    document.getElementById('file_input').value = '';
+    document.getElementById('remove_bg_button').style.display = 'none';
+    document.getElementById('download_button').style.display = 'none';
+    document.getElementById('cancel_button').style.display = 'none';
 }
 
 // '背景削除' ボタンクリック時の処理
@@ -67,7 +81,7 @@ function removeBackground(file) {
     .then(data => {
         // 画像データをグローバル変数に保存
         window.processedImage = data.image;
-        // ここで 'ダウンロード' ボタンと 'キャンセル' ボタンを表示
+        // ここで 'ダウンロード' ボタンと 'リセット' ボタンを表示
         document.getElementById('download_button').style.display = 'block';
         document.getElementById('cancel_button').style.display = 'block';
     })
@@ -94,12 +108,11 @@ document.getElementById('cancel_button').addEventListener('click', function() {
     }
     // ファイル入力をリセット
     document.getElementById('file_input').value = '';
-    // 'ダウンロード' と 'キャンセル' ボタンを非表示にする
+    // 'ダウンロード' と 'リセット' ボタンを非表示にする
     document.getElementById('remove_bg_button').style.display = 'none';
     document.getElementById('download_button').style.display = 'none';
     document.getElementById('cancel_button').style.display = 'none';
     // '背景削除' ボタンは表示されたままにする
-    // document.getElementById('remove_bg_button').style.display = 'block'; ← この行を削除
     // グローバル変数をクリアする
     window.processedImage = undefined;
 });
@@ -140,8 +153,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (this.files && this.files[0]) {
             var file = this.files[0];
             if (file.type.match('image.*')) {
+                // ファイルをフォームに設定し、ボタンを表示
                 document.getElementById('remove_bg_button').style.display = 'block';
-                removeBackground(file);
+                document.getElementById('cancel_button').style.display = 'block';
+                // ここで removeBackground を呼び出さない
             } else {
                 alert('画像ファイルを選択してください。');
             }
