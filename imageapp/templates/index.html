@@ -6,7 +6,26 @@
     <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
-    {% comment %} <div id="drop_zone">ここに画像をドロップ</div> {% endcomment %}
+    <header>
+        <div class="top-nav">
+            <div class="logo">remove<span>bg</span></div>
+            <nav>
+                <a href="#home" class="active">ホーム</a>
+                <a href="#how-to-use">使用方法</a>
+                <a href="#tools-api">ツール & API</a>
+                <a href="#pricing">価格</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>写真・画像の背景を一括で消去</h1>
+            <p>100%自動かつ無料</p>
+            <button id="upload_button" class="upload-btn">画像アップロード</button>
+        </section>
+    </main>
+
     <div id="drop_zone">
         画像をドラッグ＆ドロップ<br>
         または<br>
@@ -18,5 +37,6 @@
     <button id="download_button" style="display:none;">ダウンロード</button>
     <button id="cancel_button" style="display:none;">リセット</button>
     <script src="{% static 'script.js' %}"></script>
+
 </body>
 </html>

@@ -163,3 +163,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+// 既存のスクリプトに追加
+document.getElementById('upload_button').addEventListener('click', function() {
+    // ファイル選択ダイアログを開く
+    document.getElementById('file_input').click();
+});
