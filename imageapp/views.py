@@ -1,11 +1,10 @@
+import io
+from PIL import Image
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rembg import remove
 from base64 import b64encode
-import io
-from PIL import Image
-
 
 def index(request):
     return render(request, 'index.html')

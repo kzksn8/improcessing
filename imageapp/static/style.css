@@ -1,23 +1,19 @@
 #drop_zone {
-    width: 300px;  /* 横幅を300ピクセルに設定 */
-    height: 200px; /* 縦幅を200ピクセルに設定 */
-    border: 2px dashed #ccc; /* 枠線を点線で表示 */
-    border-radius: 5px; /* 角を丸くする */
+    width: 400px;
+    height: 200px;
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    margin: 20px auto;
     display: flex;
-    align-items: center; /* 中央に内容を配置 */
-    justify-content: center; /* 中央に内容を配置 */
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    cursor: pointer; /* カーソルをポインターに変更 */
+    cursor: pointer;
   }
 
   #drop_zone:hover {
-    border-color: #333; /* ホバー時の枠線の色を変更 */
+    border-color: #333;
   }
-
-button {
-    margin: 10px;
-    padding: 10px;
-}
 
 body, h1, p {
   margin: 0;
@@ -39,31 +35,33 @@ body, h1, p {
 }
 
 .top-nav nav a {
+  /* font-weight: bold; */
   text-decoration: none;
-  margin-left: 16px;
+  margin-left: 30px;
   color: #333;
-  font-weight: bold;
 }
 
 .top-nav nav a.active {
   color: #5B3EBC;
 }
 
-.hero {
+.removebackground {
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: 50px 20px;
 }
 
-.hero h1 {
+.removebackground h1 {
   font-size: 2em;
   color: #333;
 }
 
-.hero p {
+.removebackground p {
   margin-bottom: 20px;
 }
 
-.upload-btn {
+/* .upload_btn {
   background-color: #5B3EBC;
   color: white;
   border: none;
@@ -72,6 +70,48 @@ body, h1, p {
   cursor: pointer;
 }
 
-.upload-btn:hover {
+.upload_btn:hover {
+  background-color: #4a31ad;
+} */
+
+.removebg_btn {
+  background-color: #5B3EBC;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 20px auto;
+}
+
+.removebg_btn:hover {
+  background-color: #4a31ad;
+}
+
+.download_btn {
+  background-color: #5B3EBC;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 20px auto;
+}
+
+.download_btn:hover {
+  background-color: #4a31ad;
+}
+
+.cancel_btn {
+  background-color: #5B3EBC;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 20px auto;
+}
+
+.cancel_btn:hover {
   background-color: #4a31ad;
 }

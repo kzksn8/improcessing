@@ -17,12 +17,54 @@ function getCookie(name) {
 // CSRFトークンを取得
 const csrftoken = getCookie('csrftoken');
 
+// ページが読み込まれたらイベントリスナーを設定
+document.addEventListener('DOMContentLoaded', function() {
+    // すべてのナビゲーションリンクを取得
+    var navLinks = document.querySelectorAll('nav a');
+    // リンクごとにクリックイベントリスナーを設定
+    navLinks.forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            // 既定のアクションをキャンセル
+            event.preventDefault();
+            
+            // セクションを非表示に
+            document.querySelector('.removebackground').style.display = 'none';
+            // 背景削除タブがクリックされた場合にのみセクションを表示
+            if (this.getAttribute('href') === '#home') {
+                document.querySelector('.removebackground').style.display = 'block';
+            }
+
+
+        });
+    });
+});
+
+// // 画像アップロードボタンのイベントリスナーを設定
+// document.getElementById('upload_button').addEventListener('click', function() {
+//     // ファイル選択ダイアログを開く
+//     document.getElementById('file_input').click();
+// });
+
 // ドラッグオーバー時のデフォルト処理を無効化
 function handleDragOver(e) {
     e.stopPropagation();
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy'; // ドラッグされたデータがコピーされることを示す
+    e.dataTransfer.dropEffect = 'copy'; // ドラッグされたデータがコピーされる
 }
+
+// ドラッグ&ドロップゾーンのイベントリスナーを設定
+document.addEventListener('DOMContentLoaded', function () {
+    var dropZone = document.getElementById('drop_zone');
+    var fileInput = document.getElementById('file_input');
+
+    dropZone.addEventListener('dragover', handleDragOver, false);
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    // ドラッグ＆ドロップゾーンがクリックされたときにファイル入力を開く
+    dropZone.addEventListener('click', function() {
+        fileInput.click();
+    });
+});
 
 // ドロップ時の処理
 function handleDrop(e) {
@@ -36,7 +78,7 @@ function handleDrop(e) {
         if (file.type.match('image.*')) {
             // ファイルをフォームに設定し、「背景削除」ボタンと「リセット」ボタンを表示
             document.getElementById('file_input').files = files;
-            document.getElementById('remove_bg_button').style.display = 'block';
+            document.getElementById('removebg_button').style.display = 'block';
             document.getElementById('cancel_button').style.display = 'block';
         } else {
             alert('画像ファイルを選択してください。');
@@ -51,13 +93,13 @@ function handleDrop(e) {
 // フォームをリセットする関数
 function resetForm() {
     document.getElementById('file_input').value = '';
-    document.getElementById('remove_bg_button').style.display = 'none';
+    document.getElementById('removebg_button').style.display = 'none';
     document.getElementById('download_button').style.display = 'none';
     document.getElementById('cancel_button').style.display = 'none';
 }
 
 // '背景削除' ボタンクリック時の処理
-document.getElementById('remove_bg_button').addEventListener('click', function() {
+document.getElementById('removebg_button').addEventListener('click', function() {
     var file = document.getElementById('file_input').files[0];
     if (file) {
         removeBackground(file);
@@ -108,11 +150,10 @@ document.getElementById('cancel_button').addEventListener('click', function() {
     }
     // ファイル入力をリセット
     document.getElementById('file_input').value = '';
-    // 'ダウンロード' と 'リセット' ボタンを非表示にする
-    document.getElementById('remove_bg_button').style.display = 'none';
+    // ボタンを非表示にする
+    document.getElementById('removebg_button').style.display = 'none';
     document.getElementById('download_button').style.display = 'none';
     document.getElementById('cancel_button').style.display = 'none';
-    // '背景削除' ボタンは表示されたままにする
     // グローバル変数をクリアする
     window.processedImage = undefined;
 });
@@ -134,38 +175,3 @@ function triggerDownload(base64Data) {
     link.click();
     document.body.removeChild(link);
 }
-
-// イベントリスナーを設定
-document.addEventListener('DOMContentLoaded', function () {
-    var dropZone = document.getElementById('drop_zone');
-    var fileInput = document.getElementById('file_input');
-
-    dropZone.addEventListener('dragover', handleDragOver, false);
-    dropZone.addEventListener('drop', handleDrop, false);
-
-    // ドラッグ＆ドロップゾーンがクリックされたときにファイル入力を開く
-    dropZone.addEventListener('click', function() {
-        fileInput.click();
-    });
-
-    // ファイル入力要素の変更イベントを処理する
-    fileInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            var file = this.files[0];
-            if (file.type.match('image.*')) {
-                // ファイルをフォームに設定し、ボタンを表示
-                document.getElementById('remove_bg_button').style.display = 'block';
-                document.getElementById('cancel_button').style.display = 'block';
-                // ここで removeBackground を呼び出さない
-            } else {
-                alert('画像ファイルを選択してください。');
-            }
-        }
-    });
-});
-
-// 既存のスクリプトに追加
-document.getElementById('upload_button').addEventListener('click', function() {
-    // ファイル選択ダイアログを開く
-    document.getElementById('file_input').click();
-});
