@@ -17,6 +17,20 @@ function getCookie(name) {
 // CSRFトークンを取得
 const csrftoken = getCookie('csrftoken');
 
+// タブを切り替える関数
+function changeTab(targetId) {
+    var i, tabcontents;
+    
+    // 全てのタブコンテンツを非表示にする
+    tabcontents = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabcontents.length; i++) {
+        tabcontents[i].style.display = "none";
+    }
+
+    // 選択されたタブのコンテンツを表示する
+    document.getElementById(targetId).style.display = "block";
+}
+
 // ページが読み込まれたらイベントリスナーを設定
 document.addEventListener('DOMContentLoaded', function() {
     // すべてのナビゲーションリンクを取得
@@ -24,17 +38,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // リンクごとにクリックイベントリスナーを設定
     navLinks.forEach(function(link) {
         link.addEventListener('click', function(event) {
-            // 既定のアクションをキャンセル
-            event.preventDefault();
-            
-            // セクションを非表示に
-            document.querySelector('.removebackground').style.display = 'none';
-            // ホームタブがクリックされた場合にのみセクションを表示
-            if (this.getAttribute('href') === '#home') {
-                document.querySelector('.removebackground').style.display = 'block';
-            }
+            event.preventDefault(); // ページ遷移を防ぐ
+            var targetId = this.getAttribute('data-target'); // data-target属性からIDを取得
+            changeTab(targetId); // タブを切り替える
         });
     });
+
+    // ページ読み込み時にホームタブを表示する
+    changeTab('home');
 });
 
 // // 画像アップロードボタンのイベントリスナーを設定
@@ -71,6 +82,12 @@ function handleDrop(e) {
     } else {
         alert('アップロードできる画像は1つのみです。');
     }
+
+    // ドロップゾーンと'ダウンロード'を非表示、'背景削除'と'リセット'を表示
+    document.getElementById('drop_zone').style.display = 'none';
+    document.getElementById('removebg_button').style.display = 'block';
+    document.getElementById('cancel_button').style.display = 'block';
+    document.getElementById('download_button').style.display = 'none';
 }
 
 // クリック時の処理
@@ -80,15 +97,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ドラッグオーバー時のデフォルト処理を無効化
     dropZone.addEventListener('dragover', handleDragOver, false);
-
     // ドロップ時の処理
     dropZone.addEventListener('drop', handleDrop, false);
-
     // ドラッグ＆ドロップゾーンがクリックされたときにファイル入力を開く
     dropZone.addEventListener('click', function() {
         fileInput.click();
     });
-
     // ファイル入力要素の変更イベントを処理する
     fileInput.addEventListener('change', function(e) {
         // ファイルが選択されたときの処理
@@ -108,6 +122,12 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('アップロードできる画像は1つのみです。');
             resetForm();
         }
+
+        // ドロップゾーンと'ダウンロード'を非表示、'背景削除'と'リセット'を表示
+        document.getElementById('drop_zone').style.display = 'none';
+        document.getElementById('removebg_button').style.display = 'block';
+        document.getElementById('cancel_button').style.display = 'block';
+        document.getElementById('download_button').style.display = 'none';
     });
 });
 
@@ -144,9 +164,11 @@ function removeBackground(file) {
     .then(data => {
         // 画像データをグローバル変数に保存
         window.processedImage = data.image;
-        // ここで 'ダウンロード' ボタンと 'リセット' ボタンを表示
+
+        // 'ダウンロード' と 'リセット' を表示 '背景削除' を非表示
         document.getElementById('download_button').style.display = 'block';
         document.getElementById('cancel_button').style.display = 'block';
+        document.getElementById('removebg_button').style.display = 'none';
     })
     .catch(error => {
         console.error('Error:', error);
@@ -154,29 +176,43 @@ function removeBackground(file) {
     });
 }
 
-// 'ダウンロード' ボタンクリック時の処理
-document.getElementById('download_button').addEventListener('click', function() {
-    if (window.processedImage) {
-        triggerDownload(window.processedImage); // ここでダウンロードを開始
-    }
-});
-
-// 'キャンセル' ボタンクリック時の処理
-document.getElementById('cancel_button').addEventListener('click', function() {
+function resetToInitialState() {
     // 画像プレビューを非表示にする
     var outputImage = document.getElementById('output_image');
     if (outputImage) {
         outputImage.style.display = 'none';
         outputImage.src = '';
     }
+
     // ファイル入力をリセット
     document.getElementById('file_input').value = '';
-    // ボタンを非表示にする
+
+    // ドロップゾーンを初期状態に戻す
+    var dropZone = document.getElementById('drop_zone');
+    dropZone.style.display = 'flex';
+
+    // その他のボタンを非表示に
     document.getElementById('removebg_button').style.display = 'none';
     document.getElementById('download_button').style.display = 'none';
     document.getElementById('cancel_button').style.display = 'none';
+
     // グローバル変数をクリアする
     window.processedImage = undefined;
+}
+
+// 'ダウンロード' ボタンクリック時の処理
+document.getElementById('download_button').addEventListener('click', function() {
+    if (window.processedImage) {
+        triggerDownload(window.processedImage); // ここでダウンロードを開始
+    }
+    // ファイル入力をリセットし、初期状態に戻す
+    resetToInitialState();
+});
+
+// 'リセット' ボタンクリック時の処理
+document.getElementById('cancel_button').addEventListener('click', function() {
+    // ファイル入力をリセットし、初期状態に戻す
+    resetToInitialState();
 });
 
 // エラーハンドリング関数

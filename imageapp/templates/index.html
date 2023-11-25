@@ -1,33 +1,41 @@
-{% load static %}<!DOCTYPE html>
-<html lang="ja">
+{% load static %}
+<!DOCTYPE html>
 
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>Image Background Remover</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
+    <!-- ここに追加のスタイルを記述するか、style.cssに追加 -->
+    <style>
+    .tab-content {
+        display: none; /* すべてのタブコンテンツを初期状態で非表示に */
+    }
+    </style>
 </head>
-
 <body>
-
     <header>
         <div class="top-nav" style="text-align: left;">
             <nav>
-                <a class="logo" href="#home">removebg</a>
-                <a href="#removebg">背景削除</a>
-                <a href="#grayscale">グレースケール化</a>
-                <a href="#binarize">白黒化(二値化)</a>
+                <a href="#home" data-target="home" class="logo" >removebg</a>
+                <a href="#removebg" data-target="removebg">背景削除</a>
+                <a href="#grayscale" data-target="grayscale">グレースケール化</a>
+                <a href="#binarize" data-target="binarize">白黒化(二値化)</a>
             </nav>
         </div>
     </header>
 
-    <main>
-
-        <!-- ホームセクション -->
-        <section class="removebackground">
-            <h1>写真・画像の背景を一括で消去</h1>
-            <p>100%自動かつ無料</p>
+<main>
+    <section id="home" class="tab-content home">
+        <h1>ホーム画面</h1>
+        <p>ホーム画面</p>
+    </section>
+    
+    <section id="removebg" class="tab-content removebg">
+        <h1>写真・画像の背景を一括で消去</h1>
+        <p>100%自動かつ無料</p>
             {% comment %} <button id="upload_button" class="upload_btn">画像アップロード</button> {% endcomment %}
-            <div id="drop_zone">
+            <div id="drop_zone" class="drag_drop">
                 画像をドラッグ＆ドロップ<br>
                 または<br>
                 クリックで画像選択
@@ -40,20 +48,16 @@
             <script src="{% static 'script.js' %}"></script>
         </section>
 
-        <!--
-        <section id="removebg">
-            背景削除の内容
+        <section id="grayscale" class="tab-content grayscale">
+            <h1>グレースケール</h1>
+            <p>グレースケール</p>
         </section>
-        <section id="grayscale">
-            グレースケール化の内容
+        
+        <section id="binarize" class="tab-content binarize">
+            <h1>白黒</h1>
+            <p>白黒</p>
         </section>
-        <section id="binarize">
-            白黒化の内容
-        </section>
-        -->
-
     </main>
-
+    <script src="{% static 'script.js' %}"></script>
 </body>
-
 </html>

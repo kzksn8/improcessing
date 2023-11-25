@@ -1,24 +1,15 @@
-#drop_zone {
-    width: 400px;
-    height: 200px;
-    border: 2px dashed #ccc;
-    border-radius: 5px;
-    margin: 20px auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer;
-  }
-
-  #drop_zone:hover {
-    border-color: #333;
-  }
+/* ========================================== */
 
 body, h1, p {
   margin: 0;
   padding: 0;
 }
+
+.tab-content {
+  display: none; /* 最初は全てのタブコンテンツを非表示に */
+}
+
+/* ========================================== */
 
 .top-nav {
   background-color: #fff;
@@ -45,20 +36,95 @@ body, h1, p {
   color: #5B3EBC;
 }
 
-.removebackground {
+/* ========================================== */
+
+.home {
   align-items: center;
   justify-content: center;
   text-align: center;
   padding: 50px 20px;
 }
 
-.removebackground h1 {
+.home h1 {
   font-size: 2em;
   color: #333;
 }
 
-.removebackground p {
+.home p {
   margin-bottom: 20px;
+}
+
+/* ========================================== */
+
+.removebg {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.removebg h1 {
+  font-size: 2em;
+  color: #333;
+}
+
+.removebg p {
+  margin-bottom: 20px;
+}
+
+/* ========================================== */
+
+.grayscale {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.grayscale h1 {
+  font-size: 2em;
+  color: #333;
+}
+
+.grayscale p {
+  margin-bottom: 20px;
+}
+
+/* ========================================== */
+
+.binarize {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.binarize h1 {
+  font-size: 2em;
+  color: #333;
+}
+
+.binarize p {
+  margin-bottom: 20px;
+}
+
+/* ========================================== */
+
+.drag_drop {
+  width: 400px;
+  height: 200px;
+  border: 2px dashed #ccc;
+  border-radius: 5px;
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.drag_drop:hover {
+  border-color: #333;
 }
 
 /* .upload_btn {
@@ -73,6 +139,8 @@ body, h1, p {
 .upload_btn:hover {
   background-color: #4a31ad;
 } */
+
+/* ========================================== */
 
 .removebg_btn {
   background-color: #5B3EBC;
@@ -115,3 +183,5 @@ body, h1, p {
 .cancel_btn:hover {
   background-color: #4a31ad;
 }
+
+/* ========================================== */
