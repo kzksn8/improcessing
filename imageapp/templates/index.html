@@ -34,7 +34,7 @@
     <section id="removebg" class="tab-content removebg">
         <h1>写真・画像の背景を一括で消去</h1>
         <p>100%自動かつ無料</p>
-            {% comment %} <button id="upload_button" class="upload_btn">画像アップロード</button> {% endcomment %}
+            <button id="upload_button" class="upload_btn">画像アップロード</button>
             <div id="drop_zone" class="drag_drop">
                 画像をドラッグ＆ドロップ<br>
                 または<br>
@@ -43,6 +43,7 @@
             <input type="file" id="file_input" style="display: none;" />
             <img id="output_image" style="display:none;">
             <button id="removebg_button" class="removebg_btn" style="display:none;">背景削除</button>
+            <button id="processing_button" class="processing_btn" style="display:none;">処理中...</button>
             <button id="download_button" class="download_btn" style="display:none;">ダウンロード</button>
             <button id="cancel_button" class="cancel_btn" style="display:none;">リセット</button>
             <script src="{% static 'script.js' %}"></script>

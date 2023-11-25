@@ -48,11 +48,11 @@ document.addEventListener('DOMContentLoaded', function() {
     changeTab('home');
 });
 
-// // 画像アップロードボタンのイベントリスナーを設定
-// document.getElementById('upload_button').addEventListener('click', function() {
-//     // ファイル選択ダイアログを開く
-//     document.getElementById('file_input').click();
-// });
+// 画像アップロードボタンのイベントリスナーを設定
+document.getElementById('upload_button').addEventListener('click', function() {
+    // ファイル選択ダイアログを開く
+    document.getElementById('file_input').click();
+});
 
 // ドラッグオーバー時のデフォルト処理を無効化
 function handleDragOver(e) {
@@ -73,6 +73,8 @@ function handleDrop(e) {
         if (file.type.match('image.*')) {
             // ファイルをフォームに設定
             document.getElementById('file_input').files = files;
+            // 'アップロード'ボタンを非表示
+            document.getElementById('upload_button').style.display = 'none';
             // '背景削除'ボタンと'リセット'ボタンを表示
             document.getElementById('removebg_button').style.display = 'block';
             document.getElementById('cancel_button').style.display = 'block';
@@ -83,7 +85,8 @@ function handleDrop(e) {
         alert('アップロードできる画像は1つのみです。');
     }
 
-    // ドロップゾーンと'ダウンロード'を非表示、'背景削除'と'リセット'を表示
+    // 'アップロード'と'ドロップゾーン'と'ダウンロード'を非表示、'背景削除'と'リセット'を表示
+    document.getElementById('upload_button').style.display = 'none';
     document.getElementById('drop_zone').style.display = 'none';
     document.getElementById('removebg_button').style.display = 'block';
     document.getElementById('cancel_button').style.display = 'block';
@@ -112,6 +115,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (files.length === 1) {
             var file = files[0];
             if (file.type.match('image.*')) {
+                // 'アップロード'ボタンを非表示
+                document.getElementById('upload_button').style.display = 'none';
                 // ファイルをフォームに設定し、「背景削除」ボタンと「リセット」ボタンを表示
                 document.getElementById('removebg_button').style.display = 'block';
                 document.getElementById('cancel_button').style.display = 'block';
@@ -123,11 +128,12 @@ document.addEventListener('DOMContentLoaded', function () {
             resetForm();
         }
 
-        // ドロップゾーンと'ダウンロード'を非表示、'背景削除'と'リセット'を表示
-        document.getElementById('drop_zone').style.display = 'none';
-        document.getElementById('removebg_button').style.display = 'block';
-        document.getElementById('cancel_button').style.display = 'block';
-        document.getElementById('download_button').style.display = 'none';
+    // 'アップロード'と'ドロップゾーン'と'ダウンロード'を非表示、'背景削除'と'リセット'を表示
+    document.getElementById('upload_button').style.display = 'none';
+    document.getElementById('drop_zone').style.display = 'none';
+    document.getElementById('removebg_button').style.display = 'block';
+    document.getElementById('cancel_button').style.display = 'block';
+    document.getElementById('download_button').style.display = 'none';
     });
 });
 
@@ -143,6 +149,11 @@ function resetForm() {
 document.getElementById('removebg_button').addEventListener('click', function() {
     var file = document.getElementById('file_input').files[0];
     if (file) {
+        // '背景削除'・'リセット'を非表示にし、「処理中...」ボタンを表示
+        document.getElementById('removebg_button').style.display = 'none';
+        document.getElementById('cancel_button').style.display = 'none';
+        document.getElementById('processing_button').style.display = 'block';
+
         removeBackground(file);
     }
 });
@@ -162,13 +173,13 @@ function removeBackground(file) {
     .then(handleErrors)
     .then(response => response.json())
     .then(data => {
-        // 画像データをグローバル変数に保存
-        window.processedImage = data.image;
-
-        // 'ダウンロード' と 'リセット' を表示 '背景削除' を非表示
+        // 画像処理が完了したら、「処理中...」ボタンを非表示にし、「ダウンロード」「リセット」ボタンを表示
+        document.getElementById('processing_button').style.display = 'none';
         document.getElementById('download_button').style.display = 'block';
         document.getElementById('cancel_button').style.display = 'block';
-        document.getElementById('removebg_button').style.display = 'none';
+
+        // 画像データをグローバル変数に保存
+        window.processedImage = data.image;
     })
     .catch(error => {
         console.error('Error:', error);
@@ -186,6 +197,9 @@ function resetToInitialState() {
 
     // ファイル入力をリセット
     document.getElementById('file_input').value = '';
+    
+    // 'アップロード'ボタンを表示
+    document.getElementById('upload_button').style.display = 'block';
 
     // ドロップゾーンを初期状態に戻す
     var dropZone = document.getElementById('drop_zone');
