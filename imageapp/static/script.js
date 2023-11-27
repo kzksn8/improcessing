@@ -83,6 +83,7 @@ function handleDrop(e) {
         }
     } else {
         alert('アップロードできる画像は1つのみです。');
+        resetForm();
     }
 
     // 'アップロード'と'ドロップゾーン'と'ダウンロード'を非表示、'背景削除'と'リセット'を表示
@@ -137,21 +138,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// フォームをリセットする関数
-function resetForm() {
-    document.getElementById('file_input').value = '';
-    document.getElementById('removebg_button').style.display = 'none';
-    document.getElementById('download_button').style.display = 'none';
-    document.getElementById('cancel_button').style.display = 'none';
-}
+// グローバル変数でAbortControllerの参照を保持
+let abortController;
 
 // '背景削除' ボタンクリック時の処理
 document.getElementById('removebg_button').addEventListener('click', function() {
     var file = document.getElementById('file_input').files[0];
     if (file) {
-        // '背景削除'・'リセット'を非表示にし、「処理中...」ボタンを表示
+        // 新しいAbortControllerインスタンスを生成
+        abortController = new AbortController();
+
+        // '背景削除'を非表示にし、「処理中...」ボタンを表示
         document.getElementById('removebg_button').style.display = 'none';
-        document.getElementById('cancel_button').style.display = 'none';
         document.getElementById('processing_button').style.display = 'block';
 
         removeBackground(file);
@@ -168,24 +166,48 @@ function removeBackground(file) {
         body: formData,
         headers: {
             'X-CSRFToken': csrftoken
-        }
+        },
+        signal: abortController.signal // AbortControllerを使用
     })
     .then(handleErrors)
     .then(response => response.json())
     .then(data => {
-        // 画像処理が完了したら、「処理中...」ボタンを非表示にし、「ダウンロード」「リセット」ボタンを表示
+        // 「処理中...」ボタンを非表示にし、「ダウンロード」ボタンを表示
         document.getElementById('processing_button').style.display = 'none';
         document.getElementById('download_button').style.display = 'block';
-        document.getElementById('cancel_button').style.display = 'block';
 
         // 画像データをグローバル変数に保存
         window.processedImage = data.image;
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('エラーが発生しました。画像の背景を削除できませんでした。');
+        // 省略（エラーハンドリング）
     });
-}
+};
+
+// 'ダウンロード' ボタンクリック時の処理
+document.getElementById('download_button').addEventListener('click', function() {
+    if (window.processedImage) {
+        // 'ダウンロード'ボタンを非表示にし、「ダウンロード中...」ボタンを表示
+        document.getElementById('download_button').style.display = 'none';
+        document.getElementById('downloading_button').style.display = 'block';
+
+        triggerDownload(window.processedImage); // ダウンロードを開始
+
+        // 少し遅延させてから初期状態にリセット（ダウンロードに時間がかかるため）
+        setTimeout(resetToInitialState, 2000);
+    }
+});
+
+// 'リセット' ボタンクリック時の処理
+document.getElementById('cancel_button').addEventListener('click', function() {
+    // 進行中のfetchリクエストを中断
+    if (abortController) {
+        abortController.abort();
+    }
+    
+    // 初期状態に戻す処理
+    resetToInitialState();
+});
 
 function resetToInitialState() {
     // 画像プレビューを非表示にする
@@ -195,39 +217,24 @@ function resetToInitialState() {
         outputImage.src = '';
     }
 
-    // ファイル入力をリセット
-    document.getElementById('file_input').value = '';
-    
-    // 'アップロード'ボタンを表示
-    document.getElementById('upload_button').style.display = 'block';
-
-    // ドロップゾーンを初期状態に戻す
-    var dropZone = document.getElementById('drop_zone');
-    dropZone.style.display = 'flex';
-
-    // その他のボタンを非表示に
-    document.getElementById('removebg_button').style.display = 'none';
-    document.getElementById('download_button').style.display = 'none';
-    document.getElementById('cancel_button').style.display = 'none';
+    resetForm();
 
     // グローバル変数をクリアする
     window.processedImage = undefined;
 }
 
-// 'ダウンロード' ボタンクリック時の処理
-document.getElementById('download_button').addEventListener('click', function() {
-    if (window.processedImage) {
-        triggerDownload(window.processedImage); // ここでダウンロードを開始
-    }
-    // ファイル入力をリセットし、初期状態に戻す
-    resetToInitialState();
-});
-
-// 'リセット' ボタンクリック時の処理
-document.getElementById('cancel_button').addEventListener('click', function() {
-    // ファイル入力をリセットし、初期状態に戻す
-    resetToInitialState();
-});
+// フォームをリセットする関数
+function resetForm() {
+    document.getElementById('file_input').value = '';// ファイル入力をリセット
+    document.getElementById('upload_button').style.display = 'block';
+    var dropZone = document.getElementById('drop_zone');
+    dropZone.style.display = 'flex';
+    document.getElementById('removebg_button').style.display = 'none';
+    document.getElementById('processing_button').style.display = 'none';
+    document.getElementById('download_button').style.display = 'none';
+    document.getElementById('downloading_button').style.display = 'none';
+    document.getElementById('cancel_button').style.display = 'none';
+}
 
 // エラーハンドリング関数
 function handleErrors(response) {
