@@ -14,11 +14,21 @@ const outputImage = document.getElementById('output_image');
 
 // タブを切り替える関数
 function changeTab(targetId) {
-    const tabcontents = document.getElementsByClassName("tab-content");
-    for (let tabcontent of tabcontents) {
+    // 全てのセクションを非表示にする
+    const tabs = document.getElementsByClassName("tab-content");
+    for (let tabcontent of tabs) {
         tabcontent.style.display = "none";
     }
-    document.getElementById(targetId).style.display = "block";
+    // アクティブなタブと対応するセクションを表示する
+    const activeTab = document.getElementById(targetId);
+    if (activeTab) {
+        activeTab.style.display = "block";
+    }
+    // 対応するright-sectionも表示する
+    const activeRightTab = document.getElementById(targetId.replace('-left', '-right'));
+    if (activeRightTab) {
+        activeRightTab.style.display = "block";
+    }
 }
 
 // ページ読み込み時の処理
@@ -26,11 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', (event) => {
             event.preventDefault();
-            changeTab(link.getAttribute('data-target'));
+            const targetId = link.getAttribute('data-target');
+            changeTab(targetId + '-left');
         });
     });
-    changeTab('home');
-
+    // デフォルトでホームタブを表示
+    changeTab('home-left');
     setupDragAndDrop();
 });
 
@@ -78,6 +89,7 @@ function toggleElements(show, ...elements) {
     });
 }
 
+// グローバル変数でAbortControllerの参照を保持
 let abortController;
 
 function startBackgroundRemoval(file) {
@@ -170,7 +182,7 @@ function handleErrors(response) {
     return response;
 }
 
-// クッキーから特定の名前の値を取得
+// クッキーから特定の名前の値を取得する関数
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
