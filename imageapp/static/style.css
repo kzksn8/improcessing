@@ -127,23 +127,9 @@ body, h1, p {
   border-color: #333;
 }
 
-.upload_btn {
-  background-color: #5B3EBC;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 20px auto;
-}
-
-.upload_btn:hover {
-  background-color: #4a31ad;
-}
-
 /* ========================================== */
 
-.removebg_btn {
+.purple_btn {
   background-color: #5B3EBC;
   color: white;
   border: none;
@@ -153,11 +139,11 @@ body, h1, p {
   margin: 20px auto;
 }
 
-.removebg_btn:hover {
+.purple_btn:hover {
   background-color: #4a31ad;
 }
 
-.processing_btn {
+.gray_btn {
   background-color: #a5a4a7;
   color: white;
   border: none;
@@ -167,50 +153,8 @@ body, h1, p {
   margin: 20px auto;
 }
 
-.processing_btn:hover {
+.gray_btn:hover {
   background-color: #a1a0a4;
-}
-
-.download_btn {
-  background-color: #5B3EBC;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 20px auto;
-}
-
-.download_btn:hover {
-  background-color: #4a31ad;
-}
-
-.downloading_btn {
-  background-color: #a5a4a7;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 20px auto;
-}
-
-.downloading_btn:hover {
-  background-color: #a1a0a4;
-}
-
-.cancel_btn {
-  background-color: #5B3EBC;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 20px auto;
-}
-
-.cancel_btn:hover {
-  background-color: #4a31ad;
 }
 
 /* ========================================== */
