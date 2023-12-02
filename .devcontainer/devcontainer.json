@@ -1,0 +1,21 @@
+{
+  "name": "Django Development - improcessing",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": { 
+    "python.pythonPath": "/usr/local/bin/python",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.formatting.autopep8Path": "/usr/local/py-utils/bin/autopep8",
+    "python.formatting.blackPath": "/usr/local/py-utils/bin/black"
+  },
+  "extensions": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "batisteo.vscode-django"
+  ],
+  "forwardPorts": [8000],
+  // "postCreateCommand": "python -m pip install -r /workspace/requirements.txt"
+  "postCreateCommand": "python -m pip install -r /requirements.txt"
+}
