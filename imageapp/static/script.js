@@ -74,12 +74,20 @@ function handleFileSelect(e) {
 }
 
 function processFiles(files) {
-    if (files.length === 1 && files[0].type.match('image.*')) {
-        fileInput.files = files;
-        toggleElements(false, uploadButton, dropZone);
-        toggleElements(true, removeBgButton, cancelButton);
+    if (files.length === 1) {
+        const fileType = files[0].type;
+
+        if (fileType === 'image/avif') {
+            alert('サポートされていないファイル形式です。別の画像ファイルを選択してください。');
+        } else if (fileType.match('image.*')) {
+            fileInput.files = files;
+            toggleElements(false, uploadButton, dropZone);
+            toggleElements(true, removeBgButton, cancelButton);
+        } else {
+            alert('サポートされていないファイル形式です。別の画像ファイルを選択してください。');
+        }
     } else {
-        alert('画像ファイルを選択してください。');
+        alert('アップロードできる画像は1つのみです。');
     }
 }
 
@@ -111,7 +119,7 @@ function removeBackground(file) {
         headers: {
             'X-CSRFToken': csrftoken
         },
-        signal: abortController.signal // AbortControllerを使用
+        signal: abortController.signal
     })
     .then(handleErrors)
     .then(response => response.json())
