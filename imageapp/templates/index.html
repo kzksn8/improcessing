@@ -19,9 +19,9 @@
         <div class="top-nav">
             <nav>
                 <a href="#home" data-target="home" class="logo">removebg</a>
+                <a href="#grayscale" data-target="grayscale">画像合成</a>
                 <a href="#removebg" data-target="removebg">背景削除</a>
-                <a href="#grayscale" data-target="grayscale">グレースケール化</a>
-                <a href="#binarize" data-target="binarize">白黒化(二値化)</a>
+                <a href="#binarize" data-target="binarize">Policy</a>
             </nav>
             <div class="login-signup">
                 <a href="#login-signup" data-target="login-signup">Login / Sign Up</a>
@@ -40,6 +40,16 @@
                 <h1>ホーム画面2</h1>
                 <p>ホーム画面2</p>
             </section>
+            
+            <section id="grayscale-left" class="tab-content left-section layout1">
+                <h1>画像合成1</h1>
+                <p>画像合成1</p>
+            </section>
+
+            <section id="grayscale-right" class="tab-content right-section layout1">
+                <h1>画像合成2</h1>
+                <p>画像合成2</p>
+            </section>
 
             <section id="removebg-left" class="tab-content left-section layout1">
                 <h1>背景削除</h1>
@@ -53,6 +63,14 @@
                 <div id="drop_zone" class="drag_drop">
                     画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
                 </div>
+
+                {% comment %} <div id="background_drop_zone" class="drag_drop2">
+                    背景画像をドロップ
+                </div>
+                <input type="file" id="background_file_input" hidden />
+                <button id="ok_button" onclick="createCompositeImage()">OK</button>
+                <div id="preview_area" style="position: relative;"></div> {% endcomment %}
+
                 <input type="file" id="file_input" style="display: none;" />
                 <img id="output_image" style="display:none;">
                 <button id="removebg_button" class="purple_btn" style="display:none;">背景削除</button>
@@ -62,24 +80,9 @@
                 <button id="cancel_button" class="purple_btn" style="display:none;">リセット</button>
             </section>
 
-            <section id="grayscale-left" class="tab-content left-section layout1">
-                <h1>グレースケール1</h1>
-                <p>グレースケール1</p>
-            </section>
-
-            <section id="grayscale-right" class="tab-content right-section layout1">
-                <h1>グレースケール2</h1>
-                <p>グレースケール2</p>
-            </section>
-
-            <section id="binarize-left" class="tab-content left-section layout1">
-                <h1>白黒1</h1>
-                <p>白黒1</p>
-            </section>
-
-            <section id="binarize-right" class="tab-content right-section layout1">
-                <h1>白黒2</h1>
-                <p>白黒2</p>
+            <section id="binarize-left" class="tab-content left-section2 layout1">
+                <h1>Policy</h1>
+                <p>Policy</p>
             </section>
         </div>
     </main>

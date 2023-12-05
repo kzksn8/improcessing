@@ -79,6 +79,10 @@ header {
   flex-basis: 50%;
 }
 
+.left-section2 {
+  flex-basis: 100%;
+}
+
 .right-section {
   flex-basis: 50%;
   padding-left: 400px;
@@ -120,6 +124,23 @@ header {
 .drag_drop:hover {
   border-color: #000000;
 }
+
+/* .drag_drop2 {
+  width: 400px;
+  height: 200px;
+  border: 2px dashed #b8b8b8;
+  border-radius: 5px;
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.drag_drop2:hover {
+  border-color: #000000;
+} */
 
 /* ========================================== */
 
