@@ -19,8 +19,8 @@
         <div class="top-nav">
             <nav>
                 <a href="#home" data-target="home" class="logo">removebg</a>
-                <a href="#grayscale" data-target="grayscale">画像合成</a>
                 <a href="#removebg" data-target="removebg">背景削除</a>
+                <a href="#grayscale" data-target="grayscale">画像合成</a>
                 <a href="#binarize" data-target="binarize">Policy</a>
             </nav>
             <div class="login-signup">
@@ -40,37 +40,13 @@
                 <h1>ホーム画面2</h1>
                 <p>ホーム画面2</p>
             </section>
-            
-            <section id="grayscale-left" class="tab-content left-section layout1">
-                <h1>画像合成1</h1>
-                <p>画像合成1</p>
-            </section>
-
-            <section id="grayscale-right" class="tab-content right-section layout1">
-                <h1>画像合成2</h1>
-                <p>画像合成2</p>
-            </section>
 
             <section id="removebg-left" class="tab-content left-section layout1">
-                <h1>背景削除</h1>
-                <p>背景削除</p>
-            </section>
-            
-            <section id="removebg-right" class="tab-content right-section layout1">
                 <h1>写真・画像の背景を一括で消去</h1>
                 <p>100%自動かつ無料</p>
                 <button id="upload_button" class="purple_btn">画像アップロード</button>
                 <div id="drop_zone" class="drag_drop">
-                    画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
-                </div>
-
-                {% comment %} <div id="background_drop_zone" class="drag_drop2">
-                    背景画像をドロップ
-                </div>
-                <input type="file" id="background_file_input" hidden />
-                <button id="ok_button" onclick="createCompositeImage()">OK</button>
-                <div id="preview_area" style="position: relative;"></div> {% endcomment %}
-
+                    画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択</div>
                 <input type="file" id="file_input" style="display: none;" />
                 <img id="output_image" style="display:none;">
                 <button id="removebg_button" class="purple_btn" style="display:none;">背景削除</button>
@@ -78,6 +54,25 @@
                 <button id="download_button" class="purple_btn" style="display:none;">ダウンロード</button>
                 <button id="downloading_button" class="gray_btn" style="display:none;">ダウンロード中...</button>
                 <button id="cancel_button" class="purple_btn" style="display:none;">リセット</button>
+            </section>
+            
+            <section id="removebg-right" class="tab-content right-section layout1">
+                <h1>背景削除</h1>
+                <p>背景削除</p>
+            </section>
+
+            <section id="grayscale-left" class="tab-content left-section layout1">
+                <h1>画像合成1</h1>
+                <p>画像合成1</p>
+                <div id="background-drop-zone" class="drag_drop">背景画像をドロップ</div>
+                <div id="foreground-drop-zone" class="drag_drop">前景画像をドロップ</div>
+                <div id="preview-area"></div>
+                <button id="download-composite" class="purple_btn" style="display:none;">ダウンロード</button>
+            </section>
+
+            <section id="grayscale-right" class="tab-content right-section layout1">
+                <h1>画像合成2</h1>
+                <p>画像合成2</p>
             </section>
 
             <section id="binarize-left" class="tab-content left-section2 layout1">

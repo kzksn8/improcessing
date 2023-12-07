@@ -1,17 +1,6 @@
 // CSRFトークンをクッキーから取得
 const csrftoken = getCookie('csrftoken');
 
-// 必要な要素の事前取得
-const uploadButton = document.getElementById('upload_button');
-const dropZone = document.getElementById('drop_zone');
-const fileInput = document.getElementById('file_input');
-const removeBgButton = document.getElementById('removebg_button');
-const cancelButton = document.getElementById('cancel_button');
-const processingButton = document.getElementById('processing_button');
-const downloadButton = document.getElementById('download_button');
-const downloadingButton = document.getElementById('downloading_button');
-const outputImage = document.getElementById('output_image');
-
 // タブを切り替える関数
 function changeTab(targetId) {
     // 全てのセクションを非表示にする
@@ -44,6 +33,19 @@ document.addEventListener('DOMContentLoaded', () => {
     changeTab('home-left');
     setupDragAndDrop();
 });
+
+// ====================================================
+
+// 必要な要素の事前取得
+const uploadButton = document.getElementById('upload_button');
+const dropZone = document.getElementById('drop_zone');
+const fileInput = document.getElementById('file_input');
+const removeBgButton = document.getElementById('removebg_button');
+const cancelButton = document.getElementById('cancel_button');
+const processingButton = document.getElementById('processing_button');
+const downloadButton = document.getElementById('download_button');
+const downloadingButton = document.getElementById('downloading_button');
+const outputImage = document.getElementById('output_image');
 
 function setupDragAndDrop() {
     dropZone.addEventListener('dragover', handleDragOver, false);
@@ -161,7 +163,7 @@ function resetToInitialState() {
 }
 
 function resetForm() {
-    document.getElementById('file_input').value = '';// ファイル入力をリセット
+    document.getElementById('file_input').value = ''; // ファイル入力をリセット
     document.getElementById('upload_button').style.display = 'block';
     var dropZone = document.getElementById('drop_zone');
     dropZone.style.display = 'flex';
@@ -204,4 +206,139 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+// ====================================================
+
+// 合成画像用のグローバル変数
+let compositeForegroundImage = null;
+let compositeBackgroundImage = null;
+
+// ファイルインプット要素の作成
+const compositeForegroundFileInput = document.createElement('input');
+compositeForegroundFileInput.type = 'file';
+compositeForegroundFileInput.accept = 'image/*';
+compositeForegroundFileInput.style.display = 'none';
+
+const compositeBackgroundFileInput = document.createElement('input');
+compositeBackgroundFileInput.type = 'file';
+compositeBackgroundFileInput.accept = 'image/*';
+compositeBackgroundFileInput.style.display = 'none';
+
+// HTMLにファイルインプット要素を追加
+document.body.appendChild(compositeForegroundFileInput);
+document.body.appendChild(compositeBackgroundFileInput);
+
+// クリックイベントでファイル選択ダイアログを開くように設定
+foregroundDropZone.addEventListener('click', () => compositeForegroundFileInput.click());
+backgroundDropZone.addEventListener('click', () => compositeBackgroundFileInput.click());
+
+// ファイル選択イベントの処理
+compositeForegroundFileInput.addEventListener('change', (e) => {
+    processCompositeFileSelect(e, 'foreground');
+});
+compositeBackgroundFileInput.addEventListener('change', (e) => {
+    processCompositeFileSelect(e, 'background');
+});
+
+function processCompositeFileSelect(e, type) {
+    // ファイルの処理
+    const files = e.target.files;
+    if (files.length === 1 && files[0].type.match('image.*')) {
+        processCompositeImage(files[0], type);
+    }
+}
+
+// 合成画像のプレビュー表示関数
+function showCompositePreview() {
+    if (compositeForegroundImage && compositeBackgroundImage) {
+        // ここで合成画像のプレビューを表示
+    }
+}
+
+// 合成画像のダウンロード関数
+compositeDownloadButton.addEventListener('click', function() {
+    if (!compositeForegroundImage || !compositeBackgroundImage) {
+        alert('両方の画像が必要です。');
+        return;
+    }
+
+    // ここでサーバーに合成リクエストを送信し、ダウンロードリンクを生成
+    fetchCompositeImage();
+});
+
+function fetchCompositeImage() {
+    var formData = new FormData();
+    formData.append('foreground', compositeForegroundImage);
+    formData.append('background', compositeBackgroundImage);
+
+    fetch('composite-image/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrftoken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.composite_image) {
+            // ダウンロードリンクを生成して自動クリック
+            var link = document.createElement('a');
+            link.href = 'data:image/png;base64,' + data.composite_image;
+            link.download = 'composite_image.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            alert('画像の合成に失敗しました。');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('画像の合成中にエラーが発生しました。');
+    });
+}
+
+// ドラッグ＆ドロップイベントのハンドラー
+function handleCompositeDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const files = event.dataTransfer.files;
+
+    if (files.length !== 1 || !files[0].type.match('image.*')) {
+        alert('画像ファイルを1つ選択してください。');
+        return;
+    }
+
+    const file = files[0];
+    const targetElement = event.target;
+
+    // ファイルのドロップ位置に応じて、ファイルの処理を行う
+    const type = (targetElement === foregroundDropZone) ? 'foreground' : 'background';
+    processCompositeImage(file, type);
+}
+
+function processCompositeImage(file, type) {
+    // ファイルの読み込みと画像の表示
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const imageSrc = e.target.result;
+        if (type === 'foreground') {
+            compositeForegroundImage = imageSrc;
+        } else if (type === 'background') {
+            compositeBackgroundImage = imageSrc;
+        }
+        showCompositePreview();
+    };
+    reader.readAsDataURL(file);
+}
+
+function showCompositePreview() {
+    if (compositeForegroundImage && compositeBackgroundImage) {
+        // 合成プレビュー画像を表示
+        compositePreviewArea.innerHTML = `
+            <img src="${compositeBackgroundImage}" alt="Background" style="width: 100%; height: auto;">
+            <img src="${compositeForegroundImage}" alt="Foreground" style="position: absolute; top: 0; left: 0; width: 100%; height: auto;">
+        `;
+    }
 }
