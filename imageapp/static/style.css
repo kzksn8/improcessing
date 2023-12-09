@@ -1,5 +1,9 @@
 /* ========================================== */
 
+/* button -> BTN, drag & drop zone -> DDZ */
+
+/* ========================================== */
+
 body, h1, p {
   margin: 0;
   padding: 0;
@@ -79,7 +83,7 @@ header {
   flex-basis: 50%;
 }
 
-.left-section2 {
+.middle-section {
   flex-basis: 100%;
 }
 
@@ -108,7 +112,7 @@ header {
 
 /* ========================================== */
 
-.drag_drop {
+.removebgDDZ {
   width: 400px;
   height: 200px;
   border: 2px dashed #b8b8b8;
@@ -121,30 +125,42 @@ header {
   cursor: pointer;
 }
 
-.drag_drop:hover {
+.removebgDDZ:hover {
   border-color: #000000;
 }
-
-/* .drag_drop2 {
-  width: 400px;
-  height: 200px;
-  border: 2px dashed #b8b8b8;
-  border-radius: 5px;
-  margin: 20px auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  cursor: pointer;
-}
-
-.drag_drop2:hover {
-  border-color: #000000;
-} */
 
 /* ========================================== */
 
-.purple_btn {
+.compositeDDZ {
+  width: 300px;
+  height: 150px;
+  border: 2px dashed #b8b8b8;
+  border-radius: 5px;
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.compositeDDZ:hover {
+  border-color: #000000;
+}
+
+.composite-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.compositeDDZ {
+  flex-basis: 40%;
+}
+
+/* ========================================== */
+
+.purpleBTN {
   background-color: #5B3EBC;
   color: white;
   border: none;
@@ -154,11 +170,11 @@ header {
   margin: 20px auto;
 }
 
-.purple_btn:hover {
+.purpleBTN:hover {
   background-color: #4a31ad;
 }
 
-.gray_btn {
+.grayBTN {
   background-color: #a5a4a7;
   color: white;
   border: none;
@@ -168,7 +184,7 @@ header {
   margin: 20px auto;
 }
 
-.gray_btn:hover {
+.grayBTN:hover {
   background-color: #a1a0a4;
 }
 

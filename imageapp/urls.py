@@ -17,8 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from .views import index, remove_background
+from .views import index, composite_image
 
 urlpatterns = [
     path('', index, name='index'),
     path('remove-background/', remove_background, name='remove_background'),
+    path('composite_image/', composite_image, name='composite_image'),
 ]
