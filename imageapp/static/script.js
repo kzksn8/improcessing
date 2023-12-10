@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     // デフォルトでホームタブを表示
     changeTab('home-left');
+
+    // ドラッグ&ドロップゾーンの配置
     setupDragAndDrop_removebg();
 });
 
@@ -226,8 +228,8 @@ const resetBackgroundBTN = document.createElement('resetBackgroundBTN');
 // 合成ボタンとダウンロードボタンを非表示にする
 document.getElementById('compositeBTN').style.display = 'none';
 document.getElementById('downloadcompositeBTN').style.display = 'none';
-document.getElementById('resetForegroundBTN').style.display = 'block';
-document.getElementById('resetBackgroundBTN').style.display = 'block';
+// document.getElementById('resetForegroundBTN').style.display = 'block';
+// document.getElementById('resetBackgroundBTN').style.display = 'block';
 
 // ファイルインプット要素の作成
 const compositeForegroundFileInput = document.createElement('input');
@@ -296,6 +298,19 @@ function processCompositeFileSelect(e, type) {
     }
 }
 
+// リセットボタンの初期化関数
+function initializeResetButton(button, text, ddzElement) {
+    button.innerText = text;
+    button.style.display = 'block'; // ボタンを常に表示
+    ddzElement.parentNode.insertBefore(button, ddzElement.nextSibling);
+
+    // リセットボタンのイベントハンドラー設定
+    button.addEventListener('click', () => {
+        const type = ddzElement.id === 'foregroundDDZ' ? 'foreground' : 'background';
+        resetImage(type);
+    });
+}
+
 // 画像処理関数
 function processCompositeImage(file, type) {
     const reader = new FileReader();
@@ -316,22 +331,33 @@ function processCompositeImage(file, type) {
 // DDZ表示更新関数
 function updateDDZDisplay(DDZElement, imageSrc, type) {
     // 既存の画像を削除する
-    const existingImage = DDZElement.querySelector('img');
+    const existingImage = DDZElement.querySelector('img.preview');
     if (existingImage) {
         DDZElement.removeChild(existingImage);
     }
 
     // 新しい画像要素を作成して追加する
     const imageElement = new Image();
+    imageElement.onload = function() {
+        // 画像のアスペクト比を維持しながらサイズ調整
+        const aspectRatio = this.width / this.height;
+        const newHeight = DDZElement.offsetHeight;
+        const newWidth = newHeight * aspectRatio;
+        this.style.width = newWidth + 'px';
+        this.style.height = newHeight + 'px';
+
+        // 画像をドラッグ＆ドロップゾーンの直前に挿入
+        DDZElement.parentNode.insertBefore(this, DDZElement);
+
+        // ドラッグ＆ドロップゾーンを非表示にする
+        DDZElement.style.display = 'none';
+    };
     imageElement.src = imageSrc;
-    imageElement.style.width = '100%'; // または適切なサイズに設定
-    DDZElement.style.display = 'block'; // DDZを表示する
-    DDZElement.appendChild(imageElement);
+    imageElement.className = 'preview'; // クラスを追加
 
     // 対応するリセットボタンを取得して表示する
     const resetButton = type === 'foreground' ? resetForegroundBTN : resetBackgroundBTN;
     resetButton.style.display = 'block';
-    DDZElement.parentNode.insertBefore(resetButton, DDZElement.nextSibling);
 }
 
 // 画像合成ボタンの表示制御
@@ -341,6 +367,22 @@ function updateCompositeButtonVisibility() {
     } else {
         compositeBTN.style.display = 'none'; // compositeBTNに変更
     }
+}
+
+// 画像リセット関数
+function resetImage(type) {
+    if (type === 'foreground') {
+        compositeForegroundImage = null;
+        const preview = foregroundDDZ.querySelector('img.preview');
+        if (preview) preview.remove();
+        foregroundDDZ.style.display = 'flex'; // DDZを再表示
+    } else if (type === 'background') {
+        compositeBackgroundImage = null;
+        const preview = backgroundDDZ.querySelector('img.preview');
+        if (preview) preview.remove();
+        backgroundDDZ.style.display = 'flex'; // DDZを再表示
+    }
+    updateCompositeButtonVisibility();
 }
 
 // リセットボタンのイベントハンドラ
@@ -400,6 +442,7 @@ compositeBTN.addEventListener('click', () => {
     });
 });
 
+// ダウンロードボタンのイベントハンドラ
 downloadcompositeBTN.addEventListener('click', () => {
     // キャンバスを作成
     const canvas = document.createElement('canvas');
