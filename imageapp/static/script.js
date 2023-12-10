@@ -222,14 +222,10 @@ const backgroundDDZ = document.getElementById('backgroundDDZ');
 const compositePreviewArea = document.getElementById('composite_preview_area');
 const compositeBTN = document.getElementById('compositeBTN');
 const downloadcompositeBTN = document.getElementById('downloadcompositeBTN');
-const resetForegroundBTN = document.createElement('resetForegroundBTN');
-const resetBackgroundBTN = document.createElement('resetBackgroundBTN');
 
 // 合成ボタンとダウンロードボタンを非表示にする
 document.getElementById('compositeBTN').style.display = 'none';
 document.getElementById('downloadcompositeBTN').style.display = 'none';
-// document.getElementById('resetForegroundBTN').style.display = 'block';
-// document.getElementById('resetBackgroundBTN').style.display = 'block';
 
 // ファイルインプット要素の作成
 const compositeForegroundFileInput = document.createElement('input');
@@ -298,19 +294,6 @@ function processCompositeFileSelect(e, type) {
     }
 }
 
-// リセットボタンの初期化関数
-function initializeResetButton(button, text, ddzElement) {
-    button.innerText = text;
-    button.style.display = 'block'; // ボタンを常に表示
-    ddzElement.parentNode.insertBefore(button, ddzElement.nextSibling);
-
-    // リセットボタンのイベントハンドラー設定
-    button.addEventListener('click', () => {
-        const type = ddzElement.id === 'foregroundDDZ' ? 'foreground' : 'background';
-        resetImage(type);
-    });
-}
-
 // 画像処理関数
 function processCompositeImage(file, type) {
     const reader = new FileReader();
@@ -354,10 +337,6 @@ function updateDDZDisplay(DDZElement, imageSrc, type) {
     };
     imageElement.src = imageSrc;
     imageElement.className = 'preview'; // クラスを追加
-
-    // 対応するリセットボタンを取得して表示する
-    const resetButton = type === 'foreground' ? resetForegroundBTN : resetBackgroundBTN;
-    resetButton.style.display = 'block';
 }
 
 // 画像合成ボタンの表示制御
@@ -384,10 +363,6 @@ function resetImage(type) {
     }
     updateCompositeButtonVisibility();
 }
-
-// リセットボタンのイベントハンドラ
-resetForegroundBTN.addEventListener('click', () => resetImage('foreground'));
-resetBackgroundBTN.addEventListener('click', () => resetImage('background'));
 
 function resetImage(type) {
     if (type === 'foreground') {
