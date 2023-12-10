@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ドラッグ&ドロップゾーンの配置
     setupDragAndDrop_removebg();
+
+    // リセットボタンのセットアップ関数を呼び出し
+    setupResetCompositeButton();
 });
 
 // ====================================================
@@ -222,6 +225,8 @@ const backgroundDDZ = document.getElementById('backgroundDDZ');
 const compositePreviewArea = document.getElementById('composite_preview_area');
 const compositeBTN = document.getElementById('compositeBTN');
 const downloadcompositeBTN = document.getElementById('downloadcompositeBTN');
+const resetForegroundBTN = document.getElementById('resetForegroundBTN');
+const resetBackgroundBTN = document.getElementById('resetBackgroundBTN');
 
 // 合成ボタンとダウンロードボタンを非表示にする
 document.getElementById('compositeBTN').style.display = 'none';
@@ -253,6 +258,45 @@ compositeForegroundFileInput.addEventListener('change', (e) => {
 compositeBackgroundFileInput.addEventListener('change', (e) => {
     processCompositeFileSelect(e, 'background');
 });
+
+// 「合成リセット」ボタンのセットアップ関数
+function setupResetCompositeButton() {
+    const resetCompositeButton = createResetButton('合成リセット');
+    resetCompositeButton.addEventListener('click', resetAllImages);
+    document.body.appendChild(resetCompositeButton);
+}
+
+// リセットボタンを作成する関数
+function createResetButton(buttonText) {
+    const button = document.createElement('button');
+    button.textContent = buttonText;
+    button.id = 'resetCompositeButton';
+    button.class = 'purpleBTN';
+    button.style.display = 'block';
+    button.style.margin = '10px auto';
+    return button;
+}
+
+// すべての画像とプレビューをリセットする関数
+function resetAllImages() {
+    compositeForegroundImage = null;
+    compositeBackgroundImage = null;
+    clearPreviews();
+    resetDDZDisplay();
+    updateCompositeButtonVisibility();
+}
+
+// プレビューをクリアする関数
+function clearPreviews() {
+    const previewImages = document.querySelectorAll('.preview');
+    previewImages.forEach(image => image.remove());
+}
+
+// ドラッグ＆ドロップゾーンの表示をリセットする関数
+function resetDDZDisplay() {
+    const ddzElements = document.querySelectorAll('.compositeDDZ');
+    ddzElements.forEach(ddz => ddz.style.display = 'block');
+}
 
 // ドラッグ＆ドロップイベントハンドラーの追加
 foregroundDDZ.addEventListener('dragover', handleDragOver, false);
@@ -294,72 +338,20 @@ function processCompositeFileSelect(e, type) {
     }
 }
 
-// 画像処理関数
-function processCompositeImage(file, type) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const imageSrc = e.target.result;
-        if (type === 'foreground') {
-            compositeForegroundImage = imageSrc;
-            updateDDZDisplay(foregroundDDZ, imageSrc, 'foreground');
-        } else if (type === 'background') {
-            compositeBackgroundImage = imageSrc;
-            updateDDZDisplay(backgroundDDZ, imageSrc, 'background');
-        }
-        updateCompositeButtonVisibility();
-    };
-    reader.readAsDataURL(file);
-}
-
-// DDZ表示更新関数
-function updateDDZDisplay(DDZElement, imageSrc, type) {
-    // 既存の画像を削除する
-    const existingImage = DDZElement.querySelector('img.preview');
-    if (existingImage) {
-        DDZElement.removeChild(existingImage);
-    }
-
-    // 新しい画像要素を作成して追加する
-    const imageElement = new Image();
-    imageElement.onload = function() {
-        // 画像のアスペクト比を維持しながらサイズ調整
-        const aspectRatio = this.width / this.height;
-        const newHeight = DDZElement.offsetHeight;
-        const newWidth = newHeight * aspectRatio;
-        this.style.width = newWidth + 'px';
-        this.style.height = newHeight + 'px';
-
-        // 画像をドラッグ＆ドロップゾーンの直前に挿入
-        DDZElement.parentNode.insertBefore(this, DDZElement);
-
-        // ドラッグ＆ドロップゾーンを非表示にする
-        DDZElement.style.display = 'none';
-    };
-    imageElement.src = imageSrc;
-    imageElement.className = 'preview'; // クラスを追加
-}
-
-// 画像合成ボタンの表示制御
-function updateCompositeButtonVisibility() {
-    if (compositeForegroundImage && compositeBackgroundImage) {
-        compositeBTN.style.display = 'block'; // compositeBTNに変更
-    } else {
-        compositeBTN.style.display = 'none'; // compositeBTNに変更
-    }
-}
-
 // 画像リセット関数
 function resetImage(type) {
     if (type === 'foreground') {
         compositeForegroundImage = null;
         const preview = foregroundDDZ.querySelector('img.preview');
         if (preview) preview.remove();
-        foregroundDDZ.style.display = 'flex'; // DDZを再表示
+        foregroundDDZ.style.display = 'flex';
+        compositeForegroundFileInput.value = ''; // ファイル入力をリセット
     } else if (type === 'background') {
         compositeBackgroundImage = null;
         const preview = backgroundDDZ.querySelector('img.preview');
         if (preview) preview.remove();
-        backgroundDDZ.style.display = 'flex'; // DDZを再表示
+        backgroundDDZ.style.display = 'flex';
+        compositeBackgroundFileInput.value = ''; // ファイル入力をリセット
     }
     updateCompositeButtonVisibility();
 }
@@ -377,17 +369,82 @@ function resetImage(type) {
     updateCompositeButtonVisibility();
 }
 
+// すべての画像とプレビューをリセットする関数
+function resetAllImages() {
+    compositeForegroundImage = null;
+    compositeBackgroundImage = null;
+    clearPreviews();
+    resetDDZDisplay();
+    updateCompositeButtonVisibility();
+    compositeForegroundFileInput.value = ''; // ファイル入力をリセット
+    compositeBackgroundFileInput.value = ''; // ファイル入力をリセット
+}
+
+// 画像処理関数
+function processCompositeImage(file, type) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const imageSrc = e.target.result;
+        if (type === 'foreground') {
+            compositeForegroundImage = imageSrc;
+            console.log("前景画像設定:", compositeForegroundImage); // ログ追加
+            updateDDZDisplay(foregroundDDZ, imageSrc, 'foreground');
+        } else if (type === 'background') {
+            compositeBackgroundImage = imageSrc;
+            console.log("背景画像設定:", compositeBackgroundImage); // ログ追加
+            updateDDZDisplay(backgroundDDZ, imageSrc, 'background');
+        }
+        updateCompositeButtonVisibility();
+    };
+    reader.readAsDataURL(file);
+}
+
+// DDZ表示更新関数
+function updateDDZDisplay(DDZElement, imageSrc, type) {
+    const existingImage = DDZElement.querySelector('img.preview');
+    if (existingImage) {
+        DDZElement.removeChild(existingImage);
+    }
+
+    const imageElement = new Image();
+    imageElement.onload = function() {
+        const aspectRatio = this.width / this.height;
+        const newHeight = DDZElement.offsetHeight;
+        const newWidth = newHeight * aspectRatio;
+        this.style.width = newWidth + 'px';
+        this.style.height = newHeight + 'px';
+
+        DDZElement.parentNode.insertBefore(this, DDZElement);
+        DDZElement.style.display = 'none';
+    };
+    imageElement.src = imageSrc;
+    imageElement.className = 'preview';
+}
+
+// 画像合成ボタンの表示制御
+function updateCompositeButtonVisibility() {
+    // 「ダウンロード」ボタンの表示状態をここで制御しないようにします。
+    if (compositeForegroundImage && compositeBackgroundImage) {
+        compositeBTN.style.display = 'block';
+    } else {
+        compositeBTN.style.display = 'none';
+    }
+}
+
 // 画像合成ボタンのイベントハンドラ
 compositeBTN.addEventListener('click', () => {
-    console.log('合成ボタンがクリックされました。');
-    
-    // FormDataオブジェクトを作成し、画像データを追加
+    if (!compositeForegroundImage || !compositeBackgroundImage) {
+        alert('前景画像と背景画像の両方が必要です。');
+        return;
+    }
+
+    // 合成ボタンを非表示にする
+    compositeBTN.style.display = 'none';
+
     var formData = new FormData();
     formData.append('foreground', dataURItoBlob(compositeForegroundImage));
     formData.append('background', dataURItoBlob(compositeBackgroundImage));
-    console.log('送信するFormData:', formData);
 
-    // サーバーに合成リクエストを送信
     fetch('composite-image/', {
         method: 'POST',
         body: formData,
@@ -398,22 +455,23 @@ compositeBTN.addEventListener('click', () => {
     .then(handleErrors)
     .then(response => response.json())
     .then(data => {
-        console.log('合成画像のレスポンスデータ:', data);
         if (data.composite_image) {
-            // 合成画像をプレビューとして表示
             const compositeImageSrc = `data:image/png;base64,${data.composite_image}`;
-            compositePreviewArea.innerHTML = `<img src="${compositeImageSrc}" alt="Composite Image">`;
-            // ダウンロードボタンを表示し、ダウンロードリンクを設定
-            downloadcompositeBTN.style.display = 'block';
+            compositePreviewArea.innerHTML = `<img src="${compositeImageSrc}" alt="Composite Image" style="max-width: 100%;">`;
+            
+            // ダウンロードボタンに合成画像のデータURLをセット
             downloadcompositeBTN.href = compositeImageSrc;
             downloadcompositeBTN.download = 'composite_image.png';
+            downloadcompositeBTN.style.display = 'block';
         } else {
             alert('画像の合成に失敗しました。');
+            downloadcompositeBTN.style.display = 'none';
         }
     })
     .catch(error => {
         console.error('画像合成中にエラーが発生しました:', error);
         alert('エラーが発生しました。コンソールを確認してください。');
+        downloadcompositeBTN.style.display = 'none';
     });
 });
 
