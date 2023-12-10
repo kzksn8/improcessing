@@ -362,10 +362,13 @@ function resetImage(type) {
 
 // 画像合成ボタンのイベントハンドラ
 compositeBTN.addEventListener('click', () => {
+    console.log('合成ボタンがクリックされました。');
+    
     // FormDataオブジェクトを作成し、画像データを追加
     var formData = new FormData();
     formData.append('foreground', dataURItoBlob(compositeForegroundImage));
     formData.append('background', dataURItoBlob(compositeBackgroundImage));
+    console.log('送信するFormData:', formData);
 
     // サーバーに合成リクエストを送信
     fetch('composite-image/', {
@@ -375,13 +378,10 @@ compositeBTN.addEventListener('click', () => {
             'X-CSRFToken': csrftoken
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-        }
-        return response.json();  // ここでJSONとしてレスポンスを解析
-    })
+    .then(handleErrors)
+    .then(response => response.json())
     .then(data => {
+        console.log('合成画像のレスポンスデータ:', data);
         if (data.composite_image) {
             // 合成画像をプレビューとして表示
             const compositeImageSrc = `data:image/png;base64,${data.composite_image}`;
@@ -395,9 +395,48 @@ compositeBTN.addEventListener('click', () => {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('エラーが発生しました。');
+        console.error('画像合成中にエラーが発生しました:', error);
+        alert('エラーが発生しました。コンソールを確認してください。');
     });
+});
+
+downloadcompositeBTN.addEventListener('click', () => {
+    // キャンバスを作成
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // 背景画像をロード
+    const backgroundImg = new Image();
+    backgroundImg.src = compositeBackgroundImage;
+
+    // 前景画像をロード
+    const foregroundImg = new Image();
+    foregroundImg.src = compositeForegroundImage;
+
+    backgroundImg.onload = () => {
+        // キャンバスのサイズを背景画像に合わせる
+        canvas.width = backgroundImg.width;
+        canvas.height = backgroundImg.height;
+
+        // 背景画像をキャンバスに描画
+        ctx.drawImage(backgroundImg, 0, 0);
+
+        foregroundImg.onload = () => {
+            // 前景画像をキャンバスに描画
+            ctx.drawImage(foregroundImg, 0, 0, canvas.width, canvas.height);
+
+            // キャンバスから画像のデータURLを取得
+            const dataURL = canvas.toDataURL('image/png');
+
+            // ダウンロードリンクを作成
+            const downloadLink = document.createElement('a');
+            downloadLink.href = dataURL;
+            downloadLink.download = 'composite_image.png';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        };
+    };
 });
 
 // Data URIをBlobに変換するヘルパー関数
@@ -410,4 +449,20 @@ function dataURItoBlob(dataURI) {
         ia[i] = byteString.charCodeAt(i);
     }
     return new Blob([ab], {type: mimeString});
+}
+
+function handleErrors(response) {
+    if (!response.ok) {
+        // エラーレスポンスの内容をログに出力するために、レスポンスをクローンしてJSONを解析します。
+        response.clone().json().then(json => {
+            console.error('Error response JSON:', json);
+        }).catch(() => {
+            // JSONの解析に失敗した場合は、テキストとして出力します。
+            response.clone().text().then(text => {
+                console.error('Error response text:', text);
+            });
+        });
+        throw Error(`HTTP error: ${response.status} ${response.statusText}`);
+    }
+    return response;
 }

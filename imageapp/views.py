@@ -57,7 +57,7 @@ def composite_image(request):
         background = Image.open(background_file)
 
         # 前景画像のサイズを背景画像に合わせる（必要に応じて）
-        foreground = foreground.resize(background.size, Image.ANTIALIAS)
+        foreground = foreground.resize(background.size, Image.Resampling.LANCZOS)
 
         # 画像を合成
         background.paste(foreground, (0, 0), foreground)

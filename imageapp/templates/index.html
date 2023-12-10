@@ -7,6 +7,9 @@
     <title>Image Background Remover</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <!-- ここに追加のスタイルを記述するか、style.cssに追加 -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <style>
         .tab-content {
             display: none; /* すべてのタブコンテンツを初期状態で非表示に */
@@ -69,10 +72,11 @@
                         背景画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
                     </div>
                 </div>
-                <div id="preview-area"></div>
+                <div id="preview-area" class="composite-preview"></div>
                 <button id="resetForegroundBTN" class="purpleBTN" style="display:none;">リセット1</button>
                 <button id="resetBackgroundBTN" class="purpleBTN" style="display:none;">リセット2</button>
                 <button id="compositeBTN" class="purpleBTN" style="display:none;">画像合成</button>
+                <div id="composite_preview_area"></div>
                 <button id="downloadcompositeBTN" class="purpleBTN" style="display:none;">ダウンロード</button>
             </section>
 
