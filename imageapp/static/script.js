@@ -325,32 +325,30 @@ function processCompositeFileSelect(e, type) {
 }
 
 // 画像リセット関数
+// 画像リセット関数
 function resetImage(type) {
     if (type === 'foreground') {
         compositeForegroundImage = null;
         const preview = foregroundDDZ.querySelector('img.preview');
-        if (preview) preview.remove();
-        foregroundDDZ.style.display = 'flex';
+        if (preview) {
+            // 画像プレビューがあれば削除
+            preview.remove();
+        } else {
+            // なければ表示スタイルをリセット
+            foregroundDDZ.style.display = 'flex';
+        }
         compositeForegroundFileInput.value = ''; // ファイル入力をリセット
     } else if (type === 'background') {
         compositeBackgroundImage = null;
         const preview = backgroundDDZ.querySelector('img.preview');
-        if (preview) preview.remove();
-        backgroundDDZ.style.display = 'flex';
+        if (preview) {
+            // 画像プレビューがあれば削除
+            preview.remove();
+        } else {
+            // なければ表示スタイルをリセット
+            backgroundDDZ.style.display = 'flex';
+        }
         compositeBackgroundFileInput.value = ''; // ファイル入力をリセット
-    }
-    updateCompositeButtonVisibility();
-}
-
-function resetImage(type) {
-    if (type === 'foreground') {
-        compositeForegroundImage = null;
-        foregroundDDZ.style.display = 'block';
-        foregroundDDZ.nextElementSibling.remove(); // 前景画像プレビューを削除
-    } else if (type === 'background') {
-        compositeBackgroundImage = null;
-        backgroundDDZ.style.display = 'block';
-        backgroundDDZ.nextElementSibling.remove(); // 背景画像プレビューを削除
     }
     updateCompositeButtonVisibility();
 }
@@ -484,8 +482,11 @@ downloadcompositeBTN.addEventListener('click', () => {
         ctx.drawImage(backgroundImg, 0, 0);
 
         foregroundImg.onload = () => {
-            // 前景画像をキャンバスに描画
-            ctx.drawImage(foregroundImg, 0, 0, canvas.width, canvas.height);
+            // アスペクト比を維持しつつ前景画像をキャンバスに描画
+            const aspectRatioForeground = foregroundImg.width / foregroundImg.height;
+            const scaledWidth = aspectRatioForeground * canvas.height;
+            const offsetX = (canvas.width - scaledWidth) / 2; // 中央揃えのためのXオフセット
+            ctx.drawImage(foregroundImg, offsetX, 0, scaledWidth, canvas.height);
 
             // キャンバスから画像のデータURLを取得
             const dataURL = canvas.toDataURL('image/png');

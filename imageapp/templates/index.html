@@ -73,9 +73,10 @@
                     </div>
                 </div>
                 <button id="compositeBTN" class="purpleBTN" style="display:none;">画像合成</button>
-                <button id="resetCompositeButton" class="purpleBTN" onclick="resetAllImages()" style="display: none; margin: 10px auto;">合成リセット</button>
-                <div id="composite_preview_area" class="composite-preview"></div>
+                {% comment %} <button id="resetCompositeButton" class="purpleBTN" onclick="resetAllImages()" style="display: none; margin: 10px auto;">合成リセット</button> {% endcomment %}
+                <button id="resetCompositeButton" class="purpleBTN" onclick="resetAllImages()" style="display: none;">合成リセット</button>
                 <button id="downloadcompositeBTN" class="purpleBTN" style="display:none;">ダウンロード</button>
+                <div id="composite_preview_area" class="composite-preview"></div>
             </section>
 
             <section id="policy-left" class="tab-content left-section layout1">
