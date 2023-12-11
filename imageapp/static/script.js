@@ -1,27 +1,32 @@
 // CSRFトークンをクッキーから取得
 const csrftoken = getCookie('csrftoken');
 
-// タブを切り替える関数
+// タブを切り替える関数の修正
 function changeTab(targetId) {
-    // 全てのセクションを非表示にする
     const tabs = document.getElementsByClassName("tab-content");
     for (let tabcontent of tabs) {
         tabcontent.style.display = "none";
     }
-    // アクティブなタブと対応するセクションを表示する
+
     const activeTab = document.getElementById(targetId);
     if (activeTab) {
         activeTab.style.display = "block";
     }
-    // 対応するright-sectionも表示する
+
     const activeRightTab = document.getElementById(targetId.replace('-left', '-right'));
     if (activeRightTab) {
         activeRightTab.style.display = "block";
     }
+
+    // 合成リセットボタンの表示を「画像合成」タブがアクティブの時のみにする
+    const resetCompositeButton = document.getElementById('resetCompositeButton');
+    const isCompositeTab = targetId.includes('composite');
+    resetCompositeButton.style.display = isCompositeTab ? 'block' : 'none';
 }
 
 // ページ読み込み時の処理
 document.addEventListener('DOMContentLoaded', () => {
+    // タブ関連のイベントリスナーを設定
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', (event) => {
             event.preventDefault();
@@ -218,6 +223,7 @@ function getCookie(name) {
 // 合成画像用のグローバル変数
 let compositeForegroundImage = null;
 let compositeBackgroundImage = null;
+let resetCompositeButton;
 
 // HTML要素の参照
 const foregroundDDZ = document.getElementById('foregroundDDZ');
@@ -225,8 +231,6 @@ const backgroundDDZ = document.getElementById('backgroundDDZ');
 const compositePreviewArea = document.getElementById('composite_preview_area');
 const compositeBTN = document.getElementById('compositeBTN');
 const downloadcompositeBTN = document.getElementById('downloadcompositeBTN');
-const resetForegroundBTN = document.getElementById('resetForegroundBTN');
-const resetBackgroundBTN = document.getElementById('resetBackgroundBTN');
 
 // 合成ボタンとダウンロードボタンを非表示にする
 document.getElementById('compositeBTN').style.display = 'none';
@@ -258,24 +262,6 @@ compositeForegroundFileInput.addEventListener('change', (e) => {
 compositeBackgroundFileInput.addEventListener('change', (e) => {
     processCompositeFileSelect(e, 'background');
 });
-
-// 「合成リセット」ボタンのセットアップ関数
-function setupResetCompositeButton() {
-    const resetCompositeButton = createResetButton('合成リセット');
-    resetCompositeButton.addEventListener('click', resetAllImages);
-    document.body.appendChild(resetCompositeButton);
-}
-
-// リセットボタンを作成する関数
-function createResetButton(buttonText) {
-    const button = document.createElement('button');
-    button.textContent = buttonText;
-    button.id = 'resetCompositeButton';
-    button.class = 'purpleBTN';
-    button.style.display = 'block';
-    button.style.margin = '10px auto';
-    return button;
-}
 
 // すべての画像とプレビューをリセットする関数
 function resetAllImages() {
