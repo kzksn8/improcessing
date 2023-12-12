@@ -41,7 +41,7 @@ def remove_background(request):
     else:
         # POSTリクエストでない場合はエラーを返す
         return JsonResponse({'error': '無効なリクエストです。'}, status=400)
-    
+
 @csrf_exempt
 def composite_image(request):
     if request.method == 'POST':
@@ -53,14 +53,33 @@ def composite_image(request):
             return JsonResponse({'error': '前景画像と背景画像の両方が必要です。'}, status=400)
 
         # 画像を開く
-        foreground = Image.open(foreground_file)
-        background = Image.open(background_file)
+        foreground = Image.open(foreground_file).convert("RGBA")
+        background = Image.open(background_file).convert("RGBA")
 
-        # 前景画像のサイズを背景画像に合わせる（必要に応じて）
-        foreground = foreground.resize(background.size, Image.Resampling.LANCZOS)
+        # アスペクト比を維持しつつ前景画像をリサイズする
+        bg_width, bg_height = background.size
+        fg_width, fg_height = foreground.size
 
-        # 画像を合成
-        background.paste(foreground, (0, 0), foreground)
+        # 前景画像のアスペクト比を計算
+        fg_aspect = fg_width / fg_height
+        bg_aspect = bg_width / bg_height
+
+        # 背景画像に合わせて前景画像をスケールする
+        if fg_aspect > bg_aspect:
+            # 前景画像の方が横長の場合
+            scaled_width = bg_width
+            scaled_height = round(bg_width / fg_aspect)
+        else:
+            # 前景画像の方が縦長の場合
+            scaled_height = bg_height
+            scaled_width = round(bg_height * fg_aspect)
+
+        # スケーリングした前景画像のサイズで前景画像をリサイズ
+        foreground = foreground.resize((scaled_width, scaled_height), Image.Resampling.LANCZOS)
+
+        # 前景画像を背景画像の中央に配置
+        bg_paste_position = ((bg_width - scaled_width) // 2, (bg_height - scaled_height) // 2)
+        background.paste(foreground, bg_paste_position, foreground)
 
         # 合成画像をBase64エンコード
         img_byte_arr = BytesIO()

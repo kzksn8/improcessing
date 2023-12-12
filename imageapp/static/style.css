@@ -161,14 +161,20 @@ header {
 /* ========================================== */
 
 .composite-preview {
-  width: 300px;
-  height: 200px;
+  width: 400px;
+  height: 300px;
   margin: 20px auto;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  cursor: pointer;
+  overflow: hidden;
+}
+
+.composite-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 /* ========================================== */

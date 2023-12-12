@@ -325,7 +325,6 @@ function processCompositeFileSelect(e, type) {
 }
 
 // 画像リセット関数
-// 画像リセット関数
 function resetImage(type) {
     if (type === 'foreground') {
         compositeForegroundImage = null;
@@ -392,17 +391,27 @@ function updateDDZDisplay(DDZElement, imageSrc, type) {
 
     const imageElement = new Image();
     imageElement.onload = function() {
+        let newWidth, newHeight;
+        const parentWidth = DDZElement.offsetWidth;
+        const parentHeight = DDZElement.offsetHeight;
         const aspectRatio = this.width / this.height;
-        const newHeight = DDZElement.offsetHeight;
-        const newWidth = newHeight * aspectRatio;
+
+        if (parentWidth / parentHeight > aspectRatio) {
+            newHeight = parentHeight;
+            newWidth = aspectRatio * newHeight;
+        } else {
+            newWidth = parentWidth;
+            newHeight = newWidth / aspectRatio;
+        }
+
         this.style.width = newWidth + 'px';
         this.style.height = newHeight + 'px';
+        this.className = 'preview';
 
-        DDZElement.parentNode.insertBefore(this, DDZElement);
+        DDZElement.parentNode.insertBefore(this, DDZElement.nextSibling);
         DDZElement.style.display = 'none';
     };
     imageElement.src = imageSrc;
-    imageElement.className = 'preview';
 }
 
 // 画像合成ボタンの表示制御
@@ -441,7 +450,8 @@ compositeBTN.addEventListener('click', () => {
     .then(data => {
         if (data.composite_image) {
             const compositeImageSrc = `data:image/png;base64,${data.composite_image}`;
-            compositePreviewArea.innerHTML = `<img src="${compositeImageSrc}" alt="Composite Image" style="max-width: 100%;">`;
+            // ここで画像をプレビューに表示する際に、オリジナルのアスペクト比を維持する
+            compositePreviewArea.innerHTML = `<img src="${compositeImageSrc}" alt="Composite Image" style="max-width: 100%; height: auto;">`;
             
             // ダウンロードボタンに合成画像のデータURLをセット
             downloadcompositeBTN.href = compositeImageSrc;
@@ -461,37 +471,37 @@ compositeBTN.addEventListener('click', () => {
 
 // ダウンロードボタンのイベントハンドラ
 downloadcompositeBTN.addEventListener('click', () => {
-    // キャンバスを作成
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
-    // 背景画像をロード
     const backgroundImg = new Image();
     backgroundImg.src = compositeBackgroundImage;
 
-    // 前景画像をロード
     const foregroundImg = new Image();
     foregroundImg.src = compositeForegroundImage;
 
     backgroundImg.onload = () => {
-        // キャンバスのサイズを背景画像に合わせる
         canvas.width = backgroundImg.width;
         canvas.height = backgroundImg.height;
 
-        // 背景画像をキャンバスに描画
         ctx.drawImage(backgroundImg, 0, 0);
 
         foregroundImg.onload = () => {
-            // アスペクト比を維持しつつ前景画像をキャンバスに描画
             const aspectRatioForeground = foregroundImg.width / foregroundImg.height;
-            const scaledWidth = aspectRatioForeground * canvas.height;
-            const offsetX = (canvas.width - scaledWidth) / 2; // 中央揃えのためのXオフセット
-            ctx.drawImage(foregroundImg, offsetX, 0, scaledWidth, canvas.height);
+            let scaledWidth = canvas.width;
+            let scaledHeight = canvas.width / aspectRatioForeground;
 
-            // キャンバスから画像のデータURLを取得
+            if (scaledHeight > canvas.height) {
+                scaledHeight = canvas.height;
+                scaledWidth = canvas.height * aspectRatioForeground;
+            }
+
+            const offsetX = (canvas.width - scaledWidth) / 2;
+            const offsetY = (canvas.height - scaledHeight) / 2;
+            ctx.drawImage(foregroundImg, offsetX, offsetY, scaledWidth, scaledHeight);
+
             const dataURL = canvas.toDataURL('image/png');
 
-            // ダウンロードリンクを作成
             const downloadLink = document.createElement('a');
             downloadLink.href = dataURL;
             downloadLink.download = 'composite_image.png';
