@@ -150,12 +150,14 @@ header {
 
 .composite-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .compositeDDZ {
   flex-basis: 40%;
+  margin: 10px;
 }
 
 /* ========================================== */
