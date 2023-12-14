@@ -17,11 +17,6 @@ function changeTab(targetId) {
     if (activeRightTab) {
         activeRightTab.style.display = "block";
     }
-
-    // 合成リセットボタンの表示を「画像合成」タブがアクティブの時のみにする
-    const resetCompositeButton = document.getElementById('resetCompositeButton');
-    const isCompositeTab = targetId.includes('composite');
-    resetCompositeButton.style.display = isCompositeTab ? 'block' : 'none';
 }
 
 // ページ読み込み時の処理
@@ -39,9 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ドラッグ&ドロップゾーンの配置
     setupDragAndDrop_removebg();
-
-    // リセットボタンのセットアップ関数を呼び出し
-    setupResetCompositeButton();
 });
 
 // ====================================================
@@ -223,7 +215,6 @@ function getCookie(name) {
 // 合成画像用のグローバル変数
 let compositeForegroundImage = null;
 let compositeBackgroundImage = null;
-let resetCompositeButton;
 
 // HTML要素の参照
 const foregroundDDZ = document.getElementById('foregroundDDZ');
@@ -231,10 +222,12 @@ const backgroundDDZ = document.getElementById('backgroundDDZ');
 const compositePreviewArea = document.getElementById('composite_preview_area');
 const compositeBTN = document.getElementById('compositeBTN');
 const downloadcompositeBTN = document.getElementById('downloadcompositeBTN');
+const resetCompositeButton = document.getElementById('resetCompositeButton');
 
 // 合成ボタンとダウンロードボタンを非表示にする
 document.getElementById('compositeBTN').style.display = 'none';
 document.getElementById('downloadcompositeBTN').style.display = 'none';
+document.getElementById('resetCompositeButton').style.display = 'block';
 
 // ファイルインプット要素の作成
 const compositeForegroundFileInput = document.createElement('input');
@@ -267,6 +260,9 @@ compositeBackgroundFileInput.addEventListener('change', (e) => {
 function resetAllImages() {
     compositeForegroundImage = null;
     compositeBackgroundImage = null;
+    compositeForegroundFileInput.value = ''; // ファイル入力をリセット
+    compositeBackgroundFileInput.value = ''; // ファイル入力をリセット
+    document.getElementById('downloadcompositeBTN').style.display = 'none';
     clearPreviews();
     resetDDZDisplay();
     updateCompositeButtonVisibility();
@@ -281,7 +277,7 @@ function clearPreviews() {
 // ドラッグ＆ドロップゾーンの表示をリセットする関数
 function resetDDZDisplay() {
     const ddzElements = document.querySelectorAll('.compositeDDZ');
-    ddzElements.forEach(ddz => ddz.style.display = 'block');
+    ddzElements.forEach(ddz => ddz.style.display = 'flex');
 }
 
 // ドラッグ＆ドロップイベントハンドラーの追加
@@ -322,45 +318,6 @@ function processCompositeFileSelect(e, type) {
     } else {
         alert('アップロードできる画像は1つのみです。');
     }
-}
-
-// 画像リセット関数
-function resetImage(type) {
-    if (type === 'foreground') {
-        compositeForegroundImage = null;
-        const preview = foregroundDDZ.querySelector('img.preview');
-        if (preview) {
-            // 画像プレビューがあれば削除
-            preview.remove();
-        } else {
-            // なければ表示スタイルをリセット
-            foregroundDDZ.style.display = 'flex';
-        }
-        compositeForegroundFileInput.value = ''; // ファイル入力をリセット
-    } else if (type === 'background') {
-        compositeBackgroundImage = null;
-        const preview = backgroundDDZ.querySelector('img.preview');
-        if (preview) {
-            // 画像プレビューがあれば削除
-            preview.remove();
-        } else {
-            // なければ表示スタイルをリセット
-            backgroundDDZ.style.display = 'flex';
-        }
-        compositeBackgroundFileInput.value = ''; // ファイル入力をリセット
-    }
-    updateCompositeButtonVisibility();
-}
-
-// すべての画像とプレビューをリセットする関数
-function resetAllImages() {
-    compositeForegroundImage = null;
-    compositeBackgroundImage = null;
-    clearPreviews();
-    resetDDZDisplay();
-    updateCompositeButtonVisibility();
-    compositeForegroundFileInput.value = ''; // ファイル入力をリセット
-    compositeBackgroundFileInput.value = ''; // ファイル入力をリセット
 }
 
 // 画像処理関数
@@ -416,7 +373,7 @@ function updateDDZDisplay(DDZElement, imageSrc, type) {
 
 // 画像合成ボタンの表示制御
 function updateCompositeButtonVisibility() {
-    // 「ダウンロード」ボタンの表示状態をここで制御しないようにします。
+    //「ダウンロード」ボタンの表示状態をここで制御しないようにします。
     if (compositeForegroundImage && compositeBackgroundImage) {
         compositeBTN.style.display = 'block';
     } else {
