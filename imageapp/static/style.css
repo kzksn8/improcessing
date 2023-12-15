@@ -131,6 +131,31 @@ header {
 
 /* ========================================== */
 
+.composite-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ========================================== */
+
+.compositeuploadBTN {
+  background-color: #5B3EBC;
+  color: white;
+  border: none;
+  width: auto;
+  margin: 10px auto;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.compositeuploadBTN:hover {
+  background-color: #4a31ad;
+}
+
+/* ========================================== */
+
 .compositeDDZ {
   width: 400px;
   height: 200px;
@@ -142,21 +167,12 @@ header {
   justify-content: center;
   text-align: center;
   cursor: pointer;
+  flex-basis: 40%;
+  margin: 30px;
 }
 
 .compositeDDZ:hover {
   border-color: #000000;
-}
-
-.composite-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.compositeDDZ {
-  flex-basis: 40%;
-  margin: 30px;
 }
 
 /* ========================================== */
@@ -184,10 +200,11 @@ header {
   background-color: #5B3EBC;
   color: white;
   border: none;
+  width: auto;
+  margin: 20px auto;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
-  margin: 20px auto;
 }
 
 .purpleBTN:hover {
@@ -198,10 +215,11 @@ header {
   background-color: #a5a4a7;
   color: white;
   border: none;
+  width: auto;
+  margin: 20px auto;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
-  margin: 20px auto;
 }
 
 .grayBTN:hover {

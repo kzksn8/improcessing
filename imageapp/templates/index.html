@@ -65,6 +65,10 @@
                 <h1>画像合成</h1>
                 <p>画像合成</p>
                 <div class="composite-container">
+                    <div id="foregrounduploadBTN" class="compositeuploadBTN">前景画像アップロード</div>
+                    <div id="backgrounduploadBTN" class="compositeuploadBTN">背景画像アップロード</div>
+                </div>
+                <div class="composite-container">
                     <div id="foregroundDDZ" class="compositeDDZ">
                         前景画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
                     </div>
@@ -75,7 +79,7 @@
                 <button id="compositeBTN" class="purpleBTN" style="display:none;">画像合成</button>
                 <button id="resetCompositeButton" class="purpleBTN" onclick="resetAllImages()" style="display: none;">合成リセット</button>
                 <button id="downloadcompositeBTN" class="purpleBTN" style="display:none;">ダウンロード</button>
-                <div id="composite_preview_area" class="composite-preview">ここにプレビュー画面が表示されます。</div>
+                <div id="composite_preview_area" class="composite-preview"></div>
             </section>
 
             <section id="policy-left" class="tab-content left-section layout1">

@@ -227,7 +227,7 @@ const resetCompositeButton = document.getElementById('resetCompositeButton');
 // 合成ボタンとダウンロードボタンを非表示にする
 document.getElementById('compositeBTN').style.display = 'none';
 document.getElementById('downloadcompositeBTN').style.display = 'none';
-document.getElementById('resetCompositeButton').style.display = 'block';
+document.getElementById('resetCompositeButton').style.display = 'none';
 
 // ファイルインプット要素の作成
 const compositeForegroundFileInput = document.createElement('input');
@@ -256,13 +256,17 @@ compositeBackgroundFileInput.addEventListener('change', (e) => {
     processCompositeFileSelect(e, 'background');
 });
 
+// リセットボタンのイベントハンドラーをセットアップ
+resetCompositeButton.addEventListener('click', resetAllImages);
+
 // すべての画像とプレビューをリセットする関数
 function resetAllImages() {
     compositeForegroundImage = null;
     compositeBackgroundImage = null;
     compositeForegroundFileInput.value = ''; // ファイル入力をリセット
     compositeBackgroundFileInput.value = ''; // ファイル入力をリセット
-    document.getElementById('downloadcompositeBTN').style.display = 'none';
+    compositePreviewArea.innerHTML = ''; // プレビュー領域をクリア
+    document.getElementById('downloadcompositeBTN').style.display = 'none'; // ダウンロードボタンを非表示に
     clearPreviews();
     resetDDZDisplay();
     updateCompositeButtonVisibility();
@@ -277,7 +281,10 @@ function clearPreviews() {
 // ドラッグ＆ドロップゾーンの表示をリセットする関数
 function resetDDZDisplay() {
     const ddzElements = document.querySelectorAll('.compositeDDZ');
-    ddzElements.forEach(ddz => ddz.style.display = 'flex');
+    ddzElements.forEach(ddz => {
+        ddz.style.display = 'flex'; // デフォルト表示に戻す
+        ddz.innerHTML = 'ドラッグ＆ドロップ<br>または<br>クリックで画像選択'; // デフォルトテキストに戻す
+    });
 }
 
 // ドラッグ＆ドロップイベントハンドラーの追加
@@ -371,14 +378,15 @@ function updateDDZDisplay(DDZElement, imageSrc, type) {
     imageElement.src = imageSrc;
 }
 
-// 画像合成ボタンの表示制御
+// 画像合成ボタンの表示制御関数
 function updateCompositeButtonVisibility() {
-    //「ダウンロード」ボタンの表示状態をここで制御しないようにします。
     if (compositeForegroundImage && compositeBackgroundImage) {
         compositeBTN.style.display = 'block';
     } else {
         compositeBTN.style.display = 'none';
     }
+    // リセットボタンの表示状態もここで制御
+    resetCompositeButton.style.display = (compositeForegroundImage || compositeBackgroundImage) ? 'block' : 'none';
 }
 
 // 画像合成ボタンのイベントハンドラ
