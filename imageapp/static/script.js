@@ -89,15 +89,13 @@ function toggleElements(show, ...elements) {
     });
 }
 
-// グローバル変数でAbortControllerの参照を保持
-let abortController;
-
 function startBackgroundRemoval(file) {
     if (file) {
-        abortController = new AbortController();
+        const localAbortController = new AbortController();  // ローカル変数としてAbortControllerを作成
+        toggleElements(false, cancelBTN);
         toggleElements(false, removebgBTN);
         toggleElements(true, processingBTN);
-        removeBackground(file);
+        removeBackground(file, localAbortController);  // AbortControllerを引数として渡す
     }
 }
 
@@ -107,7 +105,7 @@ downloadingBTN.addEventListener('click', () => {
     }
 });
 
-function removeBackground(file, callback) {
+function removeBackground(file, abortController) {  // abortControllerを引数として受け取る
     var formData = new FormData();
     formData.append('image', file);
 
@@ -117,7 +115,7 @@ function removeBackground(file, callback) {
         headers: {
             'X-CSRFToken': csrftoken
         },
-        signal: abortController.signal
+        signal: abortController.signal  // ローカルのAbortControllerを使用
     })
     .then(handleErrors)
     .then(response => response.json())
@@ -127,6 +125,7 @@ function removeBackground(file, callback) {
 
         // 「処理中...」ボタンを非表示にし、「ダウンロード」ボタンを表示
         document.getElementById('processingBTN').style.display = 'none';
+        document.getElementById('cancelBTN').style.display = 'block';
         document.getElementById('downloadBTN').style.display = 'block';
 
         // 画像データをcallback関数に渡す
@@ -153,9 +152,7 @@ function startDownload(processedImage) {
 }
 
 function resetToInitialState() {
-    if (abortController) {
-        abortController.abort();
-    }
+    // AbortControllerの処理は不要になるため削除
     outputImage.style.display = 'none';
     resetForm();
     window.processedImage = undefined;
