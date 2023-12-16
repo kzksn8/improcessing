@@ -41,14 +41,14 @@ const downloadBTN = document.getElementById('downloadBTN');
 const downloadingBTN = document.getElementById('downloadingBTN');
 const outputImage = document.getElementById('output_image');
 
-uploadBTN.addEventListener('click', () => fileInput.click());
 removebgDDZ.addEventListener('dragover', handleDragOver, false);
 removebgDDZ.addEventListener('drop', handleDrop, false);
 removebgDDZ.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', handleFileSelect);
+uploadBTN.addEventListener('click', () => fileInput.click());
 removebgBTN.addEventListener('click', () => startBackgroundRemoval(fileInput.files[0]));
 cancelBTN.addEventListener('click', resetToInitialState);
-downloadBTN.addEventListener('click', () => startDownload(window.processedImage));
+downloadBTN.addEventListener('click', () => startDownload(processedImage));
 
 function handleDragOver(e) {
     e.stopPropagation();
@@ -89,17 +89,25 @@ function toggleElements(show, ...elements) {
     });
 }
 
-// 画像の処理開始
+// グローバル変数でAbortControllerの参照を保持
+let abortController;
+
 function startBackgroundRemoval(file) {
     if (file) {
-        const abortController = new AbortController();
+        abortController = new AbortController();
         toggleElements(false, removebgBTN);
         toggleElements(true, processingBTN);
-        removeBackground(file, abortController);
+        removeBackground(file);
     }
 }
 
-function removeBackground(file, abortController) {
+downloadingBTN.addEventListener('click', () => {
+    if (window.processedImage) {
+        triggerDownload(window.processedImage);
+    }
+});
+
+function removeBackground(file, callback) {
     var formData = new FormData();
     formData.append('image', file);
 
@@ -114,12 +122,15 @@ function removeBackground(file, abortController) {
     .then(handleErrors)
     .then(response => response.json())
     .then(data => {
+        // 画像データをグローバル変数に保存
+        window.processedImage = data.image;
+
         // 「処理中...」ボタンを非表示にし、「ダウンロード」ボタンを表示
         document.getElementById('processingBTN').style.display = 'none';
         document.getElementById('downloadBTN').style.display = 'block';
 
-        // 画像データをグローバル変数に保存
-        window.processedImage = data.image;
+        // 画像データをcallback関数に渡す
+        callback(data.image);
     })
     .catch(error => {
         if (error.name === 'AbortError') {
@@ -132,18 +143,16 @@ function removeBackground(file, abortController) {
     });
 }
 
-// ダウンロード開始
-function startDownload(processedImage, abortController) {
+function startDownload(processedImage) {
     if (processedImage) {
         toggleElements(false, downloadBTN, cancelBTN);
         toggleElements(true, downloadingBTN);
         triggerDownload(processedImage);
-        setTimeout(() => resetToInitialState(abortController), 2000);
+        setTimeout(resetToInitialState, 2000);
     }
 }
 
-// 初期状態にリセット
-function resetToInitialState(abortController) {
+function resetToInitialState() {
     if (abortController) {
         abortController.abort();
     }
