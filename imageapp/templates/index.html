@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <title>Image Background Remover</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
-    <!-- ここに追加のスタイルを記述するか、style.cssに追加 -->
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -22,8 +21,9 @@
         <div class="top-nav">
             <nav>
                 <a href="#home" data-target="home" class="logo">removebg</a>
+                <a href="#composite" data-target="sp_composite">特殊合成</a>
+                <a href="#composite" data-target="composite">一般合成</a>
                 <a href="#removebg" data-target="removebg">背景削除</a>
-                <a href="#composite" data-target="composite">画像合成</a>
                 <a href="#policy" data-target="policy">Policy</a>
             </nav>
             <div class="login-signup">
@@ -32,68 +32,55 @@
         </div>
     </header>
 
-    <!--  button -> BTN, drag & drop zone -> DDZ -->
     <main>
-        <div class="main-content">
-            <section id="home-left" class="tab-content middle-section layout1">
-                <h1>ホーム画面</h1>
-                <p>ホーム画面</p>
-            </section>
+        <section id="home" class="tab-content layout1">
+            <h1>ホーム画面</h1>
+            <p>ホーム画面</p>
+        </section>
 
-            <section id="removebg-left" class="tab-content left-section layout1">
-                <h1>写真・画像の背景を一括で消去</h1>
-                <p>100%自動かつ無料</p>
-                <button id="uploadBTN" class="purpleBTN">画像アップロード</button>
-                <div id="removebgDDZ" class="removebgDDZ">
-                    画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
+        <section id="sp_composite" class="tab-content layout1">
+            <h1>特殊合成</h1>
+            <p>特殊合成</p>
+        </section>
+
+        <section id="composite" class="tab-content layout1">
+            <h1>一般合成</h1>
+            <p>一般合成</p>
+            <div class="composite-container">
+                <div id="foregroundDDZ" class="compositeDDZ">
+                    前景画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
                 </div>
-                <input type="file" id="file_input" style="display: none;" />
-                <img id="output_image" style="display:none;">
-                <button id="removebgBTN" class="purpleBTN" style="display:none;">背景削除</button>
-                <button id="processingBTN" class="grayBTN" style="display:none;">処理中...</button>
-                <button id="downloadBTN" class="purpleBTN" style="display:none;">ダウンロード</button>
-                <button id="downloadingBTN" class="grayBTN" style="display:none;">ダウンロード中...</button>
-                <button id="cancelBTN" class="purpleBTN" style="display:none;">リセット</button>
-            </section>
-            
-            <section id="removebg-right" class="tab-content right-section layout1">
-                <h1>背景削除</h1>
-                <p>背景削除</p>
-            </section>
-
-            <section id="composite-left" class="tab-content middle-section layout1">
-                <h1>画像合成</h1>
-                <p>画像合成</p>
-                <div class="composite-container">
-                    <div id="foregrounduploadBTN" class="compositeuploadBTN">前景画像アップロード</div>
-                    <div id="backgrounduploadBTN" class="compositeuploadBTN">背景画像アップロード</div>
+                <div id="backgroundDDZ" class="compositeDDZ">
+                    背景画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
                 </div>
-                <div class="composite-container">
-                    <div id="foregroundDDZ" class="compositeDDZ">
-                        前景画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
-                    </div>
-                    <div id="backgroundDDZ" class="compositeDDZ">
-                        背景画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
-                    </div>
-                </div>
-                <button id="compositeBTN" class="purpleBTN" style="display:none;">画像合成</button>
-                <button id="resetCompositeButton" class="purpleBTN" onclick="resetAllImages()" style="display: none;">合成リセット</button>
-                <button id="downloadcompositeBTN" class="purpleBTN" style="display:none;">ダウンロード</button>
-                <div id="composite_preview_area" class="composite-preview"></div>
-            </section>
-
-            <section id="policy-left" class="tab-content left-section layout1">
-                <h1>Policy1</h1>
-                <p>Policy1</p>
-            </section>
-
-            <section id="policy-right" class="tab-content right-section layout1">
-                <h1>Policy2</h1>
-                <p>Policy2</p>
-            </section>
-        </div>
+            </div>
+            <button id="compositeBTN" class="purpleBTN" style="display:none;">画像合成</button>
+            <button id="resetCompositeButton" class="purpleBTN" onclick="resetAllImages()" style="display: none;">合成リセット</button>
+            <button id="downloadcompositeBTN" class="purpleBTN" style="display:none;">ダウンロード</button>
+            <div id="composite_preview_area" class="composite-preview"></div>
+        </section>
+    
+        <section id="removebg" class="tab-content layout1">
+            <h1>写真・画像の背景を一括で消去</h1>
+            <p>100%自動かつ無料</p>
+            <button id="uploadBTN" class="purpleBTN">画像アップロード</button>
+            <div id="removebgDDZ" class="removebgDDZ">
+                画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
+            </div>
+            <input type="file" id="file_input" style="display: none;" />
+            <img id="output_image" style="display:none;">
+            <button id="removebgBTN" class="purpleBTN" style="display:none;">背景削除</button>
+            <button id="processingBTN" class="grayBTN" style="display:none;">処理中...</button>
+            <button id="downloadBTN" class="purpleBTN" style="display:none;">ダウンロード</button>
+            <button id="downloadingBTN" class="grayBTN" style="display:none;">ダウンロード中...</button>
+            <button id="cancelBTN" class="purpleBTN" style="display:none;">リセット</button>
+        </section>
+        
+        <section id="policy" class="tab-content layout1">
+            <h1>Policy</h1>
+            <p>Policy</p>
+        </section>
     </main>
-
     <script src="{% static 'script.js' %}"></script>
 </body>
 </html>

@@ -1,9 +1,5 @@
 /* ========================================== */
 
-/* button -> BTN, drag & drop zone -> DDZ */
-
-/* ========================================== */
-
 body, h1, p {
   margin: 0;
   padding: 0;
@@ -67,34 +63,12 @@ header {
 
 /* ========================================== */
 
-.main-content {
+.layout1 {
   display: flex;
   justify-content: space-between;
   margin: 0 auto;
   max-width: 1200px;
   padding: 40px;
-}
-
-.tab-content {
-  display: block;
-}
-
-.left-section {
-  flex-basis: 50%;
-}
-
-.middle-section {
-  flex-basis: 100%;
-}
-
-.right-section {
-  flex-basis: 50%;
-  padding-left: 400px;
-}
-
-/* ========================================== */
-
-.layout1 {
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -112,21 +86,36 @@ header {
 
 /* ========================================== */
 
-.removebgDDZ {
-  width: 400px;
-  height: 200px;
-  border: 2px dashed #b8b8b8;
+.purpleBTN {
+  background-color: #5B3EBC;
+  color: white;
+  border: none;
+  width: auto;
+  margin: 10px auto;
+  padding: 10px 20px;
   border-radius: 5px;
-  margin: 20px auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  font-size: 0.9em;
   cursor: pointer;
 }
 
-.removebgDDZ:hover {
-  border-color: #000000;
+.purpleBTN:hover {
+  background-color: #4a31ad;
+}
+
+.grayBTN {
+  background-color: #a5a4a7;
+  color: white;
+  border: none;
+  width: auto;
+  margin: 10px auto;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.grayBTN:hover {
+  background-color: #a1a0a4;
 }
 
 /* ========================================== */
@@ -135,40 +124,24 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-/* ========================================== */
-
-.compositeuploadBTN {
-  background-color: #5B3EBC;
-  color: white;
-  border: none;
-  width: auto;
-  margin: 10px auto;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.compositeuploadBTN:hover {
-  background-color: #4a31ad;
+  text-align: center;
 }
 
 /* ========================================== */
 
 .compositeDDZ {
-  width: 400px;
+  width: 300px;
   height: 200px;
   border: 2px dashed #b8b8b8;
   border-radius: 5px;
-  margin: 20px auto;
+  margin: 10px auto;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   cursor: pointer;
-  flex-basis: 40%;
-  margin: 30px;
+  font-size: 1.1em;
+  flex-basis: 35%;
 }
 
 .compositeDDZ:hover {
@@ -196,34 +169,22 @@ header {
 
 /* ========================================== */
 
-.purpleBTN {
-  background-color: #5B3EBC;
-  color: white;
-  border: none;
-  width: auto;
-  margin: 20px auto;
-  padding: 10px 20px;
+.removebgDDZ {
+  width: 400px;
+  height: 200px;
+  border: 2px dashed #b8b8b8;
   border-radius: 5px;
-  cursor: pointer;
-}
-
-.purpleBTN:hover {
-  background-color: #4a31ad;
-}
-
-.grayBTN {
-  background-color: #a5a4a7;
-  color: white;
-  border: none;
-  width: auto;
   margin: 20px auto;
-  padding: 10px 20px;
-  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   cursor: pointer;
+  font-size: 1.1em;
 }
 
-.grayBTN:hover {
-  background-color: #a1a0a4;
+.removebgDDZ:hover {
+  border-color: #000000;
 }
 
 /* ========================================== */

@@ -12,11 +12,6 @@ function changeTab(targetId) {
     if (activeTab) {
         activeTab.style.display = "block";
     }
-
-    const activeRightTab = document.getElementById(targetId.replace('-left', '-right'));
-    if (activeRightTab) {
-        activeRightTab.style.display = "block";
-    }
 }
 
 // ページ読み込み時の処理
@@ -26,19 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', (event) => {
             event.preventDefault();
             const targetId = link.getAttribute('data-target');
-            changeTab(targetId + '-left');
+            changeTab(targetId);
         });
     });
     // デフォルトでホームタブを表示
-    changeTab('home-left');
-
-    // ドラッグ&ドロップゾーンの配置
-    setupDragAndDrop_removebg();
+    changeTab('home');
 });
 
 // ====================================================
-
-// button -> BTN, drag & drop zone -> DDZ
 
 // 必要な要素の事前取得
 const uploadBTN = document.getElementById('uploadBTN');
@@ -51,16 +41,14 @@ const downloadBTN = document.getElementById('downloadBTN');
 const downloadingBTN = document.getElementById('downloadingBTN');
 const outputImage = document.getElementById('output_image');
 
-function setupDragAndDrop_removebg() {
-    removebgDDZ.addEventListener('dragover', handleDragOver, false);
-    removebgDDZ.addEventListener('drop', handleDrop, false);
-    removebgDDZ.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', handleFileSelect);
-    uploadBTN.addEventListener('click', () => fileInput.click());
-    removebgBTN.addEventListener('click', () => startBackgroundRemoval(fileInput.files[0]));
-    cancelBTN.addEventListener('click', resetToInitialState);
-    downloadBTN.addEventListener('click', () => startDownload(window.processedImage));
-}
+uploadBTN.addEventListener('click', () => fileInput.click());
+removebgDDZ.addEventListener('dragover', handleDragOver, false);
+removebgDDZ.addEventListener('drop', handleDrop, false);
+removebgDDZ.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', handleFileSelect);
+removebgBTN.addEventListener('click', () => startBackgroundRemoval(fileInput.files[0]));
+cancelBTN.addEventListener('click', resetToInitialState);
+downloadBTN.addEventListener('click', () => startDownload(window.processedImage));
 
 function handleDragOver(e) {
     e.stopPropagation();
@@ -101,19 +89,17 @@ function toggleElements(show, ...elements) {
     });
 }
 
-// グローバル変数でAbortControllerの参照を保持
-let abortController;
-
+// 画像の処理開始
 function startBackgroundRemoval(file) {
     if (file) {
-        abortController = new AbortController();
+        const abortController = new AbortController();
         toggleElements(false, removebgBTN);
         toggleElements(true, processingBTN);
-        removeBackground(file);
+        removeBackground(file, abortController);
     }
 }
 
-function removeBackground(file) {
+function removeBackground(file, abortController) {
     var formData = new FormData();
     formData.append('image', file);
 
@@ -146,16 +132,18 @@ function removeBackground(file) {
     });
 }
 
-function startDownload(processedImage) {
+// ダウンロード開始
+function startDownload(processedImage, abortController) {
     if (processedImage) {
         toggleElements(false, downloadBTN, cancelBTN);
         toggleElements(true, downloadingBTN);
         triggerDownload(processedImage);
-        setTimeout(resetToInitialState, 2000);
+        setTimeout(() => resetToInitialState(abortController), 2000);
     }
 }
 
-function resetToInitialState() {
+// 初期状態にリセット
+function resetToInitialState(abortController) {
     if (abortController) {
         abortController.abort();
     }
