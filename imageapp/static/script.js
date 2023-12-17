@@ -39,23 +39,28 @@ const downloadingBTN = document.getElementById('downloadingBTN');
 
 // ====================================================
 
-// 必要な要素の事前取得
-const uploadBTN = document.getElementById('uploadBTN');
+// HTML要素の参照
 const removebgDDZ = document.getElementById('removebgDDZ');
-const fileInput = document.getElementById('file_input');
 const removebgBTN = document.getElementById('removebgBTN');
 const cancelBTN = document.getElementById('cancelBTN');
 const downloadBTN = document.getElementById('downloadBTN');
 const outputImage = document.getElementById('output_image');
 
-removebgDDZ.addEventListener('dragover', handleDragOver, false);
-removebgDDZ.addEventListener('drop', handleDrop, false);
-removebgDDZ.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', handleFileSelect);
-uploadBTN.addEventListener('click', () => fileInput.click());
+// 合成ボタンとダウンロードボタンを非表示にする
+toggleElements(false, removebgBTN, cancelBTN, downloadBTN);
+
+// ファイルインプット要素の作成
+const fileInput = document.createElement('input');
+fileInput.type = 'file';
+fileInput.accept = 'image/*';
+fileInput.style.display = 'none';
+
 removebgBTN.addEventListener('click', () => startBackgroundRemoval(fileInput.files[0]));
-cancelBTN.addEventListener('click', resetToInitialState);
-downloadBTN.addEventListener('click', () => startDownload(processedImage));
+cancelBTN.addEventListener('click', resetForm);
+
+// ドラッグ＆ドロップイベントハンドラーの追加
+removebgDDZ.addEventListener('dragover', handleDragOver, false);
+removebgDDZ.addEventListener('drop', (e) => handleRemoveDrop(e, 'remove_aaa'));
 
 function handleDragOver(e) {
     e.stopPropagation();
@@ -63,25 +68,26 @@ function handleDragOver(e) {
     e.dataTransfer.dropEffect = 'copy';
 }
 
-function handleDrop(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    processFiles(e.dataTransfer.files);
-}
+// HTMLにファイルインプット要素を追加
+document.body.appendChild(fileInput);
 
-function handleFileSelect(e) {
-    processFiles(e.target.files);
-}
+// クリックイベントでファイル選択ダイアログを開くように設定
+removebgDDZ.addEventListener('click', () => fileInput.click());
 
-function processFiles(files) {
+// ファイル選択イベントの処理
+fileInput.addEventListener('change', (e) => {
+    processRemoveFileSelect(e, 'remove_aaa');
+});
+
+// ファイル選択イベントの処理
+function processRemoveFileSelect(e, type) {
+    const files = e.target.files;
     if (files.length === 1) {
         const fileType = files[0].type;
         if (fileType === 'image/avif') {
             alert('サポートされていないファイル形式です。別の画像ファイルを選択してください。');
         } else if (fileType.match('image.*')) {
-            fileInput.files = files;
-            toggleElements(false, uploadBTN, removebgDDZ);
-            toggleElements(true, removebgBTN, cancelBTN);
+            processRemoveImage(files[0], type);
         } else {
             alert('サポートされていないファイル形式です。別の画像ファイルを選択してください。');
         }
@@ -89,6 +95,30 @@ function processFiles(files) {
         alert('アップロードできる画像は1つのみです。');
     }
 }
+
+function processRemoveImage(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const imageSrc = e.target.result;
+        updateDDZDisplay(removebgDDZ, imageSrc, 'remove_aaa');
+        toggleElements(true, removebgBTN, cancelBTN);
+    };
+    reader.readAsDataURL(file);
+}
+
+// ドラッグ＆ドロップイベントのハンドラー
+function handleRemoveDrop(e, type) {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer.files;
+    if (files.length === 1 && files[0].type.match('image.*')) {
+        processCompositeImage(files[0], type);
+    } else {
+        alert('画像ファイルを1つ選択してください。');
+    }
+}
+
+// ====================================================
 
 function startBackgroundRemoval(file) {
     if (file) {
@@ -142,7 +172,7 @@ function startDownload(base64Data) {
 
         // ダウンロードが完了するのを待ってからリセットする
         link.addEventListener('click', () => {
-            setTimeout(resetToInitialState, 2000);
+            setTimeout(resetForm, 2000);
         });
 
         document.body.appendChild(link);
@@ -151,21 +181,14 @@ function startDownload(base64Data) {
     }
 }
 
-function resetToInitialState() {
-    outputImage.style.display = 'none';
-    resetForm();
-}
-
 function resetForm() {
-    document.getElementById('file_input').value = ''; // ファイル入力をリセット
-    document.getElementById('uploadBTN').style.display = 'block';
+    outputImage.style.display = 'none';
+    document.getElementById('file_input').value = '';
     var removebgDDZ = document.getElementById('removebgDDZ');
     removebgDDZ.style.display = 'flex';
-    document.getElementById('removebgBTN').style.display = 'none';
-    document.getElementById('processingBTN').style.display = 'none';
-    document.getElementById('downloadBTN').style.display = 'none';
-    document.getElementById('downloadingBTN').style.display = 'none';
-    document.getElementById('cancelBTN').style.display = 'none';
+    toggleElements(false, removebgBTN, processingBTN, downloadBTN, downloadingBTN, cancelBTN);
+    clearPreviews();
+    resetDDZDisplay();
 }
 
 // Base64エンコードされた画像データをダウンロードする関数
@@ -487,11 +510,6 @@ function downloadLink(href, filename) {
     // ダウンロードボタンとリセットボタンを元に戻す
     toggleElements(true, resetCompositeButton);
     toggleElements(false, compositedownloadingBTN);
-}
-
-function compositeresetToInitialState() {
-    outputImage.style.display = 'none';
-    resetAllImages();
 }
 
 // Data URIをBlobに変換するヘルパー関数
