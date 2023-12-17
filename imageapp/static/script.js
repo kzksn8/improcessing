@@ -28,6 +28,15 @@ document.addEventListener('DOMContentLoaded', () => {
     changeTab('home');
 });
 
+function toggleElements(show, ...elements) {
+    elements.forEach(element => {
+        element.style.display = show ? 'block' : 'none';
+    });
+}
+
+const processingBTN = document.getElementById('processingBTN');
+const downloadingBTN = document.getElementById('downloadingBTN');
+
 // ====================================================
 
 // 必要な要素の事前取得
@@ -36,9 +45,7 @@ const removebgDDZ = document.getElementById('removebgDDZ');
 const fileInput = document.getElementById('file_input');
 const removebgBTN = document.getElementById('removebgBTN');
 const cancelBTN = document.getElementById('cancelBTN');
-const processingBTN = document.getElementById('processingBTN');
 const downloadBTN = document.getElementById('downloadBTN');
-const downloadingBTN = document.getElementById('downloadingBTN');
 const outputImage = document.getElementById('output_image');
 
 removebgDDZ.addEventListener('dragover', handleDragOver, false);
@@ -83,17 +90,11 @@ function processFiles(files) {
     }
 }
 
-function toggleElements(show, ...elements) {
-    elements.forEach(element => {
-        element.style.display = show ? 'block' : 'none';
-    });
-}
-
 function startBackgroundRemoval(file) {
     if (file) {
         const localAbortController = new AbortController();  // ローカル変数としてAbortControllerを作成
-        toggleElements(false, cancelBTN);
-        toggleElements(false, removebgBTN);
+        // 同時に複数の要素の表示状態を変更
+        toggleElements(false, cancelBTN, removebgBTN);
         toggleElements(true, processingBTN);
         removeBackground(file, localAbortController);  // AbortControllerを引数として渡す
     }
@@ -105,7 +106,7 @@ downloadingBTN.addEventListener('click', () => {
     }
 });
 
-function removeBackground(file, abortController) {  // abortControllerを引数として受け取る
+function removeBackground(file, abortController) {
     var formData = new FormData();
     formData.append('image', file);
 
@@ -123,20 +124,14 @@ function removeBackground(file, abortController) {  // abortControllerを引数�
         // 画像データをグローバル変数に保存
         window.processedImage = data.image;
 
-        // 「処理中...」ボタンを非表示にし、「ダウンロード」ボタンを表示
-        document.getElementById('processingBTN').style.display = 'none';
-        document.getElementById('cancelBTN').style.display = 'block';
-        document.getElementById('downloadBTN').style.display = 'block';
-
-        // 画像データをcallback関数に渡す
-        callback(data.image);
+        // 「処理中...」ボタンを非表示にし、「ダウンロード」「キャンセル」ボタンを表示
+        toggleElements(false, processingBTN);
+        toggleElements(true, downloadBTN, cancelBTN);
     })
     .catch(error => {
         if (error.name === 'AbortError') {
-            // 処理が中断された場合の処理
             console.log('Fetch aborted');
         } else {
-            // その他のエラー処理
             console.error('Error:', error);
         }
     });
@@ -152,7 +147,6 @@ function startDownload(processedImage) {
 }
 
 function resetToInitialState() {
-    // AbortControllerの処理は不要になるため削除
     outputImage.style.display = 'none';
     resetForm();
     window.processedImage = undefined;
@@ -206,7 +200,6 @@ function getCookie(name) {
 
 // ====================================================
 
-// 合成画像用のグローバル変数
 let compositeForegroundImage = null;
 let compositeBackgroundImage = null;
 
@@ -215,7 +208,9 @@ const foregroundDDZ = document.getElementById('foregroundDDZ');
 const backgroundDDZ = document.getElementById('backgroundDDZ');
 const compositePreviewArea = document.getElementById('composite_preview_area');
 const compositeBTN = document.getElementById('compositeBTN');
+const compositeprocessingBTN = document.getElementById('compositeprocessingBTN');
 const downloadcompositeBTN = document.getElementById('downloadcompositeBTN');
+const compositedownloadingBTN = document.getElementById('compositedownloadingBTN');
 const resetCompositeButton = document.getElementById('resetCompositeButton');
 
 // 合成ボタンとダウンロードボタンを非表示にする
@@ -260,7 +255,7 @@ function resetAllImages() {
     compositeForegroundFileInput.value = ''; // ファイル入力をリセット
     compositeBackgroundFileInput.value = ''; // ファイル入力をリセット
     compositePreviewArea.innerHTML = ''; // プレビュー領域をクリア
-    document.getElementById('downloadcompositeBTN').style.display = 'none'; // ダウンロードボタンを非表示に
+    toggleElements(false, resetCompositeButton, compositeBTN, compositeprocessingBTN, downloadcompositeBTN, compositedownloadingBTN);
     clearPreviews();
     resetDDZDisplay();
     updateCompositeButtonVisibility();
@@ -321,27 +316,24 @@ function processCompositeFileSelect(e, type) {
     }
 }
 
-// 画像処理関数
 function processCompositeImage(file, type) {
     const reader = new FileReader();
     reader.onload = (e) => {
         const imageSrc = e.target.result;
         if (type === 'foreground') {
             compositeForegroundImage = imageSrc;
-            console.log("前景画像設定:", compositeForegroundImage); // ログ追加
-            updateDDZDisplay(foregroundDDZ, imageSrc, 'foreground');
+            updateDDZDisplay(foregroundDDZ, imageSrc, 'foreground', compositeForegroundImage, compositeBackgroundImage);
         } else if (type === 'background') {
             compositeBackgroundImage = imageSrc;
-            console.log("背景画像設定:", compositeBackgroundImage); // ログ追加
-            updateDDZDisplay(backgroundDDZ, imageSrc, 'background');
+            updateDDZDisplay(backgroundDDZ, imageSrc, 'background', compositeForegroundImage, compositeBackgroundImage);
         }
-        updateCompositeButtonVisibility();
+        updateCompositeButtonVisibility(compositeForegroundImage, compositeBackgroundImage);
     };
     reader.readAsDataURL(file);
 }
 
 // DDZ表示更新関数
-function updateDDZDisplay(DDZElement, imageSrc, type) {
+function updateDDZDisplay(DDZElement, imageSrc) {
     const existingImage = DDZElement.querySelector('img.preview');
     if (existingImage) {
         DDZElement.removeChild(existingImage);
@@ -373,11 +365,11 @@ function updateDDZDisplay(DDZElement, imageSrc, type) {
 }
 
 // 画像合成ボタンの表示制御関数
-function updateCompositeButtonVisibility() {
+function updateCompositeButtonVisibility(compositeForegroundImage, compositeBackgroundImage) {
     if (compositeForegroundImage && compositeBackgroundImage) {
-        compositeBTN.style.display = 'block';
+        toggleElements(true, compositeBTN);
     } else {
-        compositeBTN.style.display = 'none';
+        toggleElements(false, compositeBTN);
     }
     // リセットボタンの表示状態もここで制御
     resetCompositeButton.style.display = (compositeForegroundImage || compositeBackgroundImage) ? 'block' : 'none';
@@ -391,7 +383,8 @@ compositeBTN.addEventListener('click', () => {
     }
 
     // 合成ボタンを非表示にする
-    compositeBTN.style.display = 'none';
+    toggleElements(false, compositeBTN, resetCompositeButton);
+    toggleElements(true, compositeprocessingBTN);
 
     var formData = new FormData();
     formData.append('foreground', dataURItoBlob(compositeForegroundImage));
@@ -415,21 +408,25 @@ compositeBTN.addEventListener('click', () => {
             // ダウンロードボタンに合成画像のデータURLをセット
             downloadcompositeBTN.href = compositeImageSrc;
             downloadcompositeBTN.download = 'composite_image.png';
-            downloadcompositeBTN.style.display = 'block';
+            toggleElements(false, compositeprocessingBTN);
+            toggleElements(true, resetCompositeButton, downloadcompositeBTN);
         } else {
             alert('画像の合成に失敗しました。');
-            downloadcompositeBTN.style.display = 'none';
+            resetAllImages();
         }
     })
     .catch(error => {
         console.error('画像合成中にエラーが発生しました:', error);
         alert('エラーが発生しました。コンソールを確認してください。');
-        downloadcompositeBTN.style.display = 'none';
+        resetAllImages();
     });
 });
 
 // ダウンロードボタンのイベントハンドラ
 downloadcompositeBTN.addEventListener('click', () => {
+    toggleElements(false, downloadcompositeBTN, resetCompositeButton);
+    toggleElements(true, compositedownloadingBTN);
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
@@ -469,7 +466,13 @@ downloadcompositeBTN.addEventListener('click', () => {
             document.body.removeChild(downloadLink);
         };
     };
+    setTimeout(compositeresetToInitialState, 2000);
 });
+
+function compositeresetToInitialState() {
+    outputImage.style.display = 'none';
+    resetAllImages();
+}
 
 // Data URIをBlobに変換するヘルパー関数
 function dataURItoBlob(dataURI) {

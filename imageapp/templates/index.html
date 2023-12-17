@@ -26,9 +26,10 @@
                 <a href="#removebg" data-target="removebg">背景削除</a>
                 <a href="#policy" data-target="policy">Policy</a>
             </nav>
-            <div class="login-signup">
-                <a href="#login-signup" data-target="login-signup">Login / Sign Up</a>
-            </div>
+            <nav>
+                <a href="#login" data-target="login" class="login-signup">Login</a>
+                <a href="#signup" data-target="signup" class="login-signup">Sign Up</a>
+            </nav>
         </div>
     </header>
 
@@ -48,14 +49,16 @@
             <p>一般合成</p>
             <div class="composite-container">
                 <div id="foregroundDDZ" class="compositeDDZ">
-                    前景画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
+                    前景画像<br>ドラッグ＆ドロップ<br>または<br>クリックで画像選択
                 </div>
                 <div id="backgroundDDZ" class="compositeDDZ">
-                    背景画像をドラッグ＆ドロップ<br>または<br>クリックで画像選択
+                    背景画像<br>ドラッグ＆ドロップ<br>または<br>クリックで画像選択
                 </div>
             </div>
             <button id="compositeBTN" class="purpleBTN" style="display:none;">画像合成</button>
+            <button id="compositeprocessingBTN" class="grayBTN" style="display:none;">処理中...</button>
             <button id="resetCompositeButton" class="purpleBTN" onclick="resetAllImages()" style="display: none;">合成リセット</button>
+            <button id="compositedownloadingBTN" class="grayBTN" style="display:none;">ダウンロード中...</button>
             <button id="downloadcompositeBTN" class="purpleBTN" style="display:none;">ダウンロード</button>
             <div id="composite_preview_area" class="composite-preview"></div>
         </section>
