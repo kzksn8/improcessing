@@ -200,9 +200,6 @@ function getCookie(name) {
 
 // ====================================================
 
-let compositeForegroundImage = null;
-let compositeBackgroundImage = null;
-
 // HTML要素の参照
 const foregroundDDZ = document.getElementById('foregroundDDZ');
 const backgroundDDZ = document.getElementById('backgroundDDZ');
@@ -250,8 +247,6 @@ resetCompositeButton.addEventListener('click', resetAllImages);
 
 // すべての画像とプレビューをリセットする関数
 function resetAllImages() {
-    compositeForegroundImage = null;
-    compositeBackgroundImage = null;
     compositeForegroundFileInput.value = ''; // ファイル入力をリセット
     compositeBackgroundFileInput.value = ''; // ファイル入力をリセット
     compositePreviewArea.innerHTML = ''; // プレビュー領域をクリア
@@ -321,13 +316,11 @@ function processCompositeImage(file, type) {
     reader.onload = (e) => {
         const imageSrc = e.target.result;
         if (type === 'foreground') {
-            compositeForegroundImage = imageSrc;
-            updateDDZDisplay(foregroundDDZ, imageSrc, 'foreground', compositeForegroundImage, compositeBackgroundImage);
+            updateDDZDisplay(foregroundDDZ, imageSrc, 'foreground');
         } else if (type === 'background') {
-            compositeBackgroundImage = imageSrc;
-            updateDDZDisplay(backgroundDDZ, imageSrc, 'background', compositeForegroundImage, compositeBackgroundImage);
+            updateDDZDisplay(backgroundDDZ, imageSrc, 'background');
         }
-        updateCompositeButtonVisibility(compositeForegroundImage, compositeBackgroundImage);
+        updateCompositeButtonVisibility();
     };
     reader.readAsDataURL(file);
 }
@@ -365,31 +358,37 @@ function updateDDZDisplay(DDZElement, imageSrc) {
 }
 
 // 画像合成ボタンの表示制御関数
-function updateCompositeButtonVisibility(compositeForegroundImage, compositeBackgroundImage) {
-    if (compositeForegroundImage && compositeBackgroundImage) {
+function updateCompositeButtonVisibility() {
+    const foregroundImage = compositeForegroundFileInput.files[0];
+    const backgroundImage = compositeBackgroundFileInput.files[0];
+    if (foregroundImage && backgroundImage) {
         toggleElements(true, compositeBTN);
     } else {
         toggleElements(false, compositeBTN);
     }
     // リセットボタンの表示状態もここで制御
-    resetCompositeButton.style.display = (compositeForegroundImage || compositeBackgroundImage) ? 'block' : 'none';
+    resetCompositeButton.style.display = (foregroundImage || backgroundImage) ? 'block' : 'none';
 }
 
 // 画像合成ボタンのイベントハンドラ
 compositeBTN.addEventListener('click', () => {
-    if (!compositeForegroundImage || !compositeBackgroundImage) {
+    const foregroundFile = compositeForegroundFileInput.files[0];
+    const backgroundFile = compositeBackgroundFileInput.files[0];
+    if (!foregroundFile || !backgroundFile) {
         alert('前景画像と背景画像の両方が必要です。');
         return;
     }
 
-    // 合成ボタンを非表示にする
+    // 合成ボタンを非表示にし、処理中状態を表示する
     toggleElements(false, compositeBTN, resetCompositeButton);
     toggleElements(true, compositeprocessingBTN);
 
+    // FormDataオブジェクトを作成し、ファイルを追加
     var formData = new FormData();
-    formData.append('foreground', dataURItoBlob(compositeForegroundImage));
-    formData.append('background', dataURItoBlob(compositeBackgroundImage));
+    formData.append('foreground', foregroundFile);
+    formData.append('background', backgroundFile);
 
+    // サーバーに対して合成を要求
     fetch('composite-image/', {
         method: 'POST',
         body: formData,
@@ -402,10 +401,7 @@ compositeBTN.addEventListener('click', () => {
     .then(data => {
         if (data.composite_image) {
             const compositeImageSrc = `data:image/png;base64,${data.composite_image}`;
-            // ここで画像をプレビューに表示する際に、オリジナルのアスペクト比を維持する
             compositePreviewArea.innerHTML = `<img src="${compositeImageSrc}" alt="Composite Image" style="max-width: 100%; height: auto;">`;
-            
-            // ダウンロードボタンに合成画像のデータURLをセット
             downloadcompositeBTN.href = compositeImageSrc;
             downloadcompositeBTN.download = 'composite_image.png';
             toggleElements(false, compositeprocessingBTN);
@@ -423,51 +419,71 @@ compositeBTN.addEventListener('click', () => {
 });
 
 // ダウンロードボタンのイベントハンドラ
-downloadcompositeBTN.addEventListener('click', () => {
+downloadcompositeBTN.addEventListener('click', (event) => {
+    event.preventDefault(); // デフォルトの動作を停止する
+
+    // ダウンロードボタンの表示状態を更新
     toggleElements(false, downloadcompositeBTN, resetCompositeButton);
     toggleElements(true, compositedownloadingBTN);
 
+    // 背景画像と前景画像をCanvasに描画してダウンロード
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-
     const backgroundImg = new Image();
-    backgroundImg.src = compositeBackgroundImage;
-
     const foregroundImg = new Image();
-    foregroundImg.src = compositeForegroundImage;
+
+    // 画像の読み込みがCORSによる制限を受けないようにする
+    backgroundImg.crossOrigin = 'Anonymous';
+    foregroundImg.crossOrigin = 'Anonymous';
 
     backgroundImg.onload = () => {
+        // 背景画像が読み込まれたらCanvasのサイズを設定
         canvas.width = backgroundImg.width;
         canvas.height = backgroundImg.height;
-
         ctx.drawImage(backgroundImg, 0, 0);
 
         foregroundImg.onload = () => {
-            const aspectRatioForeground = foregroundImg.width / foregroundImg.height;
-            let scaledWidth = canvas.width;
-            let scaledHeight = canvas.width / aspectRatioForeground;
-
-            if (scaledHeight > canvas.height) {
-                scaledHeight = canvas.height;
-                scaledWidth = canvas.height * aspectRatioForeground;
-            }
-
-            const offsetX = (canvas.width - scaledWidth) / 2;
-            const offsetY = (canvas.height - scaledHeight) / 2;
-            ctx.drawImage(foregroundImg, offsetX, offsetY, scaledWidth, scaledHeight);
-
+            // 前景画像を描画
+            ctx.drawImage(foregroundImg, 0, 0);
+            // Canvasから画像のDataURLを取得
             const dataURL = canvas.toDataURL('image/png');
-
-            const downloadLink = document.createElement('a');
-            downloadLink.href = dataURL;
-            downloadLink.download = 'composite_image.png';
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
+            triggerDownload(dataURL, 'composite_image.png');
+            setTimeout(resetAllImages, 1000);
         };
+        // 前景画像の読み込みを開始
+        foregroundImg.src = compositePreviewArea.querySelector('img').src;
     };
-    setTimeout(compositeresetToInitialState, 2000);
+    // 背景画像の読み込みを開始
+    backgroundImg.src = compositePreviewArea.querySelector('img').src;
 });
+
+// ダウンロードをトリガーする関数
+function triggerDownload(dataURL, filename) {
+    const downloadLink = document.createElement('a');
+    downloadLink.href = dataURL;
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+function compositeresetToInitialState() {
+    outputImage.style.display = 'none';
+    resetAllImages();
+}
+
+function downloadLink(href, filename) {
+    const downloadLink = document.createElement('a');
+    downloadLink.href = href;
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+
+    // ダウンロードボタンとリセットボタンを元に戻す
+    toggleElements(true, resetCompositeButton);
+    toggleElements(false, compositedownloadingBTN);
+}
 
 function compositeresetToInitialState() {
     outputImage.style.display = 'none';
