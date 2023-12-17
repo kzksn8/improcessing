@@ -100,12 +100,6 @@ function startBackgroundRemoval(file) {
     }
 }
 
-downloadingBTN.addEventListener('click', () => {
-    if (window.processedImage) {
-        triggerDownload(window.processedImage);
-    }
-});
-
 function removeBackground(file, abortController) {
     var formData = new FormData();
     formData.append('image', file);
@@ -116,17 +110,17 @@ function removeBackground(file, abortController) {
         headers: {
             'X-CSRFToken': csrftoken
         },
-        signal: abortController.signal  // ローカルのAbortControllerを使用
+        signal: abortController.signal
     })
     .then(handleErrors)
     .then(response => response.json())
     .then(data => {
-        // 画像データをグローバル変数に保存
-        window.processedImage = data.image;
-
         // 「処理中...」ボタンを非表示にし、「ダウンロード」「キャンセル」ボタンを表示
         toggleElements(false, processingBTN);
         toggleElements(true, downloadBTN, cancelBTN);
+    
+        // ダウンロードボタンのイベントハンドラーを設定
+        downloadBTN.onclick = () => startDownload(data.image);
     })
     .catch(error => {
         if (error.name === 'AbortError') {
@@ -137,19 +131,29 @@ function removeBackground(file, abortController) {
     });
 }
 
-function startDownload(processedImage) {
-    if (processedImage) {
+function startDownload(base64Data) {
+    if (base64Data) {
         toggleElements(false, downloadBTN, cancelBTN);
         toggleElements(true, downloadingBTN);
-        triggerDownload(processedImage);
-        setTimeout(resetToInitialState, 2000);
+
+        var link = document.createElement('a');
+        link.href = 'data:image/png;base64,' + base64Data;
+        link.download = 'processed_image.png';
+
+        // ダウンロードが完了するのを待ってからリセットする
+        link.addEventListener('click', () => {
+            setTimeout(resetToInitialState, 2000);
+        });
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 }
 
 function resetToInitialState() {
     outputImage.style.display = 'none';
     resetForm();
-    window.processedImage = undefined;
 }
 
 function resetForm() {
