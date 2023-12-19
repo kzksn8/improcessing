@@ -15,10 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from .views import index, remove_background, composite_image
+from .views import index, remove_background, style_transfer_view
 
 urlpatterns = [
     path('', index, name='index'),
     path('remove-background/', remove_background, name='remove_background'),
-    path('composite-image/', composite_image, name='composite_image'),
+    path('style_transfer_view/', style_transfer_view, name='style_transfer_view'),
 ]
