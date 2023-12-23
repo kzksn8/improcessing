@@ -1,5 +1,3 @@
-// ===========================================================================
-
 // タブを切り替える関数
 function changeTab(targetId) {
     const tabs = document.getElementsByClassName("tab-content");
@@ -33,7 +31,6 @@ function toggleElements(show, ...elements) {
     });
 }
 
-// ===========================================================================
 // ===========================================================================
 // ===========================================================================
 
@@ -74,7 +71,6 @@ function handleErrors(response) {
 
 // ===========================================================================
 // ===========================================================================
-// ===========================================================================
 
 const processingBTN = document.getElementById('processingBTN');
 const downloadingBTN = document.getElementById('downloadingBTN');
@@ -94,7 +90,6 @@ function resetDDZDisplay() {
     });
 }
 
-// ===========================================================================
 // ===========================================================================
 // ===========================================================================
 
@@ -176,16 +171,6 @@ function processRemoveFileSelect(e, type) {
     }
 }
 
-// function processRemoveImage(file) {
-//     const reader = new FileReader();
-//     reader.onload = (e) => {
-//         const imageSrc = e.target.result;
-//         updateDDZDisplay(removebgDDZ, imageSrc, 'remove_aaa');
-//         toggleElements(true, removebgBTN, cancelBTN);
-//     };
-//     reader.readAsDataURL(file);
-// }
-
 function processRemoveImage(file, type) {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -259,7 +244,6 @@ function startDownload(base64Data) {
     }
 }
 
-// ===========================================================================
 // ===========================================================================
 // ===========================================================================
 
@@ -530,18 +514,3 @@ function downloadLink(href, filename) {
     toggleElements(true, resetCompositeButton);
     toggleElements(false, compositedownloadingBTN);
 }
-
-// ===========================================================================
-
-// Data URIをBlobに変換するヘルパー関数
-// function dataURItoBlob(dataURI) {
-//     var byteString = atob(dataURI.split(',')[1]);
-//     var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
-//     var ab = new ArrayBuffer(byteString.length);
-//     var ia = new Uint8Array(ab);
-//     for (var i = 0; i < byteString.length; i++) {
-//         ia[i] = byteString.charCodeAt(i);
-//     }
-//     return new Blob([ab], {type: mimeString});
-// }
-
