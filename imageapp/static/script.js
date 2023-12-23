@@ -1,3 +1,5 @@
+// ===========================================================================
+
 // タブを切り替える関数
 function changeTab(targetId) {
     const tabs = document.getElementsByClassName("tab-content");
@@ -81,15 +83,6 @@ function clearPreviews() {
     previewImages.forEach(image => image.remove());
 }
 
-// ドラッグ＆ドロップゾーンの表示をリセットする関数
-function resetDDZDisplay() {
-    const ddzElements = document.querySelectorAll('.compositeDDZ');
-    ddzElements.forEach(ddz => {
-        ddz.style.display = 'flex'; // デフォルト表示に戻す
-        ddz.innerHTML = 'ドラッグ＆ドロップ<br>または<br>クリックで画像選択'; // デフォルトテキストに戻す
-    });
-}
-
 // ===========================================================================
 // ===========================================================================
 
@@ -109,13 +102,11 @@ toggleElements(false, cancelBTN, removebgBTN, processingBTN, downloadBTN, downlo
 cancelBTN.addEventListener('click', resetForm);
 
 function resetForm() {
+    fileInput.value = '';
     outputImage.style.display = 'none';
-    document.getElementById('file_input').value = '';
-    var removebgDDZ = document.getElementById('removebgDDZ');
     removebgDDZ.style.display = 'flex';
     toggleElements(false, cancelBTN, removebgBTN, processingBTN, downloadBTN, downloadingBTN);
     clearPreviews();
-    resetDDZDisplay();
 }
 
 // ===========================================================================
@@ -176,16 +167,42 @@ function processRemoveImage(file, type) {
     reader.onload = (e) => {
         const imageSrc = e.target.result;
         if (type === 'remove_aaa') {
-            updateDDZDisplay(removebgDDZ, imageSrc, 'remove_aaa');
+            displayUploadedImage(imageSrc);
         }
-        toggleElements(true, removebgBTN, cancelBTN);
     };
     reader.readAsDataURL(file);
 }
 
+// アップロードされた画像を表示する関数
+function displayUploadedImage(imageSrc) {
+    const imageElement = new Image();
+    imageElement.onload = function() {
+        let newWidth, newHeight;
+        const parentWidth = removebgDDZ.offsetWidth;
+        const parentHeight = removebgDDZ.offsetHeight;
+        const aspectRatio = this.width / this.height;
+
+        if (parentWidth / parentHeight > aspectRatio) {
+            newHeight = parentHeight;
+            newWidth = aspectRatio * newHeight;
+        } else {
+            newWidth = parentWidth;
+            newHeight = newWidth / aspectRatio;
+        }
+
+        this.style.width = newWidth + 'px';
+        this.style.height = newHeight + 'px';
+        this.className = 'preview';
+        removebgDDZ.parentNode.insertBefore(this, removebgDDZ.nextSibling);
+        removebgDDZ.style.display = 'none';
+        toggleElements(true, removebgBTN, cancelBTN);
+    };
+    imageElement.src = imageSrc;
+}
+
 // ===========================================================================
 
-// 画像合成、ダウンロードボタン
+// 背景削除
 removebgBTN.addEventListener('click', () => startBackgroundRemoval(fileInput.files[0]));
 
 function startBackgroundRemoval(file) {
@@ -212,8 +229,7 @@ function removeBackground(file, abortController) {
     .then(handleErrors)
     .then(response => response.json())
     .then(data => {
-        toggleElements(false, processingBTN);
-        toggleElements(true, downloadBTN, cancelBTN);
+        displayProcessedImage(data.image);
         downloadBTN.onclick = () => startDownload(data.image);
     })
     .catch(error => {
@@ -223,6 +239,37 @@ function removeBackground(file, abortController) {
             console.error('Error:', error);
         }
     });
+}
+
+// 背景削除後の画像を表示する関数
+function displayProcessedImage(base64Data) {
+    const imageElement = new Image();
+    imageElement.onload = function() {
+        clearPreviews();
+        removebgDDZ.style.display = 'flex';
+
+        let newWidth, newHeight;
+        const parentWidth = removebgDDZ.offsetWidth;
+        const parentHeight = removebgDDZ.offsetHeight;
+        const aspectRatio = this.width / this.height;
+
+        if (parentWidth / parentHeight > aspectRatio) {
+            newHeight = parentHeight;
+            newWidth = aspectRatio * newHeight;
+        } else {
+            newWidth = parentWidth;
+            newHeight = newWidth / aspectRatio;
+        }
+
+        this.style.width = newWidth + 'px';
+        this.style.height = newHeight + 'px';
+        this.className = 'preview';
+        removebgDDZ.parentNode.insertBefore(this, removebgDDZ.nextSibling);
+        removebgDDZ.style.display = 'none';
+        toggleElements(false, processingBTN);
+        toggleElements(true, downloadBTN, cancelBTN);
+    };
+    imageElement.src = 'data:image/png;base64,' + base64Data;
 }
 
 function startDownload(base64Data) {
@@ -273,8 +320,17 @@ function resetAllImages() {
     compositePreviewArea.innerHTML = ''; // プレビュー領域をクリア
     toggleElements(false, resetCompositeButton, compositeBTN, compositeprocessingBTN, downloadcompositeBTN, compositedownloadingBTN);
     clearPreviews();
-    resetDDZDisplay();
+    // resetDDZDisplay();
 }
+
+// // ドラッグ＆ドロップゾーンの表示をリセットする関数
+// function resetDDZDisplay() {
+//     const ddzElements = document.querySelectorAll('.compositeDDZ');
+//     ddzElements.forEach(ddz => {
+//         ddz.style.display = 'flex'; // デフォルト表示に戻す
+//         ddz.innerHTML = 'ドラッグ＆ドロップ<br>または<br>クリックで画像選択'; // デフォルトテキストに戻す
+//     });
+// }
 
 // ===========================================================================
 
@@ -514,3 +570,5 @@ function downloadLink(href, filename) {
     toggleElements(true, resetCompositeButton);
     toggleElements(false, compositedownloadingBTN);
 }
+
+// ===========================================================================
