@@ -86,7 +86,8 @@ def gram_matrix(tensor):
     return gram
 
 # スタイル転送のメイン関数
-def style_transfer(content_img, style_img, model, content_weight=1e5, style_weight=1e10, steps=300):
+# Step数の調整で計算時間変化
+def style_transfer(content_img, style_img, model, content_weight=1e5, style_weight=1e10, steps=100):
     # 特徴抽出器を評価モードに設定
     model.eval()
 
@@ -108,7 +109,8 @@ def style_transfer(content_img, style_img, model, content_weight=1e5, style_weig
         total_loss.backward()
         optimizer.step()
 
-        if i % 50 == 0:
+        # Stepの進捗の出力
+        if i % 20 == 0:
             print("Step {}/{}".format(i, steps))
             print("Total loss: ", total_loss.item())
 

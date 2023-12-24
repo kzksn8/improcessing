@@ -10,7 +10,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .style_transfer import style_transfer
-from .style_transfer import style_transfer, get_feature_extractor, load_image
+from .style_transfer import style_transfer, get_feature_extractor
 
 # デバイスを設定（GPUが利用可能な場合はGPUを使用）
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -20,19 +20,18 @@ def index(request):
 
 # メモリから画像を読み込むための新しい関数
 def load_image_from_memory(image, max_size=512, shape=None):
-    # 画像サイズを大きすぎないように調整
-    size = max(image.size)
-    if size > max_size:
-        size = max_size
-    
-    if shape is not None:
-        # shape がタプルであることを確認し、それに基づいて size を設定
-        if isinstance(shape, tuple):
-            size = shape[0]  # 例として、shapeの最初の要素を使用
+    # 元のアスペクト比を保持するために新しいサイズを計算
+    aspect_ratio = image.width / image.height
+    if aspect_ratio > 1:  # 幅が高さより大きい場合
+        new_width = min(image.width, max_size)
+        new_height = int(new_width / aspect_ratio)
+    else:  # 高さが幅より大きい、または等しい場合
+        new_height = min(image.height, max_size)
+        new_width = int(new_height * aspect_ratio)
 
     # 画像の前処理を行うための変換
     in_transform = transforms.Compose([
-        transforms.Resize((size, int(size * image.size[1] / image.size[0]))), # アスペクト比を保持
+        transforms.Resize((new_height, new_width)),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     ])

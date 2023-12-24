@@ -87,11 +87,11 @@ const foregroundDDZ = document.getElementById('foregroundDDZ');
 const backgroundDDZ = document.getElementById('backgroundDDZ');
 const compositeForegroundFileInput = document.createElement('input');
 const compositeBackgroundFileInput = document.createElement('input');
-const compositePreviewArea = document.getElementById('composite_preview_area');
 const compositeBTN = document.getElementById('compositeBTN');
 const compositeprocessingBTN = document.getElementById('compositeprocessingBTN');
 const downloadcompositeBTN = document.getElementById('downloadcompositeBTN');
 const compositedownloadingBTN = document.getElementById('compositedownloadingBTN');
+const compositePreviewArea = document.getElementById('composite_preview_area');
 
 toggleElements(false, resetCompositeButton, compositeBTN, compositeprocessingBTN, downloadcompositeBTN, compositedownloadingBTN);
 
@@ -153,8 +153,6 @@ function handleCompositeDrop(e, type) {
 }
 
 function processCompositeFileSelect(e, type) {
-    // document.body.appendChild(compositeForegroundFileInput);  // HTMLにファイルインプット要素を追加
-    // document.body.appendChild(compositeBackgroundFileInput);  // HTMLにファイルインプット要素を追加
     const files = e.target.files;
     if (files.length === 1) {
         const fileType = files[0].type;
@@ -259,9 +257,11 @@ compositeBTN.addEventListener('click', () => {
     .then(handleErrors)
     .then(response => response.json())
     .then(data => {
-        // レスポンスの検証: サーバーからのレスポンスに 'style_transfer_view' プロパティが含まれているか
-        if (data && data.style_transfer_view) {
-            // 画像の表示処理 ...
+        // レスポンスの検証: サーバーからのレスポンスに 'image' プロパティが含まれているか
+        if (data && data.image) {
+            // 画像を表示
+            compositedisplayProcessedImage(data.image);
+            downloadcompositeBTN.onclick = () => compositestartDownload(data.image);
         } else {
             // エラーハンドリング: 適切なエラーメッセージをユーザーに通知
             alert('画像の合成に失敗しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
@@ -276,68 +276,62 @@ compositeBTN.addEventListener('click', () => {
     });
 });
 
-// ===========================================================================
-
-// ダウンロードボタンのイベントハンドラ
-downloadcompositeBTN.addEventListener('click', (event) => {
-    event.preventDefault(); // デフォルトの動作を停止する
-
-    // ダウンロードボタンの表示状態を更新
-    toggleElements(false, downloadcompositeBTN, resetCompositeButton);
-    toggleElements(true, compositedownloadingBTN);
-
-    // 背景画像と前景画像をCanvasに描画してダウンロード
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const backgroundImg = new Image();
-    const foregroundImg = new Image();
-
-    // 画像の読み込みがCORSによる制限を受けないようにする
-    backgroundImg.crossOrigin = 'Anonymous';
-    foregroundImg.crossOrigin = 'Anonymous';
-
-    backgroundImg.onload = () => {
-        // 背景画像が読み込まれたらCanvasのサイズを設定
-        canvas.width = backgroundImg.width;
-        canvas.height = backgroundImg.height;
-        ctx.drawImage(backgroundImg, 0, 0);
-
-        foregroundImg.onload = () => {
-            // 前景画像を描画
-            ctx.drawImage(foregroundImg, 0, 0);
-            // Canvasから画像のDataURLを取得
-            const dataURL = canvas.toDataURL('image/png');
-            triggerDownload(dataURL, 'composite_image.png');
-            setTimeout(resetAllImages, 1000);
-        };
-        // 前景画像の読み込みを開始
-        foregroundImg.src = compositePreviewArea.querySelector('img').src;
-    };
-    // 背景画像の読み込みを開始
-    backgroundImg.src = compositePreviewArea.querySelector('img').src;
-});
-
-// ダウンロードをトリガーする関数
-function triggerDownload(dataURL, filename) {
-    const downloadLink = document.createElement('a');
-    downloadLink.href = dataURL;
-    downloadLink.download = filename;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+function compositedisplayProcessedImage(base64Data) {
+    AAAcreateAndDisplayImage('data:image/png;base64,' + base64Data, function() {
+        toggleElements(false, compositeprocessingBTN);
+        toggleElements(true, downloadcompositeBTN, resetCompositeButton);
+    });
 }
 
-function downloadLink(href, filename) {
-    const downloadLink = document.createElement('a');
-    downloadLink.href = href;
-    downloadLink.download = filename;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+// 新しい画像要素を作成し、サイズを調整して表示する関数
+function AAAcreateAndDisplayImage(imageSrc, additionalOnload) {
+    const imageElement = new Image();
+    imageElement.onload = function() {
+        compositePreviewArea.style.display = 'flex';
 
-    // ダウンロードボタンとリセットボタンを元に戻す
-    toggleElements(true, resetCompositeButton);
-    toggleElements(false, compositedownloadingBTN);
+        let newWidth, newHeight;
+        const parentWidth = compositePreviewArea.offsetWidth;
+        const parentHeight = compositePreviewArea.offsetHeight;
+        const aspectRatio = this.width / this.height;
+
+        if (parentWidth / parentHeight > aspectRatio) {
+            newHeight = parentHeight;
+            newWidth = aspectRatio * newHeight;
+        } else {
+            newWidth = parentWidth;
+            newHeight = newWidth / aspectRatio;
+        }
+
+        this.style.width = newWidth + 'px';
+        this.style.height = newHeight + 'px';
+        this.className = 'preview';
+        compositePreviewArea.parentNode.insertBefore(this, compositePreviewArea.nextSibling);
+        compositePreviewArea.style.display = 'none';
+
+        if (additionalOnload) additionalOnload();
+    };
+    imageElement.src = imageSrc;
+}
+
+// ===========================================================================
+
+function compositestartDownload(base64Data) {
+    if (base64Data) {
+        toggleElements(false, downloadcompositeBTN, resetCompositeButton);
+        toggleElements(true, compositedownloadingBTN);
+
+        var link = document.createElement('a');
+        link.href = 'data:image/png;base64,' + base64Data;
+        link.download = 'processed_image.png';
+
+        link.addEventListener('click', () => {
+            setTimeout(resetAllImages, 1000);
+        });
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 }
 
 // ===========================================================================
@@ -431,7 +425,6 @@ function handleRemoveDrop(e, type) {
 }
 
 function processRemoveFileSelect(e, type) {
-    // document.body.appendChild(fileInput);  // HTMLにファイルインプット要素を追加
     const files = e.target.files;
     if (files.length === 1) {
         const fileType = files[0].type;
