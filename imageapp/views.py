@@ -21,13 +21,14 @@ def index(request):
 # メモリから画像を読み込むための新しい関数
 def load_image_from_memory(image, max_size=512, shape=None):
     # 画像サイズを大きすぎないように調整
-    if max(image.size) > max_size:
+    size = max(image.size)
+    if size > max_size:
         size = max_size
-    else:
-        size = max(image.size)
     
     if shape is not None:
-        size = shape
+        # shape がタプルであることを確認し、それに基づいて size を設定
+        if isinstance(shape, tuple):
+            size = shape[0]  # 例として、shapeの最初の要素を使用
 
     # 画像の前処理を行うための変換
     in_transform = transforms.Compose([
