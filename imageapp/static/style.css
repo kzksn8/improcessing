@@ -65,7 +65,7 @@ header {
 
 /* ========================================== */
 
-.layout1 {
+.layout {
   display: flex;
   justify-content: space-between;
   margin: 0 auto;
@@ -77,7 +77,7 @@ header {
   padding: 50px 20px;
 }
 
-.layout1 h1 {
+.layout h {
   font-size: 2em;
   color: #333;
 }

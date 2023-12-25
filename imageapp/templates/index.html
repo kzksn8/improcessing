@@ -21,9 +21,9 @@
         <div class="top-nav">
             <nav>
                 <a href="#home" data-target="home" class="logo">removebg</a>
-                <a href="#composite" data-target="composite">特殊合成</a>
-                <a href="#removebg" data-target="removebg">背景削除</a>
-                <a href="#policy" data-target="About">About</a>
+                <a href="#composite" data-target="composite" class="login-signup">特殊合成</a>
+                <a href="#removebg" data-target="removebg" class="login-signup">背景削除</a>
+                <a href="#about" data-target="about">About</a>
             </nav>
             <nav>
                 <a href="#login" data-target="login" class="login-signup">Login</a>
@@ -33,46 +33,42 @@
     </header>
 
     <main>
-        <section id="home" class="tab-content layout1">
+        <section id="home" class="tab-content layout">
             <h1>ホーム画面</h1>
             <p>ホーム画面</p>
         </section>
 
-        <section id="composite" class="tab-content layout1">
+        <section id="composite" class="tab-content layout">
             <h1>特殊合成</h1>
             <p>特殊合成</p>
             <div class="composite-container">
-                <div id="foregroundDDZ" class="compositeDDZ">
-                    前景画像 ドラッグ＆ドロップ<br><br>または クリックで画像選択
-                </div>
-                <div id="backgroundDDZ" class="compositeDDZ">
-                    背景画像 ドラッグ＆ドロップ<br><br>または クリックで画像選択
-                </div>
+                <div id="st_input_img_content_ddz" class="compositeDDZ">前景画像 ドラッグ＆ドロップ<br><br>または クリックで画像選択</div>
+                <div id="st_input_img_style_ddz" class="compositeDDZ">背景画像 ドラッグ＆ドロップ<br><br>または クリックで画像選択</div>
             </div>
-            <button id="compositeBTN" class="purpleBTN" style="display:none;">画像合成</button>
-            <button id="compositeprocessingBTN" class="grayBTN" style="display:none;">処理中...</button>
-            <button id="resetCompositeButton" class="purpleBTN" onclick="resetAllImages()" style="display: none;">合成リセット</button>
-            <button id="compositedownloadingBTN" class="grayBTN" style="display:none;">ダウンロード中...</button>
-            <button id="downloadcompositeBTN" class="purpleBTN" style="display:none;">ダウンロード</button>
-            <div id="composite_preview_area" class="composite-preview"></div>
+            <button id="st_process_btn" class="purpleBTN" style="display:none;">画像合成</button>
+            <button id="st_processing_btn" class="grayBTN" style="display:none;">処理中...</button>
+            <button id="st_reset_btn" class="purpleBTN" style="display: none;">合成リセット</button>
+            <button id="st_download_btn" class="purpleBTN" style="display:none;">ダウンロード</button>
+            <button id="st_downloading_btn" class="grayBTN" style="display:none;">ダウンロード中...</button>
+            <div id="st_output_img_prev" class="composite-preview"></div>
         </section>
     
-        <section id="removebg" class="tab-content layout1">
+        <section id="removebg" class="tab-content layout">
             <h1>写真・画像の背景を一括で消去</h1>
             <p>100%自動かつ無料</p>
-            <div id="removebgDDZ" class="removebgDDZ">
+            <div id="rb_imput_img_ddz" class="removebgDDZ">
                 画像をドラッグ＆ドロップ<br><br>または クリックで画像選択
             </div>
             <input type="file" id="file_input" style="display: none;" />
-            <img id="output_image" style="display:none;">
-            <button id="removebgBTN" class="purpleBTN" style="display:none;">背景削除</button>
-            <button id="processingBTN" class="grayBTN" style="display:none;">処理中...</button>
-            <button id="downloadBTN" class="purpleBTN" style="display:none;">ダウンロード</button>
-            <button id="downloadingBTN" class="grayBTN" style="display:none;">ダウンロード中...</button>
-            <button id="cancelBTN" class="purpleBTN" style="display:none;">リセット</button>
+            {% comment %} <img id="output_image" style="display:none;"> {% endcomment %}
+            <button id="rb_process_btn" class="purpleBTN" style="display:none;">背景削除</button>
+            <button id="rb_processing_btn" class="grayBTN" style="display:none;">処理中...</button>
+            <button id="rb_download_btn" class="purpleBTN" style="display:none;">ダウンロード</button>
+            <button id="rb_downloading_btn" class="grayBTN" style="display:none;">ダウンロード中...</button>
+            <button id="rb_reset_btn" class="purpleBTN" style="display:none;">リセット</button>
         </section>
         
-        <section id="About" class="tab-content layout1">
+        <section id="about" class="tab-content layout">
             <h1>About</h1>
             <p>About</p>
         </section>
