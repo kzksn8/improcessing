@@ -67,7 +67,8 @@ function resetAllImages() {
     compositeBackgroundFileInput.value = '';
     foregroundDDZ.style.display = 'flex';
     backgroundDDZ.style.display = 'flex';
-    compositePreviewArea.innerHTML = '';
+    compositePreviewArea.style.display = 'none';
+    // compositePreviewArea.innerHTML = '';
     toggleElements(false, resetCompositeButton, compositeBTN, compositeprocessingBTN, downloadcompositeBTN, compositedownloadingBTN);
 }
 

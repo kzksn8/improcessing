@@ -6,17 +6,13 @@ body, h1, p {
   background-color: #eeeeee;
 }
 
-.tab-content {
-  display: none; /* 最初は全てのタブコンテンツを非表示に */
-}
-
-/* ========================================== */
-
 header {
   background-color: #000000;
   color: #fff;
   padding: 10px 20px;
 }
+
+/* ========================================== */
 
 .top-nav {
   display: flex;
@@ -25,11 +21,11 @@ header {
   padding: 0px 20px;
 }
 
-.top-nav .logo {
-  text-decoration: none;
-  color: #fff;
-  margin-left: 30px;
-  font-size: 24px;
+/* ========================================== */
+
+.top-nav nav {
+  display: flex;
+  align-items: center;
 }
 
 .top-nav nav a {
@@ -39,11 +35,23 @@ header {
   font-size: 16px;
 }
 
-.top-nav nav a:hover {
-  text-decoration: underline;
+.top-nav nav:nth-child(2) {
+  flex-grow: 1;
 }
 
-.top-nav .login-signup {
+/* ========================================== */
+
+.top-nav .logo img {
+  height: 40px;
+  width: auto;
+  padding: auto;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+/* ========================================== */
+
+.top-nav .tab-left {
   background-color: #000000;
   color: #fff;
   border: none;
@@ -54,13 +62,31 @@ header {
   margin-right: 0px;
 }
 
-.top-nav .login-signup:hover {
+.top-nav .tab-left:hover {
   background-color: #848484;
 }
 
-.login-signup a {
-  text-decoration: none;
+/* ========================================== */
+
+.top-nav .tab-right {
+  background-color: #000000;
   color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.top-nav .tab-right:hover {
+  background-color: #848484;
+}
+
+/* ========================================== */
+
+.tab-content {
+  display: none; /* デフォルトでタブコンテンツを非表示 */
 }
 
 /* ========================================== */
@@ -82,13 +108,13 @@ header {
   color: #333;
 }
 
-.layout1 p {
+.layout p {
   margin-bottom: 20px;
 }
 
 /* ========================================== */
 
-.purpleBTN {
+.purple-btn {
   background-color: #5B3EBC;
   color: white;
   border: none;
@@ -100,11 +126,11 @@ header {
   cursor: pointer;
 }
 
-.purpleBTN:hover {
+.purple-btn:hover {
   background-color: #4a31ad;
 }
 
-.grayBTN {
+.gray-btn {
   background-color: #a5a4a7;
   color: white;
   border: none;
@@ -116,22 +142,20 @@ header {
   cursor: pointer;
 }
 
-.grayBTN:hover {
+.gray-btn:hover {
   background-color: #a1a0a4;
 }
 
 /* ========================================== */
 
-.composite-container {
+.styletf-container {
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
 }
 
-/* ========================================== */
-
-.compositeDDZ {
+.styletf-ddz {
   width: 300px;
   height: 200px;
   border: 2px dashed #b8b8b8;
@@ -147,13 +171,11 @@ header {
   flex-basis: 30%;
 }
 
-.compositeDDZ:hover {
+.styletf-ddz:hover {
   border-color: #000000;
 }
 
-/* ========================================== */
-
-.composite-preview {
+.styletf-preview {
   width: 300px;
   height: 200px;
   margin: 20px auto;
@@ -164,7 +186,7 @@ header {
   overflow: hidden;
 }
 
-.composite-preview img {
+.styletf-preview img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
@@ -172,7 +194,7 @@ header {
 
 /* ========================================== */
 
-.removebgDDZ {
+.removebg-ddz {
   width: 400px;
   height: 200px;
   border: 2px dashed #b8b8b8;
@@ -186,7 +208,7 @@ header {
   font-size: 1.1em;
 }
 
-.removebgDDZ:hover {
+.removebg-ddz:hover {
   border-color: #000000;
 }
 

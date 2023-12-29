@@ -60,7 +60,6 @@ def style_transfer_view(request):
             vgg = get_feature_extractor().to(device)
 
             output_tensor = style_transfer(content_tensor, style_tensor, vgg)
-
             output_image = transforms.ToPILImage()(output_tensor.squeeze(0))
 
             img_byte_arr = BytesIO()
@@ -102,6 +101,7 @@ def remove_background(request):
 
         # Base64エンコードされた画像データをレスポンスとして返却
         return JsonResponse({'image': encoded_img})
+    
     else:
         # POSTリクエストでない場合はエラーを返す
         return JsonResponse({'error': '無効なリクエストです。'}, status=400)

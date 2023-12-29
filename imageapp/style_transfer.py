@@ -20,7 +20,7 @@ def load_image(image_bytes, max_size=512, shape=None):
         size = max(image.size)
     
     if shape is not None:
-        size = shape[0]  # または、shape[1] など、適切な次元を選択
+        size = shape[0]
 
     # PIL画像のサイズを取得
     original_size = image.size  # PILのImage.sizeはタプルを返す
