@@ -45,8 +45,6 @@ const downloadcompositeBTN = document.getElementById('st_download_btn');
 const compositedownloadingBTN = document.getElementById('st_downloading_btn');
 const compositePreviewArea = document.getElementById('st_output_img_prev');
 
-toggleElements(false, resetCompositeButton, compositeBTN, compositeprocessingBTN, downloadcompositeBTN, compositedownloadingBTN);
-
 // ===========================================================================
 
 // HTML要素の参照
@@ -57,53 +55,29 @@ const processingBTN = document.getElementById('rb_processing_btn');
 const downloadBTN = document.getElementById('rb_download_btn');
 const downloadingBTN = document.getElementById('rb_downloading_btn');
 
-toggleElements(false, cancelBTN, removebgBTN, processingBTN, downloadBTN, downloadingBTN);
-
 // ===========================================================================
 
 resetCompositeButton.addEventListener('click', resetAllImages);
-cancelBTN.addEventListener('click', resetAllImages);
+cancelBTN.addEventListener('click', resetForm);
 
 function resetAllImages() {
+    const previewImages = document.querySelectorAll('#composite .preview');
+    previewImages.forEach(image => image.remove());
     compositeForegroundFileInput.value = '';
     compositeBackgroundFileInput.value = '';
     foregroundDDZ.style.display = 'flex';
     backgroundDDZ.style.display = 'flex';
     compositePreviewArea.innerHTML = '';
-    fileInput.value = '';
-    removebgDDZ.style.display = 'flex';
     toggleElements(false, resetCompositeButton, compositeBTN, compositeprocessingBTN, downloadcompositeBTN, compositedownloadingBTN);
-    toggleElements(false, cancelBTN, removebgBTN, processingBTN, downloadBTN, downloadingBTN);
-    const previewImages = document.querySelectorAll('.preview');
-    previewImages.forEach(image => image.remove());
 }
 
-// function resetAllImages() {
-//     compositeForegroundFileInput.value = '';
-//     compositeBackgroundFileInput.value = '';
-//     foregroundDDZ.style.display = 'flex';
-//     backgroundDDZ.style.display = 'flex';
-//     compositePreviewArea.innerHTML = '';
-//     toggleElements(false, resetCompositeButton, compositeBTN, compositeprocessingBTN, downloadcompositeBTN, compositedownloadingBTN);
-//     compositeclearPreviews();
-// }
-
-// function compositeclearPreviews() {
-//     const previewImages = document.querySelectorAll('.preview');
-//     previewImages.forEach(image => image.remove());
-// }
-
-// function resetForm() {
-//     fileInput.value = '';
-//     removebgDDZ.style.display = 'flex';
-//     toggleElements(false, cancelBTN, removebgBTN, processingBTN, downloadBTN, downloadingBTN);
-//     clearPreviews();
-// }
-
-// function clearPreviews() {
-//     const previewImages = document.querySelectorAll('.preview');
-//     previewImages.forEach(image => image.remove());
-// }
+function resetForm() {
+    const removeBgPreviews = document.querySelectorAll('#removebg .preview');
+    removeBgPreviews.forEach(image => image.remove());
+    fileInput.value = '';
+    removebgDDZ.style.display = 'flex';
+    toggleElements(false, cancelBTN, removebgBTN, processingBTN, downloadBTN, downloadingBTN);
+}
 
 // ===========================================================================
 
@@ -132,13 +106,13 @@ function setupDragAndDrop(element, input, type) {
         element.addEventListener('drop', (e) => handleDrop(e, type));
         element.addEventListener('click', () => input.click());
     } else {
-        console.error('Element not found for setupDragAndDrop:', type);
+        console.error('setupDragAndDropの要素が見つかりません。:', type);
     }
 }
 
 function handleDragOver(e) {
     // デフォルトの処理をキャンセル
-    e.preventDefault();  
+    e.preventDefault();
     // ドロップ時のカーソルスタイルをコピーに設定
     e.dataTransfer.dropEffect = 'copy';
 }
@@ -177,8 +151,6 @@ function setupAndProcessFileSelect(input, type) {
         }
     });
 }
-
-// ===========================================================================
 
 function processImage(file, type) {
     const reader = new FileReader();
@@ -249,8 +221,105 @@ function updateCompositeButtonVisibility() {
 
 // ===========================================================================
 
+compositeBTN.addEventListener('click', () => {
+    const foregroundFile = compositeForegroundFileInput.files[0];
+    const backgroundFile = compositeBackgroundFileInput.files[0];
+
+    // エラーチェック: ファイルが選択されているかどうか
+    if (!foregroundFile || !backgroundFile) {
+        alert('前景画像と背景画像の両方が必要です。');
+        return;
+    }
+
+    toggleElements(false, compositeBTN, resetCompositeButton);
+    toggleElements(true, compositeprocessingBTN);
+
+    // FormDataオブジェクトを作成し、ファイルを追加
+    var formData = new FormData();
+    formData.append('content_img', foregroundFile);
+    formData.append('style_img', backgroundFile);
+
+    // サーバーに対して合成を要求
+    fetch('style_transfer_view/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrftoken
+        }
+    })
+    .then(handleErrors)
+    .then(response => response.json())
+    .then(data => {
+        // レスポンスの検証: サーバーからのレスポンスに 'image' プロパティが含まれているか
+        if (data && data.image) {
+            const base64Data1 = data.image;
+            updateDDZDisplay(compositePreviewArea, 'data:image/png;base64,' + base64Data1, function() {
+                toggleElements(false, compositeprocessingBTN);
+                toggleElements(true, downloadcompositeBTN, resetCompositeButton);
+            });
+            downloadcompositeBTN.onclick = () => startDownload(base64Data1, [downloadcompositeBTN, resetCompositeButton], [compositedownloadingBTN], resetAllImages);
+        } else {
+            // エラーハンドリング: 適切なエラーメッセージをユーザーに通知
+            alert('画像の合成に失敗しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
+            resetAllImages();
+        }
+    })
+    .catch(error => {
+        console.error('画像合成中にエラーが発生しました:', error);
+        alert('エラーが発生しました。コンソールを確認してください。');
+        resetAllImages();
+    });
+});
+
+// ===========================================================================
+
+removebgBTN.addEventListener('click', () => {
+    const file = fileInput.files[0];
+
+    // エラーチェック: ファイルが選択されているかどうか
+    if (!file) {
+        alert('画像のアップロードが必要です。');
+        return;
+    }
+
+    toggleElements(false, cancelBTN, removebgBTN);
+    toggleElements(true, processingBTN);
+
+    // ファイルをFormDataオブジェクトに追加
+    var formData = new FormData();
+    formData.append('image', file);
+
+    // サーバーにPOSTリクエストを送信
+    fetch('remove-background/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrftoken
+        }
+    })
+    .then(handleErrors)
+    .then(response => response.json())
+    .then(data => {
+        const base64Data2 = data.image;
+        updateDDZDisplay(removebgDDZ, 'data:image/png;base64,' + base64Data2, function() {
+            toggleElements(false, processingBTN);
+            toggleElements(true, downloadBTN, cancelBTN);
+        });
+        downloadBTN.onclick = () => startDownload(base64Data2, [downloadBTN, cancelBTN], [downloadingBTN], resetForm);
+    })
+    .catch(error => {
+        console.error('背景削除中にエラーが発生しました:', error);
+        alert('エラーが発生しました。コンソールを確認してください。');
+        resetForm();
+    });
+});
+
+// ===========================================================================
+
 // CSRFトークンをクッキーから取得し、クッキーから特定の名前の値を取得
 const csrftoken = getCookie('csrftoken');
+
+// クッキーから特定の名前の値を取得
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -284,118 +353,6 @@ function handleErrors(response) {
     }
     return response;
 }
-
-// ===========================================================================
-
-compositeBTN.addEventListener('click', () => {
-    const foregroundFile = compositeForegroundFileInput.files[0];
-    const backgroundFile = compositeBackgroundFileInput.files[0];
-
-    // エラーチェック: ファイルが選択されているかどうか
-    if (!foregroundFile || !backgroundFile) {
-        alert('前景画像と背景画像の両方が必要です。');
-        return;
-    }
-
-    // 合成ボタンを非表示にし、処理中状態を表示する
-    toggleElements(false, compositeBTN, resetCompositeButton);
-    toggleElements(true, compositeprocessingBTN);
-
-    // FormDataオブジェクトを作成し、ファイルを追加
-    var formData = new FormData();
-    formData.append('content_img', foregroundFile);
-    formData.append('style_img', backgroundFile);
-
-    // サーバーに対して合成を要求
-    fetch('style_transfer_view/', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': csrftoken
-        }
-    })
-    .then(handleErrors)
-    .then(response => response.json())
-    .then(data => {
-        // レスポンスの検証: サーバーからのレスポンスに 'image' プロパティが含まれているか
-        if (data && data.image) {
-            compositedisplayProcessedImage(data.image);
-            downloadcompositeBTN.onclick = () => compositestartDownload(data.image);
-        } else {
-            // エラーハンドリング: 適切なエラーメッセージをユーザーに通知
-            alert('画像の合成に失敗しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
-            resetAllImages();
-        }
-    })
-    .catch(error => {
-    // ネットワークエラーまたはその他のエラーのハンドリング
-    console.error('画像合成中にエラーが発生しました:', error);
-    alert('エラーが発生しました。コンソールを確認してください。');
-    resetAllImages();
-    });
-});
-
-function compositedisplayProcessedImage(base64Data) {
-    updateDDZDisplay(compositePreviewArea, 'data:image/png;base64,' + base64Data, function() {
-        toggleElements(false, compositeprocessingBTN);
-        toggleElements(true, downloadcompositeBTN, resetCompositeButton);
-    });
-}
-
-// ===========================================================================
-
-removebgBTN.addEventListener('click', () => {
-    const file = fileInput.files[0];
-    if (file) {
-        // AbortControllerのインスタンスを作成
-        const abortController = new AbortController();
-        // 必要な要素の表示状態を切り替え
-        toggleElements(false, cancelBTN, removebgBTN);
-        toggleElements(true, processingBTN);
-
-        // ファイルをFormDataオブジェクトに追加
-        var formData = new FormData();
-        formData.append('image', file);
-
-        // サーバーにPOSTリクエストを送信
-        fetch('remove-background/', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
-            signal: abortController.signal
-        })
-        .then(handleErrors)
-        .then(response => response.json())
-        .then(data => {
-            // 処理された画像を表示し、ダウンロードボタンにイベントを設定
-            displayProcessedImage(data.image);
-            downloadBTN.onclick = () => startDownload(data.image);
-        })
-        .catch(error => {
-            // エラーハンドリング
-            if (error.name === 'AbortError') {
-                console.log('Fetch aborted');
-            } else {
-                console.error('Error:', error);
-            }
-        });
-    }
-});
-
-// 背景削除後の画像を表示
-function displayProcessedImage(base64Data) {
-    updateDDZDisplay(removebgDDZ, 'data:image/png;base64,' + base64Data, function() {
-        toggleElements(false, processingBTN);
-        toggleElements(true, downloadBTN, cancelBTN);
-    });
-}
-
-// ===========================================================================
-
-startDownload(base64Data, [downloadBTN, cancelBTN], [downloadingBTN], resetForm);
-startDownload(base64Data, [downloadcompositeBTN, resetCompositeButton], [compositedownloadingBTN], resetAllImages);
 
 function startDownload(base64Data, elementsToHide, elementsToShow, callback) {
     if (base64Data) {
