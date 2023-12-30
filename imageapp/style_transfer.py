@@ -1,6 +1,7 @@
+from io import BytesIO
+
 import torch
 import torch.optim as optim
-from io import BytesIO
 from PIL import Image
 from torchvision import transforms
 from torchvision.models import vgg19

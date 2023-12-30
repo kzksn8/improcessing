@@ -1,10 +1,12 @@
 import os
 import io
 from io import BytesIO
+
 import torch
 from torchvision import transforms
 from PIL import Image
 from rembg import remove
+
 from base64 import b64encode
 from django.shortcuts import render
 from django.http import JsonResponse
