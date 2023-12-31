@@ -14,34 +14,34 @@ header {
 
 /* ========================================== */
 
-.top-nav {
+.tab {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 0px 20px;
 }
 
 /* ========================================== */
 
-.top-nav nav {
+.tab nav {
   display: flex;
   align-items: center;
 }
 
-.top-nav nav a {
+.tab nav a {
   text-decoration: none;
   color: #fff;
   margin-left: 30px;
   font-size: 16px;
 }
 
-.top-nav nav:nth-child(2) {
+.tab nav:nth-child(2) {
   flex-grow: 1;
 }
 
 /* ========================================== */
 
-.top-nav .logo img {
+.tab .tab-logo img {
   height: 40px;
   width: auto;
   padding: auto;
@@ -51,7 +51,7 @@ header {
 
 /* ========================================== */
 
-.top-nav .tab-left {
+.tab .tab-left {
   background-color: #000000;
   color: #fff;
   border: none;
@@ -62,13 +62,13 @@ header {
   margin-right: 0px;
 }
 
-.top-nav .tab-left:hover {
+.tab .tab-left:hover {
   background-color: #848484;
 }
 
 /* ========================================== */
 
-.top-nav .tab-right {
+.tab .tab-right {
   background-color: #000000;
   color: #fff;
   border: none;
@@ -79,19 +79,20 @@ header {
   margin-right: 0px;
 }
 
-.top-nav .tab-right:hover {
+.tab .tab-right:hover {
   background-color: #848484;
 }
 
 /* ========================================== */
 
-.tab-content {
-  display: none; /* デフォルトでタブコンテンツを非表示 */
+/* デフォルトでタブコンテンツを非表示 */
+.content-init {
+  display: none;
 }
 
 /* ========================================== */
 
-.layout {
+.content-update {
   display: flex;
   justify-content: space-between;
   margin: 0 auto;
@@ -103,12 +104,12 @@ header {
   padding: 50px 20px;
 }
 
-.layout h {
+.content-update h {
   font-size: 2em;
   color: #333;
 }
 
-.layout p {
+.content-update p {
   margin-bottom: 20px;
 }
 
