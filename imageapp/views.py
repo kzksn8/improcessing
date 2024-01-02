@@ -11,7 +11,6 @@ from base64 import b64encode
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .style_transfer import style_transfer
 from .style_transfer import style_transfer, get_feature_extractor
 
 # デバイスを設定（GPUが利用可能な場合はGPUを使用）
@@ -25,11 +24,11 @@ def load_image_from_memory(image, max_size=512, shape=None):
     # 元のアスペクト比を保持するために新しいサイズを計算
     aspect_ratio = image.width / image.height
     if aspect_ratio > 1:  # 幅が高さより大きい場合
-        new_width = min(image.width, max_size)
+        new_width  = min(image.width, max_size)
         new_height = int(new_width / aspect_ratio)
     else:  # 高さが幅より大きい、または等しい場合
         new_height = min(image.height, max_size)
-        new_width = int(new_height * aspect_ratio)
+        new_width  = int(new_height * aspect_ratio)
 
     # 画像の前処理を行うための変換
     in_transform = transforms.Compose([
@@ -47,22 +46,22 @@ def load_image_from_memory(image, max_size=512, shape=None):
 def style_transfer_view(request):
     if request.method == 'POST':
         content_file = request.FILES.get('content_img')
-        style_file = request.FILES.get('style_img')
+        style_file   = request.FILES.get('style_img')
 
         if not content_file or not style_file:
             return JsonResponse({'error': 'コンテンツ画像とスタイル画像の両方が必要です。'}, status=400)
 
         try:
             content_image = Image.open(BytesIO(content_file.read())).convert('RGB')
-            style_image = Image.open(BytesIO(style_file.read())).convert('RGB')
+            style_image   = Image.open(BytesIO(style_file.read())).convert('RGB')
 
             content_tensor = load_image_from_memory(content_image)
-            style_tensor = load_image_from_memory(style_image, shape=content_tensor.shape[-2:])
+            style_tensor   = load_image_from_memory(style_image, shape=content_tensor.shape[-2:])
 
             vgg = get_feature_extractor().to(device)
 
             output_tensor = style_transfer(content_tensor, style_tensor, vgg)
-            output_image = transforms.ToPILImage()(output_tensor.squeeze(0))
+            output_image  = transforms.ToPILImage()(output_tensor.squeeze(0))
 
             img_byte_arr = BytesIO()
             output_image.save(img_byte_arr, format='PNG')

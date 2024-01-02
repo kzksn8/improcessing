@@ -2,9 +2,9 @@ from io import BytesIO
 
 import torch
 import torch.optim as optim
-from PIL import Image
 from torchvision import transforms
 from torchvision.models import vgg19
+from PIL import Image
 
 # デバイスを設定（GPUが利用可能な場合はGPUを使用）
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
