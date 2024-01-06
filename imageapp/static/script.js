@@ -191,114 +191,67 @@ function processImageFiles(file, type) {
 // 
 // ===========================================================================
 
-st_process_btn.addEventListener('click', () => {
-    const foregroundFile = st_input_content.files[0];
-    const backgroundFile = st_input_style.files[0];
-
-    if (!foregroundFile || !backgroundFile) {
-        alert('前景画像と背景画像の両方が必要です。');
-        return;
-    }
-
-    btnDisplayUpdate(false, st_process_btn, st_reset_btn);
-    btnDisplayUpdate(true, st_processing_btn);
-
-    var formData = new FormData();
-    formData.append('content_img', foregroundFile);
-    formData.append('style_img', backgroundFile);
-
-    // CSRFトークンをクッキーから取得
-    const csrftoken = getCookie('csrftoken');
-
-    // サーバーに対して合成を要求
-    fetch('style_transfer_view/', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': csrftoken
-        }
-    })
-    .then(handleErrors)
-    .then(response => response.json())
-    .then(data => {
-        // レスポンスの検証: サーバーからのレスポンスに 'image' プロパティが含まれているか
-        if (data && data.image) {
-            const base64Data1 = data.image;
-            ddzDisplayUpdate(st_output_prev, 'data:image/png;base64,' + base64Data1, function() {
-                btnDisplayUpdate(false, st_processing_btn);
-                btnDisplayUpdate(true, st_download_btn, st_reset_btn);
-            });
-            st_download_btn.onclick = () => startDownload(base64Data1, setupReset_st, function() {
-                btnDisplayUpdate(false, st_download_btn, st_reset_btn);
-                btnDisplayUpdate(true, st_downloading_btn);
-            });
-        } else {
-            alert('画像の合成に失敗しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
-            setupReset_st();
-        }
-    })
-    .catch(error => {
-        console.error('画像合成中にエラーが発生しました:', error);
-        alert('エラーが発生しました。コンソールを確認してください。');
-        setupReset_st();
-    });
+setupProcessButton(st_process_btn, st_input_content, st_input_style, 'style_transfer_view/', 'content_img', 'style_img',
+st_download_btn, st_reset_btn, st_processing_btn, st_downloading_btn, st_output_prev, function() {
+    setupReset_st();
 });
 
-
-rb_process_btn.addEventListener('click', () => {
-    const file = rb_input.files[0];
-
-    if (!file) {
-        alert('画像のアップロードが必要です。');
-        return;
-    }
-
-    btnDisplayUpdate(false, rb_reset_btn, rb_process_btn);
-    btnDisplayUpdate(true, rb_processing_btn);
-
-    var formData = new FormData();
-    formData.append('image', file);
-
-    // CSRFトークンをクッキーから取得
-    const csrftoken = getCookie('csrftoken');
-
-    // サーバーに対して合成を要求
-    fetch('remove-background/', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': csrftoken
-        }
-    })
-    .then(handleErrors)
-    .then(response => response.json())
-    .then(data => {
-        // レスポンスの検証: サーバーからのレスポンスに 'image' プロパティが含まれているか
-        if (data && data.image) {
-            const base64Data2 = data.image;
-            ddzDisplayUpdate(rb_input_ddz, 'data:image/png;base64,' + base64Data2, function() {
-                btnDisplayUpdate(false, rb_processing_btn);
-                btnDisplayUpdate(true, rb_download_btn, rb_reset_btn);
-        });
-        rb_download_btn.onclick = () => startDownload(base64Data2, setupReset_rb, function() {
-            btnDisplayUpdate(false, rb_download_btn, rb_reset_btn);
-            btnDisplayUpdate(true, rb_downloading_btn);
-        });
-        } else {
-            alert('画像の背景削除に失敗しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
-            setupReset_rb();
-        }
-    })
-    .catch(error => {
-        console.error('背景削除中にエラーが発生しました:', error);
-        alert('エラーが発生しました。コンソールを確認してください。');
-        setupReset_rb();
-    });
+setupProcessButton(rb_process_btn, rb_input, null, 'remove-background/', 'image', null,
+rb_download_btn, rb_reset_btn, rb_processing_btn, rb_downloading_btn, rb_input_ddz, function() {
+    setupReset_rb();
 });
 
-// ===========================================================================
-// 
-// ===========================================================================
+function setupProcessButton(btn, input1, input2, url, appendName1, appendName2, downloadButton, resetButton, processingButton, downloadingButton, displayUpdateElement, setupReset) {
+    btn.addEventListener('click', () => {
+        const file1 = input1 ? input1.files[0] : null;
+        const file2 = input2 ? input2.files[0] : null;
+
+        if (!file1 || (input2 && !file2)) {
+            alert('画像のアップロードが必要です。');
+            return;
+        }
+
+        btnDisplayUpdate(false, btn, resetButton);
+        btnDisplayUpdate(true, processingButton);
+
+        var formData = new FormData();
+        if (file1) formData.append(appendName1, file1);
+        if (file2) formData.append(appendName2, file2);
+
+        const csrftoken = getCookie('csrftoken');
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(handleErrors)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.image) {
+                const base64Data = data.image;
+                ddzDisplayUpdate(displayUpdateElement, 'data:image/png;base64,' + base64Data, function() {
+                    btnDisplayUpdate(false, processingButton);
+                    btnDisplayUpdate(true, downloadButton, resetButton);
+                });
+                downloadButton.onclick = () => startDownload(base64Data, setupReset, function() {
+                    btnDisplayUpdate(false, downloadButton, resetButton);
+                    btnDisplayUpdate(true, downloadingButton);
+                });
+            } else {
+                alert('エラーが発生しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
+                setupReset();
+            }
+        })
+        .catch(error => {
+            console.error('エラーが発生しました。:', error);
+            alert('エラーが発生しました。');
+            setupReset();
+        });
+    });
+}
 
 // クッキーから特定の名前の値を取得
 function getCookie(name) {
@@ -338,11 +291,9 @@ function handleErrors(response) {
 function startDownload(base64Data, callback, btnAddOn) {
     if (base64Data) {
         btnAddOn();
-
         const link = document.createElement('a');
         link.href = `data:image/png;base64,${base64Data}`;
-        link.download = 'processed_image.png';
-        
+        link.download = 'processed_image.png';     
         link.addEventListener('click', () => setTimeout(callback, 1000));
         
         document.body.appendChild(link);
