@@ -7,17 +7,42 @@ from torchvision import transforms
 from PIL import Image
 from rembg import remove
 
+from django.contrib.auth.forms import AuthenticationForm
+from .forms import SignUpForm
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate
 from base64 import b64encode
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .style_transfer import style_transfer, get_feature_extractor
 
+
 # デバイスを設定（GPUが利用可能な場合はGPUを使用）
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 def index(request):
-    return render(request, 'index.html')
+    login_form = AuthenticationForm(prefix='login')
+    signup_form = SignUpForm(prefix='signup')
+    return render(request, 'index.html', {'login_form': login_form, 'signup_form': signup_form})
+
+def signup(request):
+    if request.method == 'POST':
+        signup_form = SignUpForm(request.POST, prefix='signup')
+        if signup_form.is_valid():
+            signup_form.save()
+            username = signup_form.cleaned_data.get('username')
+            raw_password = signup_form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('index')
+    else:
+        signup_form = SignUpForm(prefix='signup')
+    
+    login_form = AuthenticationForm(prefix='login')
+    return render(request, 'index.html', {'login_form': login_form, 'signup_form': signup_form})
+
 
 # メモリから画像を読み込むための新しい関数
 def load_image_from_memory(image, max_size=512, shape=None):
@@ -41,6 +66,7 @@ def load_image_from_memory(image, max_size=512, shape=None):
     image_tensor = in_transform(image).unsqueeze(0).to(device)
 
     return image_tensor
+
 
 @csrf_exempt
 def style_transfer_view(request):
@@ -74,6 +100,7 @@ def style_transfer_view(request):
 
     else:
         return JsonResponse({'error': '無効なリクエスト方法です。'}, status=400)
+
 
 @csrf_exempt
 def remove_background(request):

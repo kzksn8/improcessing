@@ -2,16 +2,34 @@
 // 
 // ===========================================================================
 
+// // ページ読み込み時の処理
+// document.addEventListener('DOMContentLoaded', () => {
+//     document.querySelectorAll('nav a').forEach(link => {
+//         link.addEventListener('click', (event) => {
+//             event.preventDefault();
+//             const targetId = link.getAttribute('data-target');
+//             changeTab(targetId);
+//         });
+//     });
+//     changeTab('home');  // デフォルトでホームタブを表示
+// });
+
 // ページ読み込み時の処理
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', (event) => {
-            event.preventDefault();
             const targetId = link.getAttribute('data-target');
+
+            // ログインとサインアップのリンクの場合もタブを切り替える
             changeTab(targetId);
+
+            // タブが 'home', 'styletf', 'removebg', 'about' のいずれかの場合はデフォルトの挙動をキャンセル
+            if (['home', 'styletf', 'removebg', 'about'].includes(targetId)) {
+                event.preventDefault();
+            }
         });
     });
-    changeTab('home');  // デフォルトでホームタブを表示
+    changeTab('home'); // デフォルトでホームタブを表示
 });
 
 // タブを切り替える関数

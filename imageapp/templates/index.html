@@ -1,7 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
-
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <title>Image Background Remover</title>
@@ -69,6 +69,26 @@
         <section id="about" class="content-init content-update">
             <h1>About</h1>
             <p>About</p>
+        </section>
+
+        <section id="login" class="content-init content-update">
+            <h1>ログイン</h1>
+            <p>ログイン</p>
+            <form method="post">
+                {% csrf_token %}
+                {{ login_form.as_p }}
+                <button type="submit">ログイン</button>
+            </form>
+        </section>
+
+        <section id="signup" class="content-init content-update">
+            <h1>サインアップ</h1>
+            <p>サインアップ</p>
+            <form method="post">
+                {% csrf_token %}
+                {{ signup_form.as_p }}
+                <button type="submit">サインアップ</button>
+            </form>
         </section>
     </main>
     <script src="{% static 'script.js' %}"></script>
