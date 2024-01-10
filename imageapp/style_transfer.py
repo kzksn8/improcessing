@@ -38,7 +38,6 @@ def load_image(image_bytes, max_size=512, shape=None):
 
     # バッチ次元を追加してデバイスに画像を転送
     image = in_transform(image)[:3,:,:].unsqueeze(0).to(device)
-
     return image
 
 
@@ -125,5 +124,4 @@ def style_transfer(content_img, style_img, model, content_weight=1, style_weight
             print("Content loss: ", content_loss.item())
             print("Style loss: ", style_loss.item())
             print("Total loss: ", total_loss.item())
-
     return target

@@ -16,12 +16,13 @@ Including another URLconf
 """
 
 from django.urls import path
-from .views import index, signup, remove_background, style_transfer_view
+from .views import index, signup_view, login_view, remove_background, style_transfer_view
 
 
 urlpatterns = [
     path('', index, name='index'),
-    path('signup/', signup, name='signup'),
+    path('signup/', signup_view, name='signup'),
+    path('login/', login_view, name='login'),
     path('remove-background/', remove_background, name='remove_background'),
     path('style_transfer_view/', style_transfer_view, name='style_transfer_view'),
 ]

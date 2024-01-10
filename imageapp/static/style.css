@@ -214,3 +214,70 @@ header {
 }
 
 /* ========================================== */
+
+/* 登録・ログインフォームのコンテナスタイル */
+.signup-login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* フォームコンテナのスタイル */
+.form-container {
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  width: 300px; /* または必要に応じて調整 */
+  margin: 20px;
+}
+
+/* フォームのスタイル */
+form h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* ボタンのスタイル */
+.btn {
+  padding: 10px 20px;
+  background-color: #5B3EBC; /* 既存の紫色のボタンの色を使用 */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: block; /* ブロックレベル要素にする */
+  width: 100%; /* フル幅 */
+}
+
+.btn:hover {
+  background-color: #4a31ad; /* 既存のホバースタイルを使用 */
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .signup-login-container {
+    flex-direction: column; /* スマートフォンでのスタック表示 */
+  }
+}
+
+/* ========================================== */
