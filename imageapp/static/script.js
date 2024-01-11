@@ -6,12 +6,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', (event) => {
-            event.preventDefault();
             const targetId = link.getAttribute('data-target');
-            changeTab(targetId);
+            if (['home', 'styletf', 'removebg', 'about', 'login', 'signup'].includes(targetId)) {
+                event.preventDefault();
+                changeTab(targetId);
+            }
         });
     });
-    changeTab('home');  // デフォルトでホームタブを表示
+    changeTab('home'); // デフォルトでホームタブを表示
 });
 
 // タブを切り替える関数
@@ -327,5 +329,47 @@ function setupReset_rb() {
     rb_input_ddz.style.display = 'flex';
     btnDisplayUpdate(false, rb_reset_btn, rb_process_btn, rb_processing_btn, rb_download_btn, rb_downloading_btn);
 }
+
+// ===========================================================================
+
+// ===========================================================================
+
+$(document).ready(function(){
+    $('.tab-right').click(function(){
+        var target = $(this).data('target');
+        $('.content-update').hide();
+        $('#'+target).show();
+    });
+});
+
+// パスワードのバリデーション用の関数
+function isValidPassword(password) {
+    var pattern = /^[A-Za-z0-9]{8,20}$/; // 8文字以上20文字以下、アルファベットと数字のみ
+    return pattern.test(password);
+}
+
+// ユーザーネームのバリデーション用の関数
+function isValidUsername(username) {
+    var pattern = /^[A-Za-z0-9]{4,20}$/; // 4文字以上20文字以下、アルファベットと数字のみ
+    return pattern.test(username);
+}
+
+$('#loginForm').submit(function(event){
+    var username = $('#loginUsername').val(); // ユーザーネームの入力値を取得
+    var password = $('#loginPassword').val(); // パスワードの入力値を取得
+    if (!isValidUsername(username) || !isValidPassword(password)) {
+        event.preventDefault(); // フォームの送信を阻止
+        alert('ユーザーネームまたはパスワードが無効です。');
+    }
+});
+
+$('#signupForm').submit(function(event){
+    var username = $('#signupUsername').val(); // ユーザーネームの入力値を取得
+    // サインアップの際には、ユーザーネームのみをチェックしています。
+    if (!isValidUsername(username)) {
+        event.preventDefault(); // フォームの送信を阻止
+        alert('無効なユーザーネームです。');
+    }
+});
 
 // ===========================================================================

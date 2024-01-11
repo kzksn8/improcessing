@@ -7,47 +7,20 @@ from torchvision import transforms
 from PIL import Image
 from rembg import remove
 
-from django.shortcuts import render
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from base64 import b64encode
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .style_transfer import style_transfer, get_feature_extractor
 
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+
 
 # デバイスを設定（GPUが利用可能な場合はGPUを使用）
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-def index(request):
-    return render(request, 'index.html')
-
-
-def signup_view(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            # ここでユーザーをログインさせる処理を追加する
-            return redirect('home')
-    else:
-        form = UserCreationForm()
-    return render(request, 'signup.html', {'form': form})
-
-
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            # ユーザー認証
-            user = form.get_user()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
 
 
 # メモリから画像を読み込むための新しい関数
@@ -71,6 +44,7 @@ def load_image_from_memory(image, max_size=512, shape=None):
     # バッチ次元を追加してテンソルに変換
     image_tensor = in_transform(image).unsqueeze(0).to(device)
     return image_tensor
+
 
 @csrf_exempt
 def style_transfer_view(request):
@@ -105,6 +79,7 @@ def style_transfer_view(request):
     else:
         return JsonResponse({'error': '無効なリクエスト方法です。'}, status=400)
 
+
 @csrf_exempt
 def remove_background(request):
     if request.method == 'POST':
@@ -136,3 +111,40 @@ def remove_background(request):
     else:
         # POSTリクエストでない場合はエラーを返す
         return JsonResponse({'error': '無効なリクエストです。'}, status=400)
+
+
+def index(request):
+    return render(request, 'index.html')
+
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            return HttpResponse("ログインに失敗しました。")
+    return render(request, 'index.html')
+
+
+def signup_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = User.objects.create_user(username=username, password=password)
+        login(request, user)
+        return redirect('home')
+    return render(request, 'index.html')
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
+
+@login_required
+def home_view(request):
+    return render(request, 'home.html', {'user': request.user})

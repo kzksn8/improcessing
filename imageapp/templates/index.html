@@ -25,7 +25,8 @@
                 <a href="#about"    data-target="about"    class="tab-left">About</a>
             </nav>
             <nav>
-                <a href="#signup-login" data-target="signup-login" class="tab-right">登録/ログイン</a>
+                <a href="#login"  data-target="login"  class="tab-right">Login</a>
+                <a href="#signup" data-target="signup" class="tab-right">Sign Up</a>
             </nav>
         </div>
     </header>
@@ -70,51 +71,37 @@
             <p>About</p>
         </section>
 
-        <section id="signup-login" class="content-init content-update">
-            <div class="container">
-                <div class="login-container">
-                    <h2>ログイン</h2>
-                    <form method="post" action="{% url 'login' %}">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="login-username">ユーザー名</label>
-                            <input type="text" id="login-username" name="username" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="login-password">パスワード</label>
-                            <input type="password" id="login-password" name="password" required>
-                        </div>
-                        <div class="form-action">
-                            <button type="submit" class="btn">ログイン</button>
-                        </div>
-                    </form>
+        <section id="login" class="content-init content-update" style="display:none;">
+            <h1>ログイン</h1>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <input type="text" id="loginUsername" name="username" required placeholder="ユーザーネーム" autocomplete="username">
                 </div>
-                <div class="signup-container">
-                    <h2>登録</h2>
-                    <form method="post" action="{% url 'signup' %}">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="signup-username">ユーザー名</label>
-                            <input type="text" id="signup-username" name="username" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-email">メールアドレス</label>
-                            <input type="email" id="signup-email" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-password1">パスワード</label>
-                            <input type="password" id="signup-password1" name="password1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-password2">パスワード確認</label>
-                            <input type="password" id="signup-password2" name="password2" required>
-                        </div>
-                        <div class="form-action">
-                            <button type="submit" class="btn">登録</button>
-                        </div>
-                    </form>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" name="password" required placeholder="パスワード" autocomplete="current-password">
                 </div>
-            </div>
+                <div class="form-group">
+                    <button type="submit" class="auth-button">ログイン</button>
+                </div>
+                <div class="form-help">
+                    <a href="#">パスワードをお忘れですか？</a>
+                </div>
+            </form>
+        </section>
+        
+        <section id="signup" class="content-init content-update" style="display:none;">
+            <h1>サインアップ</h1>
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <input type="text" id="signupUsername" name="username" required placeholder="ユーザーネーム" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signupPassword" name="new-password" required placeholder="パスワードを作成" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="auth-button">続行</button>
+                </div>
+            </form>
         </section>
     </main>
     <script src="{% static 'script.js' %}"></script>
