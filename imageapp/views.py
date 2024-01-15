@@ -14,8 +14,8 @@ from .style_transfer import style_transfer, get_feature_extractor
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
 from django.http import HttpResponse
+from .forms import SignUpForm
 from django.contrib.auth.decorators import login_required
 
 
@@ -132,12 +132,17 @@ def login_view(request):
 
 def signup_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = User.objects.create_user(username=username, password=password)
-        login(request, user)
-        return redirect('home')
-    return render(request, 'index.html')
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+        else:
+            # フォームのエラーを表示する
+            return render(request, 'index.html', {'form': form})
+    else:
+        form = SignUpForm()
+    return render(request, 'index.html', {'form': form})
 
 
 def logout_view(request):
