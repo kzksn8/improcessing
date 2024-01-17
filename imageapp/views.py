@@ -136,7 +136,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('home')
+            return redirect('index')
         else:
             # フォームのエラーを表示する
             return render(request, 'index.html', {'form': form})
@@ -151,5 +151,5 @@ def logout_view(request):
 
 
 @login_required
-def home_view(request):
-    return render(request, 'home.html', {'user': request.user})
+def index(request):
+    return render(request, 'index.html', {'user': request.user})

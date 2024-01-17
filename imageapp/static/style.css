@@ -263,3 +263,28 @@ header {
 .form-help a:hover {
   text-decoration: underline;
 }
+
+.user-icon {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background-color: #5c6bc0;
+  color: white;
+  text-align: center;
+  border-radius: 15px;
+  line-height: 30px;
+  margin-right: 10px;
+}
+
+.username {
+  vertical-align: middle;
+}
+
+/* ログアウトリンクに対するスタイリング */
+a[href*='logout'] {
+  background-color: #f00; /* ログアウトボタンの色 */
+  color: #fff; /* テキストの色 */
+  padding: 5px 10px; /* パディング */
+  border-radius: 5px; /* 角丸 */
+  text-decoration: none; /* アンダーラインを消す */
+}
