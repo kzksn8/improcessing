@@ -20,14 +20,10 @@
                 </a>
             </nav>
             <nav>
-                <a href="#styletf"  data-target="styletf"  class="tab-left">スタイル転送</a>
+                <a href="#upscale"  data-target="upscale"  class="tab-left">高画質化</a>
                 <a href="#removebg" data-target="removebg" class="tab-left">背景削除</a>
                 <a href="#about"    data-target="about"    class="tab-left">About</a>
             </nav>
-            {% comment %} <nav>
-                <a href="#login"  data-target="login"  class="tab-right">Login</a>
-                <a href="#signup" data-target="signup" class="tab-right">Sign Up</a>
-            </nav> {% endcomment %}
         </div>
     </header>
 
@@ -35,28 +31,23 @@
         <section id="home" class="content-init content-update">
             <h1>ホーム画面</h1>
             <p>ホーム画面</p>
-            <div class="before-after-container">
+            {% comment %} <div class="before-after-container">
                 <img src="{% static 'image/before.png' %}" class="before-image" alt="Before">
                 <div class="after-image" style="background-image: url('{% static 'image/after.png' %}');"></div>
                 <input type="range" min="0" max="100" value="50" class="slider" id="beforeAfterSlider">
-            </div>
+            </div> {% endcomment %}
         </section>
 
-        <section id="styletf" class="content-init content-update">
-            <h1>スタイル転送</h1>
-            <p>スタイル転送</p>
-            <div class="styletf-container">
-                <div id="st_input_ddz_content" class="styletf-ddz">
-                    前景画像をドラッグ<br><br>またはクリックで画像選択</div>
-                <div id="st_input_ddz_style" class="styletf-ddz">
-                    背景画像をドラッグ<br><br>またはクリックで画像選択</div>
-            </div>
-            <button id="st_process_btn"     class="purple-btn" style="display:none;">画像合成</button>
-            <button id="st_processing_btn"  class="gray-btn"   style="display:none;">処理中...</button>
-            <button id="st_reset_btn"       class="purple-btn" style="display:none;">リセット</button>
-            <button id="st_download_btn"    class="purple-btn" style="display:none;">ダウンロード</button>
-            <button id="st_downloading_btn" class="gray-btn"   style="display:none;">ダウンロード中...</button>
-            <div id="st_output_prev" class="styletf-preview" style="display:none;"></div>
+        <section id="upscale" class="content-init content-update">
+            <h1>高画質化</h1>
+            <p>高画質化</p>
+            <div id="us_input_ddz" class="upscale-ddz">
+                画像をドラッグ<br><br>またはクリックで画像選択</div>
+            <button id="us_process_btn"     class="purple-btn" style="display:none;">高画質化</button>
+            <button id="us_processing_btn"  class="gray-btn"   style="display:none;">処理中...</button>
+            <button id="us_download_btn"    class="purple-btn" style="display:none;">ダウンロード</button>
+            <button id="us_downloading_btn" class="gray-btn"   style="display:none;">ダウンロード中...</button>
+            <button id="us_reset_btn"       class="purple-btn" style="display:none;">リセット</button>
         </section>
     
         <section id="removebg" class="content-init content-update">

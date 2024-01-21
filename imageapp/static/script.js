@@ -1,6 +1,4 @@
 // ===========================================================================
-// 
-// ===========================================================================
 
 // ページ読み込み時の処理
 document.addEventListener('DOMContentLoaded', () => {
@@ -27,15 +25,14 @@ function changeTab(targetId) {
 }
 
 // ===========================================================================
+
 // HTML要素の参照
-// ===========================================================================
+const us_html_ids = ['us_input_ddz', 'us_reset_btn', 'us_process_btn',
+                     'us_processing_btn', 'us_download_btn', 'us_downloading_btn'];
 
-const st_html_ids = ['st_input_ddz_content', 'st_input_ddz_style', 'st_reset_btn', 'st_process_btn',
-                     'st_processing_btn', 'st_download_btn', 'st_downloading_btn', 'st_output_prev'];
-
-const [st_input_ddz_content, st_input_ddz_style, st_reset_btn, st_process_btn,
-       st_processing_btn, st_download_btn, st_downloading_btn, st_output_prev]
-       = st_html_ids.map(id => document.getElementById(id));
+const [us_input_ddz, us_reset_btn, us_process_btn,
+       us_processing_btn, us_download_btn, us_downloading_btn]
+       = us_html_ids.map(id => document.getElementById(id));
 
 const rb_html_ids = ['rb_input_ddz', 'rb_reset_btn', 'rb_process_btn',
                      'rb_processing_btn', 'rb_download_btn', 'rb_downloading_btn'];
@@ -45,8 +42,6 @@ const [rb_input_ddz, rb_reset_btn, rb_process_btn,
        = rb_html_ids.map(id => document.getElementById(id));
 
 // ===========================================================================
-// 
-// ===========================================================================
 
 function btnDisplayUpdate(show, ...elements) {
     elements.forEach(element => {
@@ -54,19 +49,6 @@ function btnDisplayUpdate(show, ...elements) {
     });
 }
 
-function btnDisplayUpdateCond() {
-    const contentImage = st_input_content.files[0];
-    const styleImage   = st_input_style.files[0];
-    if (contentImage && styleImage) {
-        btnDisplayUpdate(true, st_process_btn);
-    } else {
-        btnDisplayUpdate(false, st_process_btn);
-    }
-    st_reset_btn.style.display = (contentImage || styleImage) ? 'block' : 'none';
-}
-
-// ===========================================================================
-// 
 // ===========================================================================
 
 function ddzDisplayUpdate(ddzElement, imageSrc, btnAddOn, resetAddOn) {
@@ -106,12 +88,9 @@ function ddzDisplayUpdate(ddzElement, imageSrc, btnAddOn, resetAddOn) {
 }
 
 // ===========================================================================
-// 
-// ===========================================================================
 
-const st_input_content = setupInput('file', 'image/*', 'none');
-const st_input_style   = setupInput('file', 'image/*', 'none');
-const rb_input         = setupInput('file', 'image/*', 'none');
+const us_input = setupInput('file', 'image/*', 'none');
+const rb_input = setupInput('file', 'image/*', 'none');
 
 function setupInput(type, accept, display) {
     const input  = document.createElement('input');
@@ -122,11 +101,8 @@ function setupInput(type, accept, display) {
 }
 
 // ===========================================================================
-// 
-// ===========================================================================
 
-setupInputFiles(st_input_ddz_content, st_input_content, 'st_tag_content');
-setupInputFiles(st_input_ddz_style, st_input_style, 'st_tag_style');
+setupInputFiles(us_input_ddz, us_input, 'us_tag');
 setupInputFiles(rb_input_ddz, rb_input, 'rb_tag');
 
 function setupInputFiles(element, input, type) {
@@ -170,13 +146,9 @@ function processImageFiles(file, type) {
     const reader = new FileReader();
     reader.onload = (e) => {
         const imageSrc = e.target.result;
-        if (type === 'st_tag_content') {
-            ddzDisplayUpdate(st_input_ddz_content, imageSrc, function() {
-                btnDisplayUpdateCond();
-            });
-        } else if (type === 'st_tag_style') {
-            ddzDisplayUpdate(st_input_ddz_style, imageSrc, function() {
-                btnDisplayUpdateCond();
+        if (type === 'us_tag') {
+            ddzDisplayUpdate(us_input_ddz, imageSrc, function() {
+                btnDisplayUpdate(true, us_process_btn, us_reset_btn);
             });
         } else if (type === 'rb_tag') {
             ddzDisplayUpdate(rb_input_ddz, imageSrc, function() {
@@ -188,12 +160,10 @@ function processImageFiles(file, type) {
 }
 
 // ===========================================================================
-// 
-// ===========================================================================
 
-setupProcessButton(st_process_btn, st_input_content, st_input_style, 'style_transfer_view/', 'content_img', 'style_img',
-st_download_btn, st_reset_btn, st_processing_btn, st_downloading_btn, st_output_prev, function() {
-    setupReset_st();
+setupProcessButton(us_process_btn, us_input, null, 'upscale-image/', 'image', null,
+us_download_btn, us_reset_btn, us_processing_btn, us_downloading_btn, us_input_ddz, function() {
+    setupReset_us();
 });
 
 setupProcessButton(rb_process_btn, rb_input, null, 'remove-background/', 'image', null,
@@ -203,6 +173,7 @@ rb_download_btn, rb_reset_btn, rb_processing_btn, rb_downloading_btn, rb_input_d
 
 function setupProcessButton(btn, input1, input2, url, appendName1, appendName2, downloadButton, resetButton, processingButton, downloadingButton, displayUpdateElement, setupReset) {
     btn.addEventListener('click', () => {
+        console.log("ボタンがクリックされました");
         const file1 = input1 ? input1.files[0] : null;
         const file2 = input2 ? input2.files[0] : null;
 
@@ -220,6 +191,43 @@ function setupProcessButton(btn, input1, input2, url, appendName1, appendName2, 
 
         const csrftoken = getCookie('csrftoken');
 
+        // fetch(url, {
+        //     method: 'POST',
+        //     body: formData,
+        //     headers: {
+        //         'X-CSRFToken': csrftoken
+        //     }
+        // })
+        // .then(handleErrors)
+        // .then(response => response.json())
+        // .then(data => {
+        //     if (data && data.image) {
+        //         const base64Data = data.image;
+        //         ddzDisplayUpdate(displayUpdateElement, 'data:image/png;base64,' + base64Data, function() {
+        //             btnDisplayUpdate(false, processingButton);
+        //             btnDisplayUpdate(true, downloadButton, resetButton);
+        //         });
+        //         downloadButton.onclick = () => startDownload(base64Data, setupReset, function() {
+        //             btnDisplayUpdate(false, downloadButton, resetButton);
+        //             btnDisplayUpdate(true, downloadingButton);
+        //         });
+        //     } else {
+        //         alert('エラーが発生しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
+        //         setupReset();
+        //     }
+        // })
+        // .catch(error => {
+        //     console.error('エラーが発生しました。:', error);
+        //     alert('エラーが発生しました。');
+        //     setupReset();
+        // });
+
+        // ddzDisplayUpdate 関数内での画像ロードエラーを確認するためのエラーハンドリングを追加
+        imageElement.onerror = function() {
+            alert('画像を読み込む際にエラーが発生しました。');
+        };
+
+        // setupProcessButton 関数内でのレスポンスハンドリングを修正
         fetch(url, {
             method: 'POST',
             body: formData,
@@ -231,23 +239,27 @@ function setupProcessButton(btn, input1, input2, url, appendName1, appendName2, 
         .then(response => response.json())
         .then(data => {
             if (data && data.image) {
-                const base64Data = data.image;
-                ddzDisplayUpdate(displayUpdateElement, 'data:image/png;base64,' + base64Data, function() {
+                // base64エンコードされたデータが正しい形式であることを確認
+                const base64Data = data.image.split(',')[1]; // ヘッダを除去する
+                if (!base64Data.match(/^[A-Za-z0-9+/=]+$/)) {
+                    throw new Error('不正なbase64データが返されました。');
+                }
+                const imageSrc = 'data:image/png;base64,' + base64Data;
+                ddzDisplayUpdate(displayUpdateElement, imageSrc, function() {
                     btnDisplayUpdate(false, processingButton);
                     btnDisplayUpdate(true, downloadButton, resetButton);
                 });
-                downloadButton.onclick = () => startDownload(base64Data, setupReset, function() {
+                downloadButton.onclick = () => startDownload(imageSrc, setupReset, function() {
                     btnDisplayUpdate(false, downloadButton, resetButton);
                     btnDisplayUpdate(true, downloadingButton);
                 });
             } else {
-                alert('エラーが発生しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
-                setupReset();
+                throw new Error('画像データがレスポンスに含まれていません。');
             }
         })
         .catch(error => {
             console.error('エラーが発生しました。:', error);
-            alert('エラーが発生しました。');
+            alert('エラーが発生しました。: ' + error.message);
             setupReset();
         });
     });
@@ -303,21 +315,16 @@ function startDownload(base64Data, callback, btnAddOn) {
 }
 
 // ===========================================================================
-// 
-// ===========================================================================
 
-st_reset_btn.addEventListener('click', setupReset_st);
+us_reset_btn.addEventListener('click', setupReset_us);
 rb_reset_btn.addEventListener('click', setupReset_rb);
 
-function setupReset_st() {
-    const st_prev_images = document.querySelectorAll('#styletf .preview');
-    st_prev_images.forEach(image => image.remove());
-    st_input_content.value = '';
-    st_input_style.value = '';
-    st_input_ddz_content.style.display = 'flex';
-    st_input_ddz_style.style.display = 'flex';
-    st_output_prev.style.display = 'none';
-    btnDisplayUpdate(false, st_reset_btn, st_process_btn, st_processing_btn, st_download_btn, st_downloading_btn);
+function setupReset_us() {
+    const us_prev_images = document.querySelectorAll('#upscale .preview');
+    us_prev_images.forEach(image => image.remove());
+    us_input.value = '';
+    us_input_ddz.style.display = 'flex';
+    btnDisplayUpdate(false, us_reset_btn, us_process_btn, us_processing_btn, us_download_btn, us_downloading_btn);
 }
 
 function setupReset_rb() {
@@ -330,23 +337,23 @@ function setupReset_rb() {
 
 // ===========================================================================
 
-// ===========================================================================
+// // スライダーの初期化関数
+// function initializeSlider() {
+//     const slider = document.getElementById('beforeAfterSlider');
+//     const beforeImage = document.querySelector('.before-image');
+//     const afterImage = document.querySelector('.after-image');
+  
+//     // スライダーの値が変更されたときのイベントリスナー
+//     slider.oninput = function() {
+//       const sliderValue = this.value;
+//       // before-imageの表示範囲をスライダーの値に応じて変更
+//       beforeImage.style.clipPath = `inset(0 ${100 - sliderValue}% 0 0)`;
+//       // after-imageの表示範囲をスライダーの値に応じて変更
+//       afterImage.style.clipPath = `inset(0 0 0 ${sliderValue}%)`;
+//     };
+//   }
+  
+//   // ページの読み込みが完了したらスライダーを初期化
+//   window.onload = initializeSlider;
 
-// スライダーの初期化関数
-function initializeSlider() {
-    const slider = document.getElementById('beforeAfterSlider');
-    const beforeImage = document.querySelector('.before-image');
-    const afterImage = document.querySelector('.after-image');
-  
-    // スライダーの値が変更されたときのイベントリスナー
-    slider.oninput = function() {
-      const sliderValue = this.value;
-      // before-imageの表示範囲をスライダーの値に応じて変更
-      beforeImage.style.clipPath = `inset(0 ${100 - sliderValue}% 0 0)`;
-      // after-imageの表示範囲をスライダーの値に応じて変更
-      afterImage.style.clipPath = `inset(0 0 0 ${sliderValue}%)`;
-    };
-  }
-  
-  // ページの読み込みが完了したらスライダーを初期化
-  window.onload = initializeSlider;
+  // ===========================================================================

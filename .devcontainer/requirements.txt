@@ -6,3 +6,9 @@ Pillow
 rembg
 torch
 torchvision
+
+basicsr
+facexlib
+gfpgan
+opencv-python
+tqdm
