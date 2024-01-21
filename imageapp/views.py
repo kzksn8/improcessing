@@ -8,19 +8,18 @@ from PIL import Image
 from rembg import remove
 
 from base64 import b64encode
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .style_transfer import style_transfer, get_feature_extractor
 
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
-from .forms import SignUpForm
-from django.contrib.auth.decorators import login_required
-
 
 # デバイスを設定（GPUが利用可能な場合はGPUを使用）
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def index(request):
+    return render(request, 'index.html')
 
 
 # メモリから画像を読み込むための新しい関数
@@ -111,45 +110,3 @@ def remove_background(request):
     else:
         # POSTリクエストでない場合はエラーを返す
         return JsonResponse({'error': '無効なリクエストです。'}, status=400)
-
-
-def index(request):
-    return render(request, 'index.html')
-
-
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')
-        else:
-            return HttpResponse("ログインに失敗しました。")
-    return render(request, 'index.html')
-
-
-def signup_view(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('index')
-        else:
-            # フォームのエラーを表示する
-            return render(request, 'index.html', {'form': form})
-    else:
-        form = SignUpForm()
-    return render(request, 'index.html', {'form': form})
-
-
-def logout_view(request):
-    logout(request)
-    return redirect('home')
-
-
-@login_required
-def index(request):
-    return render(request, 'index.html', {'user': request.user})

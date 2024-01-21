@@ -129,8 +129,3 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
-
-LOGIN_URL  = '/login/'
-LOGOUT_URL = '/logout/'
-LOGIN_REDIRECT_URL  = '/home/'  # ログイン後にリダイレクトしたいビューのURLを設定
-LOGOUT_REDIRECT_URL = '/home/'  # ログアウト後にリダイレクトしたい場合も同様に設定

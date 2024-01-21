@@ -6,10 +6,8 @@ from torchvision import transforms
 from torchvision.models import vgg19
 from PIL import Image
 
-
 # デバイスを設定（GPUが利用可能な場合はGPUを使用）
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 # 画像の読み込みと前処理を行う関数
 def load_image(image_bytes, max_size=512, shape=None):
@@ -38,8 +36,8 @@ def load_image(image_bytes, max_size=512, shape=None):
 
     # バッチ次元を追加してデバイスに画像を転送
     image = in_transform(image)[:3,:,:].unsqueeze(0).to(device)
-    return image
 
+    return image
 
 # VGGモデルをロードし、特徴抽出器を取得
 def get_feature_extractor():
@@ -47,7 +45,6 @@ def get_feature_extractor():
     for param in model.parameters():
         param.requires_grad_(False)
     return model
-
 
 # 特徴マップを抽出する関数
 def get_features(image, model, layers=None):
@@ -60,7 +57,6 @@ def get_features(image, model, layers=None):
         if name in layers:
             features[layers[name]] = x
     return features
-
 
 # スタイル損失を計算する関数
 def calculate_style_loss(target_features, style_features):
@@ -78,12 +74,10 @@ def calculate_style_loss(target_features, style_features):
         style_loss += layer_loss / (d * h * w)
     return style_loss
 
-
 # コンテンツ損失を計算する関数
 def calculate_content_loss(target_features, content_features):
     content_loss = torch.mean((target_features['conv4_2'] - content_features['conv4_2']) ** 2)
     return content_loss
-
 
 # グラム行列を計算する関数
 def gram_matrix(tensor):
@@ -91,7 +85,6 @@ def gram_matrix(tensor):
     tensor = tensor.view(d, h * w)
     gram = torch.mm(tensor, tensor.t())
     return gram
-
 
 # スタイル転送のメイン関数
 def style_transfer(content_img, style_img, model, content_weight=1, style_weight=1, steps=20):
@@ -124,4 +117,5 @@ def style_transfer(content_img, style_img, model, content_weight=1, style_weight
             print("Content loss: ", content_loss.item())
             print("Style loss: ", style_loss.item())
             print("Total loss: ", total_loss.item())
+
     return target

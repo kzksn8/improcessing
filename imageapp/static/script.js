@@ -6,14 +6,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', (event) => {
+            event.preventDefault();
             const targetId = link.getAttribute('data-target');
-            if (['home', 'styletf', 'removebg', 'about', 'login', 'signup'].includes(targetId)) {
-                event.preventDefault();
-                changeTab(targetId);
-            }
+            changeTab(targetId);
         });
     });
-    changeTab('home'); // デフォルトでホームタブを表示
+    changeTab('home');  // デフォルトでホームタブを表示
 });
 
 // タブを切り替える関数
@@ -334,42 +332,19 @@ function setupReset_rb() {
 
 // ===========================================================================
 
-$(document).ready(function(){
-    $('.tab-right').click(function(){
-        var target = $(this).data('target');
-        $('.content-update').hide();
-        $('#'+target).show();
+function onDocumentReady() {
+    const slider = document.getElementById('beforeAfterSlider');
+    const afterImage = document.querySelector('.before-after-container .after-image');
+
+    if (!slider || !afterImage) {
+        console.error('Required elements not found!');
+        return; // 必要な要素が見つからない場合は処理を中断する
+    }
+
+    // スライダーの値が変更されたときにafterImageの幅を更新する
+    slider.addEventListener('input', function() {
+        afterImage.style.width = this.value + '%';
     });
-});
-
-// パスワードのバリデーション用の関数
-function isValidPassword(password) {
-    var pattern = /^[A-Za-z0-9]{8,20}$/; // 8文字以上20文字以下、アルファベットと数字のみ
-    return pattern.test(password);
 }
 
-// ユーザーネームのバリデーション用の関数
-function isValidUsername(username) {
-    var pattern = /^[A-Za-z0-9]{4,20}$/; // 4文字以上20文字以下、アルファベットと数字のみ
-    return pattern.test(username);
-}
-
-$('#loginForm').submit(function(event){
-    var username = $('#loginUsername').val(); // ユーザーネームの入力値を取得
-    var password = $('#loginPassword').val(); // パスワードの入力値を取得
-    if (!isValidUsername(username) || !isValidPassword(password)) {
-        event.preventDefault(); // フォームの送信を阻止
-        alert('ユーザーネームまたはパスワードが無効です。');
-    }
-});
-
-$('#signupForm').submit(function(event){
-    var username = $('#signupUsername').val(); // ユーザーネームの入力値を取得
-    // サインアップの際には、ユーザーネームのみをチェックしています。
-    if (!isValidUsername(username)) {
-        event.preventDefault(); // フォームの送信を阻止
-        alert('無効なユーザーネームです。');
-    }
-});
-
-// ===========================================================================
+document.addEventListener('DOMContentLoaded', onDocumentReady);

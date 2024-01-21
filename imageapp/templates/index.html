@@ -1,7 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
-
 <html lang="ja">
+    
 <head>
     <meta charset="UTF-8">
     <title>Image Background Remover</title>
@@ -10,8 +10,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 </head>
-<body>
 
+<body>
     <header>
         <div class="tab">
             <nav>
@@ -24,16 +24,10 @@
                 <a href="#removebg" data-target="removebg" class="tab-left">背景削除</a>
                 <a href="#about"    data-target="about"    class="tab-left">About</a>
             </nav>
-            <nav>
-                {% if user.is_authenticated %}
-                    <span class="user-icon">{{ user.username|first }}</span>
-                    <span class="username">{{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="tab-right">Logout</a>
-                {% else %}
-                    <a href="#login"  data-target="login"  class="tab-right">Login</a>
-                    <a href="#signup" data-target="signup" class="tab-right">Sign Up</a>
-                {% endif %}
-            </nav>
+            {% comment %} <nav>
+                <a href="#login"  data-target="login"  class="tab-right">Login</a>
+                <a href="#signup" data-target="signup" class="tab-right">Sign Up</a>
+            </nav> {% endcomment %}
         </div>
     </header>
 
@@ -41,6 +35,11 @@
         <section id="home" class="content-init content-update">
             <h1>ホーム画面</h1>
             <p>ホーム画面</p>
+            <div class="before-after-container">
+                <img src="{% static 'image/before.png' %}" class="before-image" alt="Before">
+                <div class="after-image" style="background-image: url('{% static 'image/after.png' %}')"></div>
+                <input type="range" min="0" max="100" value="50" class="slider" id="beforeAfterSlider">
+              </div>
         </section>
 
         <section id="styletf" class="content-init content-update">
@@ -75,44 +74,6 @@
         <section id="about" class="content-init content-update">
             <h1>About</h1>
             <p>About</p>
-        </section>
-
-        <section id="signup" class="content-init content-update" style="display:none;">
-            <h1>サインアップ</h1>
-            <form id="signupForm" method="post" action="{% url 'signup' %}" class="auth-form">
-                {% csrf_token %}
-                <div class="form-group">
-                    <input type="text" id="signupUsername" name="username" required placeholder="ユーザーネーム" autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <input type="password" id="signupPassword1" name="password1" required placeholder="パスワード" autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <input type="password" id="signupPassword2" name="password2" required placeholder="パスワード確認" autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="auth-button">続行</button>
-                </div>
-            </form>
-        </section>
-
-        <section id="login" class="content-init content-update" style="display:none;">
-            <h1>ログイン</h1>
-            <form id="loginForm" class="auth-form" method="post" action="{% url 'login' %}">
-                {% csrf_token %}
-                <div class="form-group">
-                    <input type="text" id="loginUsername" name="username" required placeholder="ユーザーネーム" autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <input type="password" id="loginPassword" name="password" required placeholder="パスワード" autocomplete="current-password">
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="auth-button">ログイン</button>
-                </div>
-                <div class="form-help">
-                    <a href="#">パスワードをお忘れですか？</a>
-                </div>
-            </form>
         </section>
     </main>
     <script src="{% static 'script.js' %}"></script>
