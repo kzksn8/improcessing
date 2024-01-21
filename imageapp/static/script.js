@@ -332,19 +332,21 @@ function setupReset_rb() {
 
 // ===========================================================================
 
-function onDocumentReady() {
+// スライダーの初期化関数
+function initializeSlider() {
     const slider = document.getElementById('beforeAfterSlider');
-    const afterImage = document.querySelector('.before-after-container .after-image');
-
-    if (!slider || !afterImage) {
-        console.error('Required elements not found!');
-        return; // 必要な要素が見つからない場合は処理を中断する
-    }
-
-    // スライダーの値が変更されたときにafterImageの幅を更新する
-    slider.addEventListener('input', function() {
-        afterImage.style.width = this.value + '%';
-    });
-}
-
-document.addEventListener('DOMContentLoaded', onDocumentReady);
+    const beforeImage = document.querySelector('.before-image');
+    const afterImage = document.querySelector('.after-image');
+  
+    // スライダーの値が変更されたときのイベントリスナー
+    slider.oninput = function() {
+      const sliderValue = this.value;
+      // before-imageの表示範囲をスライダーの値に応じて変更
+      beforeImage.style.clipPath = `inset(0 ${100 - sliderValue}% 0 0)`;
+      // after-imageの表示範囲をスライダーの値に応じて変更
+      afterImage.style.clipPath = `inset(0 0 0 ${sliderValue}%)`;
+    };
+  }
+  
+  // ページの読み込みが完了したらスライダーを初期化
+  window.onload = initializeSlider;
