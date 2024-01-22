@@ -9,16 +9,15 @@ from rembg import remove
 from django.shortcuts import render
 
 from django.conf import settings
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
 from basicsr.archs.edsr_arch import EDSR
 from base64 import b64encode
 
-# デバイスを設定（GPUが利用可能な場合はGPUを使用）
+# デバイスを設定
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# モデルの初期化（パラメータはプリトレーニング済みモデルに合わせて調整）
+# モデルの初期化
 model = EDSR(
     num_in_ch=3,
     num_out_ch=3,
@@ -32,39 +31,50 @@ model = EDSR(
 # プリトレーニング済みモデルの状態辞書を読み込む
 model_path = os.path.join(settings.BASE_DIR, 'imageapp', 'pretrained_models', 'EDSR_Mx2_f64b16_DIV2K_official-3ba7b086.pth')
 model.load_state_dict(torch.load(model_path, map_location=device), strict=False)
+model.to(device)
 model.eval()
-
-def index(request):
-    return render(request, 'index.html')
 
 @csrf_exempt
 def upscale_image(request):
-    print("リクエストを受信しました")  # デバッグ出力
     if request.method == 'POST':
-        # リクエストから画像データを取得
         file = request.FILES.get('image')
         if not file:
             return JsonResponse({'error': 'ファイルが提供されていません。'}, status=400)
 
-        # 送信された画像ファイルを取得
+        # 画像ファイルを読み込み、RGBに変換する
         image_file = request.FILES['image']
         image = Image.open(image_file).convert('RGB')
 
-        # Super Resolution処理
+        # ピクセル値を[0, 1]に正規化
         lr_img = np.array(image).astype(np.float32) / 255.0
+        # torchテンソルに変換し、バッチ次元を追加
         lr_img = torch.from_numpy(lr_img).permute(2, 0, 1).unsqueeze(0).to(device)
+
+        # モデル推論
         with torch.no_grad():
-            sr_img = model(lr_img).squeeze(0).cpu().numpy().transpose(1, 2, 0)
-        sr_img = (sr_img * 255.0).round().astype(np.uint8)
+            sr_img = model(lr_img).squeeze(0)
+
+        # 出力テンソルを[0, 255]に非正規化
+        sr_img = sr_img.mul(255.0).clamp(0.0, 255.0).cpu().numpy().astype(np.uint8)
+        # PIL用にHeight x Width x Channels形式に変換
+        sr_img = np.transpose(sr_img, (1, 2, 0))
+
+        # スケールアップされた画像をPILイメージに変換する
         output_image = Image.fromarray(sr_img)
 
-        # 結果をバイト配列に変換
+        # 結果をバイト配列に変換してbase64エンコードする
         buffer = io.BytesIO()
         output_image.save(buffer, format="PNG")
         image_base64 = b64encode(buffer.getvalue()).decode('utf-8')
 
-    # レスポンスとしてBase64エンコードされた画像を返す
-    return JsonResponse({'image': 'data:image/png;base64,' + image_base64})
+        # base64エンコードされた画像をJSONレスポンスとして返す
+        return JsonResponse({'image': 'data:image/png;base64,' + image_base64})
+    else:
+        # POSTリクエストでない場合はエラーを返す
+        return JsonResponse({'error': 'POSTリクエストのみ受け付けます。'}, status=400)
+
+def index(request):
+    return render(request, 'index.html')
 
 @csrf_exempt
 def remove_background(request):

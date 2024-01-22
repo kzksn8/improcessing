@@ -173,7 +173,6 @@ rb_download_btn, rb_reset_btn, rb_processing_btn, rb_downloading_btn, rb_input_d
 
 function setupProcessButton(btn, input1, input2, url, appendName1, appendName2, downloadButton, resetButton, processingButton, downloadingButton, displayUpdateElement, setupReset) {
     btn.addEventListener('click', () => {
-        console.log("ボタンがクリックされました");
         const file1 = input1 ? input1.files[0] : null;
         const file2 = input2 ? input2.files[0] : null;
 
@@ -191,43 +190,6 @@ function setupProcessButton(btn, input1, input2, url, appendName1, appendName2, 
 
         const csrftoken = getCookie('csrftoken');
 
-        // fetch(url, {
-        //     method: 'POST',
-        //     body: formData,
-        //     headers: {
-        //         'X-CSRFToken': csrftoken
-        //     }
-        // })
-        // .then(handleErrors)
-        // .then(response => response.json())
-        // .then(data => {
-        //     if (data && data.image) {
-        //         const base64Data = data.image;
-        //         ddzDisplayUpdate(displayUpdateElement, 'data:image/png;base64,' + base64Data, function() {
-        //             btnDisplayUpdate(false, processingButton);
-        //             btnDisplayUpdate(true, downloadButton, resetButton);
-        //         });
-        //         downloadButton.onclick = () => startDownload(base64Data, setupReset, function() {
-        //             btnDisplayUpdate(false, downloadButton, resetButton);
-        //             btnDisplayUpdate(true, downloadingButton);
-        //         });
-        //     } else {
-        //         alert('エラーが発生しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
-        //         setupReset();
-        //     }
-        // })
-        // .catch(error => {
-        //     console.error('エラーが発生しました。:', error);
-        //     alert('エラーが発生しました。');
-        //     setupReset();
-        // });
-
-        // ddzDisplayUpdate 関数内での画像ロードエラーを確認するためのエラーハンドリングを追加
-        imageElement.onerror = function() {
-            alert('画像を読み込む際にエラーが発生しました。');
-        };
-
-        // setupProcessButton 関数内でのレスポンスハンドリングを修正
         fetch(url, {
             method: 'POST',
             body: formData,
@@ -239,27 +201,23 @@ function setupProcessButton(btn, input1, input2, url, appendName1, appendName2, 
         .then(response => response.json())
         .then(data => {
             if (data && data.image) {
-                // base64エンコードされたデータが正しい形式であることを確認
-                const base64Data = data.image.split(',')[1]; // ヘッダを除去する
-                if (!base64Data.match(/^[A-Za-z0-9+/=]+$/)) {
-                    throw new Error('不正なbase64データが返されました。');
-                }
-                const imageSrc = 'data:image/png;base64,' + base64Data;
-                ddzDisplayUpdate(displayUpdateElement, imageSrc, function() {
+                const base64Data = data.image.startsWith('data:image/png;base64,') ? data.image : 'data:image/png;base64,' + data.image;
+                ddzDisplayUpdate(displayUpdateElement, base64Data, function() {
                     btnDisplayUpdate(false, processingButton);
                     btnDisplayUpdate(true, downloadButton, resetButton);
                 });
-                downloadButton.onclick = () => startDownload(imageSrc, setupReset, function() {
+                downloadButton.onclick = () => startDownload(base64Data, setupReset, function() {
                     btnDisplayUpdate(false, downloadButton, resetButton);
                     btnDisplayUpdate(true, downloadingButton);
                 });
             } else {
-                throw new Error('画像データがレスポンスに含まれていません。');
+                alert('エラーが発生しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
+                setupReset();
             }
         })
         .catch(error => {
             console.error('エラーが発生しました。:', error);
-            alert('エラーが発生しました。: ' + error.message);
+            alert('エラーが発生しました。');
             setupReset();
         });
     });
@@ -303,11 +261,30 @@ function handleErrors(response) {
 function startDownload(base64Data, callback, btnAddOn) {
     if (base64Data) {
         btnAddOn();
+
+        // Base64データをBlobに変換
+        const byteCharacters = atob(base64Data.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {type: 'image/png'});
+
+        // Blobを使用してObject URLを作成
+        const url = URL.createObjectURL(blob);
+
+        // ダウンロードリンクを設定
         const link = document.createElement('a');
-        link.href = `data:image/png;base64,${base64Data}`;
-        link.download = 'processed_image.png';     
-        link.addEventListener('click', () => setTimeout(callback, 1000));
-        
+        link.href = url;
+        link.download = 'processed_image.png';
+        link.addEventListener('click', () => {
+            setTimeout(() => {
+                URL.revokeObjectURL(url); // メモリリークを防ぐために使用後にURLを解放
+                callback();
+            }, 1000);
+        });
+
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
