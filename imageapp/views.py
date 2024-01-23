@@ -11,26 +11,19 @@ from django.shortcuts import render
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from basicsr.archs.edsr_arch import EDSR
+from basicsr.archs.rrdbnet_arch import RRDBNet
 from base64 import b64encode
 
-# デバイスを設定
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# モデルの初期化
-model = EDSR(
-    num_in_ch=3,
-    num_out_ch=3,
-    num_feat=64,
-    num_block=16,
-    upscale=2,
-    res_scale=1,
-    img_range=255.0
-)
+def index(request):
+    return render(request, 'index.html')
 
-# プリトレーニング済みモデルの状態辞書を読み込む
-model_path = os.path.join(settings.BASE_DIR, 'imageapp', 'pretrained_models', 'EDSR_Mx2_f64b16_DIV2K_official-3ba7b086.pth')
-model.load_state_dict(torch.load(model_path, map_location=device), strict=False)
+# モデルの初期化
+model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
+model_path = os.path.join(settings.BASE_DIR, 'imageapp', 'pretrained_models', 'RealESRGAN_x4plus.pth')
+checkpoint = torch.load(model_path, map_location=device)
+model.load_state_dict(checkpoint['params_ema'])
 model.to(device)
 model.eval()
 
@@ -72,9 +65,6 @@ def upscale_image(request):
     else:
         # POSTリクエストでない場合はエラーを返す
         return JsonResponse({'error': 'POSTリクエストのみ受け付けます。'}, status=400)
-
-def index(request):
-    return render(request, 'index.html')
 
 @csrf_exempt
 def remove_background(request):
