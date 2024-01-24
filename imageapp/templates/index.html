@@ -4,7 +4,7 @@
     
 <head>
     <meta charset="UTF-8">
-    <title>Image Background Remover</title>
+    <title>Image Processing</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
@@ -31,11 +31,18 @@
         <section id="home" class="content-init content-update">
             <h1>ホーム画面</h1>
             <p>ホーム画面</p>
-            {% comment %} <div class="before-after-container">
-                <img src="{% static 'image/before.png' %}" class="before-image" alt="Before">
-                <div class="after-image" style="background-image: url('{% static 'image/after.png' %}');"></div>
-                <input type="range" min="0" max="100" value="50" class="slider" id="beforeAfterSlider">
-            </div> {% endcomment %}
+            <p style="text-align:left">テキストを左寄せ</p>
+            <div class="upscale-container">
+                <img src="{% static 'image/upscale1.png' %}" class="before-image" alt="Before">
+                <div class="after-image" style="background-image: url('{% static 'image/upscale2.png' %}');"></div>
+                <input type="range" min="0" max="100" value="50" class="slider" id="us_slider">
+            </div>
+            <p style="text-align:left">テキストを左寄せ</p>
+            <div class="removebg-container">
+                <img src="{% static 'image/removebg1.png' %}" class="before-image" alt="Before">
+                <div class="after-image" style="background-image: url('{% static 'image/removebg2.png' %}');"></div>
+                <input type="range" min="0" max="100" value="50" class="slider" id="rb_slider">
+            </div>
         </section>
 
         <section id="upscale" class="content-init content-update">

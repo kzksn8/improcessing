@@ -1,18 +1,17 @@
 import os
 import io
+from base64 import b64encode
 
 import torch
 import numpy as np
 from PIL import Image
 from rembg import remove
+from basicsr.archs.rrdbnet_arch import RRDBNet
 
 from django.shortcuts import render
-
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from basicsr.archs.rrdbnet_arch import RRDBNet
-from base64 import b64encode
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -20,8 +19,8 @@ def index(request):
     return render(request, 'index.html')
 
 # モデルの初期化
-model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
-model_path = os.path.join(settings.BASE_DIR, 'imageapp', 'pretrained_models', 'RealESRGAN_x4plus.pth')
+model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=2)
+model_path = os.path.join(settings.BASE_DIR, 'imageapp', 'pretrained', 'RealESRGAN_x2plus.pth')
 checkpoint = torch.load(model_path, map_location=device)
 model.load_state_dict(checkpoint['params_ema'])
 model.to(device)
@@ -38,10 +37,36 @@ def upscale_image(request):
         image_file = request.FILES['image']
         image = Image.open(image_file).convert('RGB')
 
+        # 画像のサイズを取得
+        width, height = image.size
+
+        # 画像サイズの前処理
+        # 縦が1000ピクセルより大きい場合の処理
+        if height > 1000 and height >= width:
+            new_height = 1000
+            new_width = int(new_height * width / height)
+            new_width -= new_width % 2  # 横のピクセル数が奇数の場合、マイナス1
+            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+        # 横が1000ピクセルより大きい場合の処理
+        elif width > 1000 and width >= height:
+            new_width = 1000
+            new_height = int(new_width * height / width)
+            new_height -= new_height % 2  # 縦のピクセル数が奇数の場合、マイナス1
+            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+        # 縦横ともに1000ピクセル以下で、いずれかが奇数の場合の処理
+        elif width <= 1000 and height <= 1000:
+            new_width = width - (width % 2)  # 横のピクセル数が奇数の場合、マイナス1
+            new_height = height - (height % 2)  # 縦のピクセル数が奇数の場合、マイナス1
+            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
         # ピクセル値を[0, 1]に正規化
         lr_img = np.array(image).astype(np.float32) / 255.0
         # torchテンソルに変換し、バッチ次元を追加
         lr_img = torch.from_numpy(lr_img).permute(2, 0, 1).unsqueeze(0).to(device)
+
+
 
         # モデル推論
         with torch.no_grad():

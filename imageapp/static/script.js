@@ -27,17 +27,17 @@ function changeTab(targetId) {
 // ===========================================================================
 
 // HTML要素の参照
-const us_html_ids = ['us_input_ddz', 'us_reset_btn', 'us_process_btn',
+const us_html_ids = ['us_slider', 'us_input_ddz', 'us_reset_btn', 'us_process_btn',
                      'us_processing_btn', 'us_download_btn', 'us_downloading_btn'];
 
-const [us_input_ddz, us_reset_btn, us_process_btn,
+const [us_slider, us_input_ddz, us_reset_btn, us_process_btn,
        us_processing_btn, us_download_btn, us_downloading_btn]
        = us_html_ids.map(id => document.getElementById(id));
 
-const rb_html_ids = ['rb_input_ddz', 'rb_reset_btn', 'rb_process_btn',
+const rb_html_ids = ['rb_slider', 'rb_input_ddz', 'rb_reset_btn', 'rb_process_btn',
                      'rb_processing_btn', 'rb_download_btn', 'rb_downloading_btn'];
 
-const [rb_input_ddz, rb_reset_btn, rb_process_btn,
+const [rb_slider, rb_input_ddz, rb_reset_btn, rb_process_btn,
        rb_processing_btn, rb_download_btn, rb_downloading_btn]
        = rb_html_ids.map(id => document.getElementById(id));
 
@@ -242,16 +242,9 @@ function getCookie(name) {
 function handleErrors(response) {
     if (!response.ok) {
         const clonedResponse = response.clone();
-        // エラーレスポンスの内容をログに出力するためにJSONを解析
-        clonedResponse.json().then(json => {
-            console.error('Error response JSON:', json);
-            alert('エラーが発生しました。: ' + (json.error || '不明なエラー'));
-        }).catch(() => {
-            // JSONの解析に失敗した場合は、テキストとして出力
-            clonedResponse.text().then(text => {
-                console.error('Error response text:', text);
-                alert('エラーが発生しました。: ' + text);
-            });
+        clonedResponse.text().then(text => {
+            console.error('Error response text:', text);
+            alert('エラーが発生しました。: ' + text);
         });
         throw Error(`HTTP error: ${response.status} ${response.statusText}`);
     }
@@ -314,23 +307,32 @@ function setupReset_rb() {
 
 // ===========================================================================
 
-// // スライダーの初期化関数
-// function initializeSlider() {
-//     const slider = document.getElementById('beforeAfterSlider');
-//     const beforeImage = document.querySelector('.before-image');
-//     const afterImage = document.querySelector('.after-image');
+// ページの読み込みが完了したらスライダーを初期化
+// window.onload = function() {
+//     initializeSlider('upscale-container', 'us_slider');
+//     initializeSlider('removebg-container', 'rb_slider');
+// };
+
+window.onload = function() {
+    initializeSlider('upscale-container', 'us_slider', 'us_left_arrow', 'us_right_arrow');
+    initializeSlider('removebg-container', 'rb_slider', 'rb_left_arrow', 'rb_right_arrow');
+};
+
+// スライダーの初期化関数
+function initializeSlider(containerClass, sliderId) {
+    const container = document.querySelector(`.${containerClass}`);
+    const beforeImage = container.querySelector('.before-image');
+    const afterImage = container.querySelector('.after-image');
+    const slider = container.querySelector(`#${sliderId}`);
   
-//     // スライダーの値が変更されたときのイベントリスナー
-//     slider.oninput = function() {
-//       const sliderValue = this.value;
-//       // before-imageの表示範囲をスライダーの値に応じて変更
-//       beforeImage.style.clipPath = `inset(0 ${100 - sliderValue}% 0 0)`;
-//       // after-imageの表示範囲をスライダーの値に応じて変更
-//       afterImage.style.clipPath = `inset(0 0 0 ${sliderValue}%)`;
-//     };
-//   }
-  
-//   // ページの読み込みが完了したらスライダーを初期化
-//   window.onload = initializeSlider;
+    // スライダーの値が変更されたときのイベントリスナー
+    slider.oninput = function() {
+        const sliderValue = this.value;
+        // before-imageの表示範囲をスライダーの値に応じて変更
+        beforeImage.style.clipPath = `inset(0 ${100 - sliderValue}% 0 0)`;
+        // after-imageの表示範囲をスライダーの値に応じて変更
+        afterImage.style.clipPath = `inset(0 0 0 ${sliderValue}%)`;
+    };
+}
 
   // ===========================================================================
