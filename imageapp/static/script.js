@@ -1,5 +1,8 @@
 // ===========================================================================
 
+// 処理中かどうかの状態を保持
+let isProcessing = false;
+
 // ページ読み込み時の処理
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('nav a').forEach(link => {
@@ -10,10 +13,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     changeTab('home');  // デフォルトでホームタブを表示
+
+    // ページを離れる前に確認する
+    window.addEventListener('beforeunload', function (e) {
+        // 処理中の場合、警告メッセージを表示
+        if (isProcessing) {
+            var confirmationMessage = 'このページを離れると、処理が中止されます。本当にページを離れますか？';
+            (e || window.event).returnValue = confirmationMessage;
+            return confirmationMessage;
+        }
+    });
 });
 
 // タブを切り替える関数
 function changeTab(targetId) {
+    // 処理中であれば警告を出す
+    if (isProcessing) {
+        if (!confirm('このページを離れると、処理が中止されます。本当にページを離れますか？')) {
+            // ユーザーがキャンセルを選択した場合、処理を続行
+            return;
+        } else {
+            // ユーザーがOKを選択した場合、処理を中止
+            setupReset_us();
+            isProcessing = false;
+        }
+    }
+    updateTabDisplay(targetId);
+}
+
+function updateTabDisplay(targetId) {
     const tabs = document.getElementsByClassName("content-init");
     for (let tabcontent of tabs) {
         tabcontent.style.display = "none";
@@ -22,6 +50,31 @@ function changeTab(targetId) {
     if (activeTab) {
         activeTab.style.display = "block";
     }
+}
+
+// ===========================================================================
+
+// ページの読み込みが完了したらスライダーを初期化
+window.onload = function() {
+    initializeSlider('upscale-container', 'us_slider');
+    initializeSlider('removebg-container', 'rb_slider');
+};
+
+// スライダーの初期化関数
+function initializeSlider(containerClass, sliderId) {
+    const container = document.querySelector(`.${containerClass}`);
+    const beforeImage = container.querySelector('.before-image');
+    const afterImage = container.querySelector('.after-image');
+    const slider = container.querySelector(`#${sliderId}`);
+  
+    // スライダーの値が変更されたときのイベントリスナー
+    slider.oninput = function() {
+        const sliderValue = this.value;
+        // before-imageの表示範囲をスライダーの値に応じて変更
+        beforeImage.style.clipPath = `inset(0 ${100 - sliderValue}% 0 0)`;
+        // after-imageの表示範囲をスライダーの値に応じて変更
+        afterImage.style.clipPath = `inset(0 0 0 ${sliderValue}%)`;
+    };
 }
 
 // ===========================================================================
@@ -109,12 +162,21 @@ function setupInputFiles(element, input, type) {
     // 画像ドラッグ時の処理
     function handleDragOver(e) {
         e.preventDefault();
+        e.stopPropagation();
         e.dataTransfer.dropEffect = 'copy';
+        element.classList.add('dragover'); // ドラッグ時のクラスを追加
+    }
+    // 画像ドラッグが終了した時の処理（ドラッグが終了したらクラスを削除）
+    function handleDragLeave(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        element.classList.remove('dragover'); // ドラッグ終了時にクラスを削除
     }
     // 画像ドロップ時の処理
     function handleDrop(e) {
         e.preventDefault();
         e.stopPropagation();
+        element.classList.remove('dragover'); // ドロップ時にクラスを削除
         processFiles(e.dataTransfer.files, type);
     }
     // 画像クリック選択時の処理
@@ -132,12 +194,15 @@ function setupInputFiles(element, input, type) {
             } else {
                 alert('サポートされていないファイル形式です。別の画像ファイルを選択してください。');
             }
+            // ドラッグ＆ドロップで受け取ったファイルをinput要素に設定
+            input.files = createFileList(files[0]);
         } else {
             alert('アップロードできる画像は1つです。');
         }
     }
     element.addEventListener('dragover', handleDragOver, false);
-    element.addEventListener('drop', handleDrop);
+    element.addEventListener('dragleave', handleDragLeave, false);
+    element.addEventListener('drop', handleDrop, false);
     element.addEventListener('click', () => input.click());
     input.addEventListener('change', handleFileSelect);
 }
@@ -159,24 +224,32 @@ function processImageFiles(file, type) {
     reader.readAsDataURL(file);
 }
 
+// DataTransferオブジェクトを使用してFileListオブジェクトを作成するヘルパー関数
+function createFileList(file) {
+    // FileListオブジェクトは読み取り専用なので、間接的に作成する必要がある
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    return dataTransfer.files;
+}
+
 // ===========================================================================
 
-setupProcessButton(us_process_btn, us_input, null, 'upscale-image/', 'image', null,
-us_download_btn, us_reset_btn, us_processing_btn, us_downloading_btn, us_input_ddz, function() {
+setupProcessButton(us_process_btn, us_input, 'upscale-image/', 'image', us_download_btn,
+us_reset_btn, us_processing_btn, us_downloading_btn, us_input_ddz, function() {
     setupReset_us();
 });
 
-setupProcessButton(rb_process_btn, rb_input, null, 'remove-background/', 'image', null,
-rb_download_btn, rb_reset_btn, rb_processing_btn, rb_downloading_btn, rb_input_ddz, function() {
+setupProcessButton(rb_process_btn, rb_input, 'remove-background/', 'image', rb_download_btn, 
+rb_reset_btn, rb_processing_btn, rb_downloading_btn, rb_input_ddz, function() {
     setupReset_rb();
 });
 
-function setupProcessButton(btn, input1, input2, url, appendName1, appendName2, downloadButton, resetButton, processingButton, downloadingButton, displayUpdateElement, setupReset) {
+function setupProcessButton(btn, input, url, appendName, downloadButton, resetButton, processingButton, downloadingButton, displayUpdateElement, setupReset) {
     btn.addEventListener('click', () => {
-        const file1 = input1 ? input1.files[0] : null;
-        const file2 = input2 ? input2.files[0] : null;
-
-        if (!file1 || (input2 && !file2)) {
+        isProcessing = true;
+        
+        const file = input ? input.files[0] : null;
+        if (!file) {
             alert('画像のアップロードが必要です。');
             return;
         }
@@ -185,11 +258,9 @@ function setupProcessButton(btn, input1, input2, url, appendName1, appendName2, 
         btnDisplayUpdate(true, processingButton);
 
         var formData = new FormData();
-        if (file1) formData.append(appendName1, file1);
-        if (file2) formData.append(appendName2, file2);
+        if (file) formData.append(appendName, file);
 
         const csrftoken = getCookie('csrftoken');
-
         fetch(url, {
             method: 'POST',
             body: formData,
@@ -219,6 +290,9 @@ function setupProcessButton(btn, input1, input2, url, appendName1, appendName2, 
             console.error('エラーが発生しました。:', error);
             alert('エラーが発生しました。');
             setupReset();
+        })
+        .finally(() => {
+            isProcessing = false;
         });
     });
 }
@@ -290,6 +364,7 @@ us_reset_btn.addEventListener('click', setupReset_us);
 rb_reset_btn.addEventListener('click', setupReset_rb);
 
 function setupReset_us() {
+    isProcessing = false;
     const us_prev_images = document.querySelectorAll('#upscale .preview');
     us_prev_images.forEach(image => image.remove());
     us_input.value = '';
@@ -298,6 +373,7 @@ function setupReset_us() {
 }
 
 function setupReset_rb() {
+    isProcessing = false;
     const rb_prev_images = document.querySelectorAll('#removebg .preview');
     rb_prev_images.forEach(image => image.remove());
     rb_input.value = '';
@@ -306,33 +382,3 @@ function setupReset_rb() {
 }
 
 // ===========================================================================
-
-// ページの読み込みが完了したらスライダーを初期化
-// window.onload = function() {
-//     initializeSlider('upscale-container', 'us_slider');
-//     initializeSlider('removebg-container', 'rb_slider');
-// };
-
-window.onload = function() {
-    initializeSlider('upscale-container', 'us_slider', 'us_left_arrow', 'us_right_arrow');
-    initializeSlider('removebg-container', 'rb_slider', 'rb_left_arrow', 'rb_right_arrow');
-};
-
-// スライダーの初期化関数
-function initializeSlider(containerClass, sliderId) {
-    const container = document.querySelector(`.${containerClass}`);
-    const beforeImage = container.querySelector('.before-image');
-    const afterImage = container.querySelector('.after-image');
-    const slider = container.querySelector(`#${sliderId}`);
-  
-    // スライダーの値が変更されたときのイベントリスナー
-    slider.oninput = function() {
-        const sliderValue = this.value;
-        // before-imageの表示範囲をスライダーの値に応じて変更
-        beforeImage.style.clipPath = `inset(0 ${100 - sliderValue}% 0 0)`;
-        // after-imageの表示範囲をスライダーの値に応じて変更
-        afterImage.style.clipPath = `inset(0 0 0 ${sliderValue}%)`;
-    };
-}
-
-  // ===========================================================================
