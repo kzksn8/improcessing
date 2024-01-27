@@ -40,8 +40,8 @@ def upscale_image(request):
         # 画像のサイズを取得
         width, height = image.size
         
-        # 画像のサイズを取得
-        limit_size = 625
+        # 処理画像の最大サイズを定義
+        limit_size = 750
 
         # 画像サイズの前処理
         # 縦がlimit_sizeピクセルより大きい場合の処理
