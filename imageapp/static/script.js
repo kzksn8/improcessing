@@ -1,5 +1,16 @@
 // ===========================================================================
 
+// HTML要素の参照
+const [us_slider, us_input_ddz, us_reset_btn, us_process_btn, us_processing_btn, us_download_btn, us_downloading_btn] = getElements('us');
+const [rb_slider, rb_input_ddz, rb_reset_btn, rb_process_btn, rb_processing_btn, rb_download_btn, rb_downloading_btn] = getElements('rb');
+
+function getElements(prefix) {
+    const suffixes = ['slider', 'input_ddz', 'reset_btn', 'process_btn', 'processing_btn', 'download_btn', 'downloading_btn'];
+    return suffixes.map(suffix => document.getElementById(`${prefix}_${suffix}`));
+}
+
+// ===========================================================================
+
 // 処理中かどうかの状態を保持
 let isProcessing = false;
 
@@ -12,7 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
             changeTab(targetId);
         });
     });
-    changeTab('home');  // デフォルトでホームタブを表示
+    
+    // デフォルトでホームタブを表示
+    changeTab('home');
 
     // ページを離れる前に確認する
     window.addEventListener('beforeunload', function (e) {
@@ -34,7 +47,12 @@ function changeTab(targetId) {
             return;
         } else {
             // ユーザーがOKを選択した場合、処理を中止
-            setupReset_us();
+            if (document.getElementById('us_reset_btn')) {
+                setupReset('us');
+            }
+            if (document.getElementById('rb_reset_btn')) {
+                setupReset('rb');
+            }
             isProcessing = false;
         }
     }
@@ -66,33 +84,13 @@ function initializeSlider(containerClass, sliderId) {
     const beforeImage = container.querySelector('.before-image');
     const afterImage = container.querySelector('.after-image');
     const slider = container.querySelector(`#${sliderId}`);
-  
-    // スライダーの値が変更されたときのイベントリスナー
+
     slider.oninput = function() {
         const sliderValue = this.value;
-        // before-imageの表示範囲をスライダーの値に応じて変更
         beforeImage.style.clipPath = `inset(0 ${100 - sliderValue}% 0 0)`;
-        // after-imageの表示範囲をスライダーの値に応じて変更
         afterImage.style.clipPath = `inset(0 0 0 ${sliderValue}%)`;
     };
 }
-
-// ===========================================================================
-
-// HTML要素の参照
-const us_html_ids = ['us_slider', 'us_input_ddz', 'us_reset_btn', 'us_process_btn',
-                     'us_processing_btn', 'us_download_btn', 'us_downloading_btn'];
-
-const [us_slider, us_input_ddz, us_reset_btn, us_process_btn,
-       us_processing_btn, us_download_btn, us_downloading_btn]
-       = us_html_ids.map(id => document.getElementById(id));
-
-const rb_html_ids = ['rb_slider', 'rb_input_ddz', 'rb_reset_btn', 'rb_process_btn',
-                     'rb_processing_btn', 'rb_download_btn', 'rb_downloading_btn'];
-
-const [rb_slider, rb_input_ddz, rb_reset_btn, rb_process_btn,
-       rb_processing_btn, rb_download_btn, rb_downloading_btn]
-       = rb_html_ids.map(id => document.getElementById(id));
 
 // ===========================================================================
 
@@ -104,7 +102,7 @@ function btnDisplayUpdate(show, ...elements) {
 
 // ===========================================================================
 
-function ddzDisplayUpdate(ddzElement, imageSrc, btnAddOn, resetAddOn) {
+function ddzDisplayUpdate(ddzElement, imageSrc, buttonAddon) {
     const UploadImage = ddzElement.querySelector('img.preview');
     if (UploadImage) {
         ddzElement.removeChild(UploadImage);
@@ -112,7 +110,6 @@ function ddzDisplayUpdate(ddzElement, imageSrc, btnAddOn, resetAddOn) {
 
     const imageElement = new Image();
     imageElement.onload = function() {
-        if (resetAddOn) resetAddOn();
         ddzElement.style.display = 'flex';
 
         let newWidth, newHeight;
@@ -134,8 +131,7 @@ function ddzDisplayUpdate(ddzElement, imageSrc, btnAddOn, resetAddOn) {
 
         ddzElement.parentNode.insertBefore(this, ddzElement.nextSibling);
         ddzElement.style.display = 'none';
-
-        btnAddOn();
+        buttonAddon();
     };
     imageElement.src = imageSrc;
 }
@@ -155,10 +151,16 @@ function setupInput(type, accept, display) {
 
 // ===========================================================================
 
-setupInputFiles(us_input_ddz, us_input, 'us_tag');
-setupInputFiles(rb_input_ddz, rb_input, 'rb_tag');
+setupInputFiles(us_input_ddz, us_input, 'us');
+setupInputFiles(rb_input_ddz, rb_input, 'rb');
 
-function setupInputFiles(element, input, type) {
+function setupInputFiles(element, input, prefix) {
+
+    // 画像クリック時の処理
+    function handleFileSelect(e) {
+        processFiles(e.target.files, prefix);
+    }
+
     // 画像ドラッグ時の処理
     function handleDragOver(e) {
         e.preventDefault();
@@ -166,31 +168,30 @@ function setupInputFiles(element, input, type) {
         e.dataTransfer.dropEffect = 'copy';
         element.classList.add('dragover'); // ドラッグ時のクラスを追加
     }
+
     // 画像ドラッグが終了した時の処理（ドラッグが終了したらクラスを削除）
     function handleDragLeave(e) {
         e.preventDefault();
         e.stopPropagation();
         element.classList.remove('dragover'); // ドラッグ終了時にクラスを削除
     }
+
     // 画像ドロップ時の処理
     function handleDrop(e) {
         e.preventDefault();
         e.stopPropagation();
         element.classList.remove('dragover'); // ドロップ時にクラスを削除
-        processFiles(e.dataTransfer.files, type);
+        processFiles(e.dataTransfer.files, prefix);
     }
-    // 画像クリック選択時の処理
-    function handleFileSelect(e) {
-        processFiles(e.target.files, type);
-    }
+
     // ファイル処理ロジック
-    function processFiles(files, type) {
+    function processFiles(files, prefix) {
         if (files.length === 1) {
             const fileType = files[0].type;
             if (fileType === 'image/avif') {
                 alert('サポートされていないファイル形式です。別の画像ファイルを選択してください。');
             } else if (fileType.match('image.*')) {
-                processImageFiles(files[0], type);
+                processImageFiles(files[0], prefix);
             } else {
                 alert('サポートされていないファイル形式です。別の画像ファイルを選択してください。');
             }
@@ -200,22 +201,26 @@ function setupInputFiles(element, input, type) {
             alert('アップロードできる画像は1つです。');
         }
     }
+
+    element.addEventListener('click', () => {
+        input.value = '';
+        input.click();
+    });
     element.addEventListener('dragover', handleDragOver, false);
     element.addEventListener('dragleave', handleDragLeave, false);
     element.addEventListener('drop', handleDrop, false);
-    element.addEventListener('click', () => input.click());
     input.addEventListener('change', handleFileSelect);
 }
 
-function processImageFiles(file, type) {
+function processImageFiles(file, prefix) {
     const reader = new FileReader();
     reader.onload = (e) => {
         const imageSrc = e.target.result;
-        if (type === 'us_tag') {
+        if (prefix === 'us') {
             ddzDisplayUpdate(us_input_ddz, imageSrc, function() {
                 btnDisplayUpdate(true, us_process_btn, us_reset_btn);
             });
-        } else if (type === 'rb_tag') {
+        } else if (prefix === 'rb') {
             ddzDisplayUpdate(rb_input_ddz, imageSrc, function() {
                 btnDisplayUpdate(true, rb_process_btn, rb_reset_btn);
             });
@@ -225,8 +230,8 @@ function processImageFiles(file, type) {
 }
 
 // DataTransferオブジェクトを使用してFileListオブジェクトを作成するヘルパー関数
+// FileListオブジェクトは読み取り専用なので、間接的に作成する必要がある
 function createFileList(file) {
-    // FileListオブジェクトは読み取り専用なので、間接的に作成する必要がある
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(file);
     return dataTransfer.files;
@@ -234,18 +239,127 @@ function createFileList(file) {
 
 // ===========================================================================
 
-setupProcessButton(us_process_btn, us_input, 'upscale-image/', 'image', us_download_btn,
-us_reset_btn, us_processing_btn, us_downloading_btn, us_input_ddz, function() {
-    setupReset_us();
-});
+// setupProcessButton('upscale-image/', 'us', us_input, us_process_btn, us_download_btn,
+// us_reset_btn, us_processing_btn, us_downloading_btn, us_input_ddz);
 
-setupProcessButton(rb_process_btn, rb_input, 'remove-background/', 'image', rb_download_btn, 
-rb_reset_btn, rb_processing_btn, rb_downloading_btn, rb_input_ddz, function() {
-    setupReset_rb();
-});
+// setupProcessButton('remove-background/', 'rb', rb_input, rb_process_btn, rb_download_btn, 
+// rb_reset_btn, rb_processing_btn, rb_downloading_btn, rb_input_ddz);
 
-function setupProcessButton(btn, input, url, appendName, downloadButton, resetButton, processingButton, downloadingButton, displayUpdateElement, setupReset) {
-    btn.addEventListener('click', () => {
+// function setupProcessButton(url, prefix, input, processButton, downloadButton, resetButton, processingButton, downloadingButton, displayUpdateElement) {
+//     processButton.addEventListener('click', () => {
+//         isProcessing = true;
+        
+//         const file = input ? input.files[0] : null;
+//         if (!file) {
+//             alert('画像のアップロードが必要です。');
+//             return;
+//         }
+
+//         btnDisplayUpdate(false, processButton, resetButton);
+//         btnDisplayUpdate(true, processingButton);
+
+//         var formData = new FormData();
+//         if (file) formData.append('image', file);
+
+//         const csrftoken = getCookie('csrftoken');
+//         fetch(url, {
+//             method: 'POST',
+//             body: formData,
+//             headers: {
+//                 'X-CSRFToken': csrftoken
+//             }
+//         })
+//         .then(handleErrors)
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data && data.image) {
+//                 const base64Data = data.image.startsWith('data:image/png;base64,') ? data.image : 'data:image/png;base64,' + data.image;
+//                 ddzDisplayUpdate(displayUpdateElement, base64Data, function() {
+//                     btnDisplayUpdate(false, processingButton);
+//                     btnDisplayUpdate(true, downloadButton, resetButton);
+//                 });
+//                 downloadButton.onclick = () => startDownload(base64Data, prefix, function() {
+//                     btnDisplayUpdate(false, downloadButton, resetButton);
+//                     btnDisplayUpdate(true, downloadingButton);
+//                 });
+//             } else {
+//                 alert('エラーが発生しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
+//                 setupReset(prefix);
+//             }
+//         })
+//         .catch(error => {
+//             console.error('Error response text:', error);
+//             alert('エラーが発生しました。');
+//             setupReset(prefix);
+//         })
+//         .finally(() => {
+//             isProcessing = false;
+//         });
+//     });
+// }
+
+// setupProcessButton('us', 'upscale-image/');
+// setupProcessButton('rb', 'remove-background/');
+
+// function setupProcessButton(prefix, url) {
+//     document.getElementById(`${prefix}_process_btn`).addEventListener('click', () => {
+//         isProcessing = true;
+        
+//         const file = document.getElementById(`${prefix}_input`) ? document.getElementById(`${prefix}_input`).files[0] : null;
+//         if (!file) {
+//             alert('画像のアップロードが必要です。');
+//             return;
+//         }
+//         btnDisplayUpdate(false, document.getElementById(`${prefix}_process_btn`), document.getElementById(`${prefix}_reset_btn`));
+//         btnDisplayUpdate(true,  document.getElementById(`${prefix}_processing_btn`));
+
+//         var formData = new FormData();
+//         if (file) formData.append('image', file);
+
+//         const csrftoken = getCookie('csrftoken');
+//         fetch(url, {
+//             method: 'POST',
+//             body: formData,
+//             headers: {
+//                 'X-CSRFToken': csrftoken
+//             }
+//         })
+//         .then(handleErrors)
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data && data.image) {
+//                 const base64Data = data.image.startsWith('data:image/png;base64,') ? data.image : 'data:image/png;base64,' + data.image;
+//                 ddzDisplayUpdate(document.getElementById(`${prefix}_input_ddz`), base64Data, function() {
+//                     btnDisplayUpdate(false, document.getElementById(`${prefix}_processing_btn`));
+//                     btnDisplayUpdate(true,  document.getElementById(`${prefix}_download_btn`), document.getElementById(`${prefix}_reset_btn`));
+//                 });
+//                 document.getElementById(`${prefix}_download_btn`).onclick = () => startDownload(base64Data, prefix, function() {
+//                     btnDisplayUpdate(false, document.getElementById(`${prefix}_download_btn`), document.getElementById(`${prefix}_reset_btn`));
+//                     btnDisplayUpdate(true,  document.getElementById(`${prefix}_downloading_btn`));
+//                 });
+//             } else {
+//                 alert('エラーが発生しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
+//                 setupReset(prefix);
+//             }
+//         })
+//         .catch(error => {
+//             console.error('Error response text:', error);
+//             alert('エラーが発生しました。');
+//             setupReset(prefix);
+//         })
+//         .finally(() => {
+//             isProcessing = false;
+//         });
+//     });
+// }
+
+setupProcessButton('us', 'upscale-image/', us_input);
+setupProcessButton('rb', 'remove-background/', rb_input);
+
+function setupProcessButton(prefix, url, input) {
+    const [input_ddz, reset_btn, process_btn, processing_btn, download_btn, downloading_btn] = getElements(prefix);
+    
+    process_btn.addEventListener('click', () => {
         isProcessing = true;
         
         const file = input ? input.files[0] : null;
@@ -253,12 +367,11 @@ function setupProcessButton(btn, input, url, appendName, downloadButton, resetBu
             alert('画像のアップロードが必要です。');
             return;
         }
-
-        btnDisplayUpdate(false, btn, resetButton);
-        btnDisplayUpdate(true, processingButton);
+        btnDisplayUpdate(false, process_btn, reset_btn);
+        btnDisplayUpdate(true, processing_btn);
 
         var formData = new FormData();
-        if (file) formData.append(appendName, file);
+        formData.append('image', file);
 
         const csrftoken = getCookie('csrftoken');
         fetch(url, {
@@ -269,27 +382,29 @@ function setupProcessButton(btn, input, url, appendName, downloadButton, resetBu
             }
         })
         .then(handleErrors)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok.');
+            return response.json();
+        })
         .then(data => {
             if (data && data.image) {
                 const base64Data = data.image.startsWith('data:image/png;base64,') ? data.image : 'data:image/png;base64,' + data.image;
-                ddzDisplayUpdate(displayUpdateElement, base64Data, function() {
-                    btnDisplayUpdate(false, processingButton);
-                    btnDisplayUpdate(true, downloadButton, resetButton);
+                ddzDisplayUpdate(input_ddz, base64Data, () => {
+                    btnDisplayUpdate(false, processing_btn);
+                    btnDisplayUpdate(true, download_btn, reset_btn);
                 });
-                downloadButton.onclick = () => startDownload(base64Data, setupReset, function() {
-                    btnDisplayUpdate(false, downloadButton, resetButton);
-                    btnDisplayUpdate(true, downloadingButton);
+                download_btn.onclick = () => startDownload(base64Data, prefix, () => {
+                    btnDisplayUpdate(false, download_btn, reset_btn);
+                    btnDisplayUpdate(true, downloading_btn);
                 });
             } else {
-                alert('エラーが発生しました。' + (data && data.error ? data.error : "不明なエラーが発生しました。"));
-                setupReset();
+                throw new Error(data && data.error ? data.error : "不明なエラーが発生しました。");
             }
         })
         .catch(error => {
-            console.error('エラーが発生しました。:', error);
-            alert('エラーが発生しました。');
-            setupReset();
+            console.error('Error:', error);
+            alert(`エラーが発生しました: ${error.message}`);
+            setupReset(prefix);
         })
         .finally(() => {
             isProcessing = false;
@@ -325,16 +440,16 @@ function handleErrors(response) {
     return response;
 }
 
-function startDownload(base64Data, callback, btnAddOn) {
+function startDownload(base64Data, prefix, buttonAddon) {
     if (base64Data) {
-        btnAddOn();
-
+        buttonAddon();
         // Base64データをBlobに変換
         const byteCharacters = atob(base64Data.split(',')[1]);
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
             byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
+
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], {type: 'image/png'});
 
@@ -347,8 +462,9 @@ function startDownload(base64Data, callback, btnAddOn) {
         link.download = 'processed_image.png';
         link.addEventListener('click', () => {
             setTimeout(() => {
-                URL.revokeObjectURL(url); // メモリリークを防ぐために使用後にURLを解放
-                callback();
+                // メモリリークを防ぐために使用後にURLを解放
+                URL.revokeObjectURL(url);
+                setupReset(prefix);
             }, 1000);
         });
 
@@ -360,25 +476,26 @@ function startDownload(base64Data, callback, btnAddOn) {
 
 // ===========================================================================
 
-us_reset_btn.addEventListener('click', setupReset_us);
-rb_reset_btn.addEventListener('click', setupReset_rb);
+us_reset_btn.addEventListener('click', () => setupReset('us'));
+rb_reset_btn.addEventListener('click', () => setupReset('rb'));
 
-function setupReset_us() {
+function setupReset(prefix) {
     isProcessing = false;
-    const us_prev_images = document.querySelectorAll('#upscale .preview');
-    us_prev_images.forEach(image => image.remove());
-    us_input.value = '';
-    us_input_ddz.style.display = 'flex';
-    btnDisplayUpdate(false, us_reset_btn, us_process_btn, us_processing_btn, us_download_btn, us_downloading_btn);
+
+    resetElement(`${prefix}_input`, '');
+    resetElement(`${prefix}_input_ddz`, 'flex', 'display');
+    
+    const buttonsAndIndicators = ['reset_btn', 'process_btn', 'processing_btn', 'download_btn', 'downloading_btn'];
+    buttonsAndIndicators.forEach(suffix => {
+        resetElement(`${prefix}_${suffix}`, 'none', 'display');
+    });
 }
 
-function setupReset_rb() {
-    isProcessing = false;
-    const rb_prev_images = document.querySelectorAll('#removebg .preview');
-    rb_prev_images.forEach(image => image.remove());
-    rb_input.value = '';
-    rb_input_ddz.style.display = 'flex';
-    btnDisplayUpdate(false, rb_reset_btn, rb_process_btn, rb_processing_btn, rb_download_btn, rb_downloading_btn);
+function resetElement(elementId, value, styleProperty = 'value') {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element[styleProperty] = value;
+    }
 }
 
 // ===========================================================================

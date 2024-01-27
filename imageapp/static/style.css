@@ -149,6 +149,10 @@ header {
   transition: transform 0.2s ease; /* 拡大時のアニメーション */
 }
 
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.5);
+}
+
 .slider::-moz-range-thumb {
   -moz-appearance: none;
   appearance: none;
@@ -162,7 +166,6 @@ header {
   transition: transform 0.2s ease; /* 拡大時のアニメーション */
 }
 
-.slider::-webkit-slider-thumb:hover,
 .slider::-moz-range-thumb:hover {
   transform: scale(1.5);
 }

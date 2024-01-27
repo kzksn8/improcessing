@@ -20,8 +20,9 @@
                 </a>
             </nav>
             <nav>
-                <a href="#upscale"  data-target="upscale"  class="tab-left">高画質化</a>
-                <a href="#removebg" data-target="removebg" class="tab-left">背景削除</a>
+                <a href="#us"  data-target="us"  class="tab-left">高画質化</a>
+                <a href="#rb" data-target="rb" class="tab-left">背景削除</a>
+                <a href="#about"    data-target="about"    class="tab-left">About</a>
             </nav>
             <nav>
                 <a href="#about" data-target="about" class="tab-right">使用技術</a>
@@ -46,11 +47,13 @@
             </div>
         </section>
 
-        <section id="upscale" class="content-init content-update">
+        <section id="us" class="content-init content-update">
             <h1>高画質化</h1>
             <p>高画質化</p>
             <div id="us_input_ddz" class="upscale-ddz">
-                画像をドラッグ<br><br>またはクリックで画像選択</div>
+                <input type="file" id="us_input" style="display: none;" accept="image/*">
+                画像をドラッグ<br><br>またはクリックで画像選択
+            </div>
             <button id="us_process_btn"     class="purple-btn" style="display:none;">高画質化</button>
             <button id="us_processing_btn"  class="gray-btn"   style="display:none;">処理中...</button>
             <button id="us_download_btn"    class="purple-btn" style="display:none;">ダウンロード</button>
@@ -58,11 +61,13 @@
             <button id="us_reset_btn"       class="purple-btn" style="display:none;">リセット</button>
         </section>
     
-        <section id="removebg" class="content-init content-update">
+        <section id="rb" class="content-init content-update">
             <h1>背景削除</h1>
             <p>背景削除</p>
             <div id="rb_input_ddz" class="removebg-ddz">
-                画像をドラッグ<br><br>またはクリックで画像選択</div>
+                <input type="file" id="rb_input" style="display: none;" accept="image/*">
+                画像をドラッグ<br><br>またはクリックで画像選択
+            </div>
             <button id="rb_process_btn"     class="purple-btn" style="display:none;">背景削除</button>
             <button id="rb_processing_btn"  class="gray-btn"   style="display:none;">処理中...</button>
             <button id="rb_download_btn"    class="purple-btn" style="display:none;">ダウンロード</button>
