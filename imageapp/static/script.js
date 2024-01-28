@@ -2,11 +2,11 @@
 // HTML要素の参照
 // ===========================================================================
 
-const [us_slider, us_input_ddz, us_reset_btn, us_process_btn, us_processing_btn, us_download_btn, us_downloading_btn] = getElements('us');
-const [rb_slider, rb_input_ddz, rb_reset_btn, rb_process_btn, rb_processing_btn, rb_download_btn, rb_downloading_btn] = getElements('rb');
+const [us_input_ddz, us_reset_btn, us_process_btn, us_processing_btn, us_download_btn, us_downloading_btn] = getElements('us');
+const [rb_input_ddz, rb_reset_btn, rb_process_btn, rb_processing_btn, rb_download_btn, rb_downloading_btn] = getElements('rb');
 
 function getElements(prefix) {
-    const suffixes = ['slider', 'input_ddz', 'reset_btn', 'process_btn', 'processing_btn', 'download_btn', 'downloading_btn'];
+    const suffixes = ['input_ddz', 'reset_btn', 'process_btn', 'processing_btn', 'download_btn', 'downloading_btn'];
     return suffixes.map(suffix => document.getElementById(`${prefix}_${suffix}`));
 }
 
@@ -82,20 +82,20 @@ function changeTab(targetId) {
 // ===========================================================================
 
 window.onload = function() {
-    initializeSlider('upscale-container', 'us_slider');
-    initializeSlider('removebg-container', 'rb_slider');
+    initializeSlider('upscale-container', 'us');
+    initializeSlider('removebg-container', 'rb');
 };
 
-function initializeSlider(containerClass, sliderId) {
-    const container = document.querySelector(`.${containerClass}`);
+function initializeSlider(prefix, containerClass) {
+    const container   = document.querySelector(`.${containerClass}`);
+    const slider      = container.querySelector(`#${prefix}_slider`);
     const beforeImage = container.querySelector('.before-image');
-    const afterImage = container.querySelector('.after-image');
-    const slider = container.querySelector(`#${sliderId}`);
+    const afterImage  = container.querySelector('.after-image');
 
     slider.oninput = function() {
         const sliderValue = this.value;
         beforeImage.style.clipPath = `inset(0 ${100 - sliderValue}% 0 0)`;
-        afterImage.style.clipPath = `inset(0 0 0 ${sliderValue}%)`;
+        afterImage.style.clipPath  = `inset(0 0 0 ${sliderValue}%)`;
     };
 }
 
@@ -219,7 +219,7 @@ function processImageFiles(file, prefix) {
     const reader = new FileReader();
     reader.onload = (e) => {
         const imageSrc = e.target.result;
-        const [, input_ddz, reset_btn, process_btn, , , ] = getElements(prefix);
+        const [input_ddz, reset_btn, process_btn, , , ] = getElements(prefix);
         ddzDisplayUpdate(input_ddz, imageSrc, prefix, function() {
             btnDisplayUpdate(true, process_btn, reset_btn);
         });
@@ -231,12 +231,13 @@ function processImageFiles(file, prefix) {
 // 画像にviews.pyの処理を適用してダウンロード
 // ===========================================================================
 
+// 処理実行ボタンを押したときのロジック
 setupProcessButton('us', 'upscale-image/', us_input);
 setupProcessButton('rb', 'remove-background/', rb_input);
 
 // 処理実行ボタンを押したときのロジック
 function setupProcessButton(prefix, url, input) {
-    const [, input_ddz, reset_btn, process_btn, processing_btn, download_btn, downloading_btn] = getElements(prefix);
+    const [input_ddz, reset_btn, process_btn, processing_btn, download_btn, downloading_btn] = getElements(prefix);
     
     process_btn.addEventListener('click', () => {
         isProcessing = true;
@@ -247,7 +248,8 @@ function setupProcessButton(prefix, url, input) {
             return;
         }
         btnDisplayUpdate(false, process_btn, reset_btn);
-        btnDisplayUpdate(true, processing_btn);
+        btnDisplayUpdate(true,  processing_btn);
+        startProcessingAnimation(processing_btn);
 
         var formData = new FormData();
         formData.append('image', file);
@@ -270,11 +272,11 @@ function setupProcessButton(prefix, url, input) {
                 const base64Data = data.image.startsWith('data:image/png;base64,') ?data.image : 'data:image/png;base64,' + data.image;
                 ddzDisplayUpdate(input_ddz, base64Data, prefix, () => {
                     btnDisplayUpdate(false, processing_btn);
-                    btnDisplayUpdate(true, download_btn, reset_btn);
+                    btnDisplayUpdate(true,  download_btn, reset_btn);
                 });
                 download_btn.onclick = () => startDownload(base64Data, prefix, () => {
                     btnDisplayUpdate(false, download_btn, reset_btn);
-                    btnDisplayUpdate(true, downloading_btn);
+                    btnDisplayUpdate(true,  downloading_btn);
                 });
             } else {
                 throw new Error(data && data.error ? data.error : "不明なエラーが発生しました。");
@@ -286,6 +288,7 @@ function setupProcessButton(prefix, url, input) {
             setupReset(prefix);
         })
         .finally(() => {
+            stopProcessingAnimation(processing_btn);
             isProcessing = false;
         });
     });
@@ -345,13 +348,37 @@ function startDownload(base64Data, prefix, buttonAddon) {
             setTimeout(() => {
                 URL.revokeObjectURL(url); // メモリリークを防ぐために使用後にURLを解放
                 setupReset(prefix);
-            }, 1000);
+            }, 500);
         });
 
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
+}
+
+// 処理中アニメーションの開始
+function startProcessingAnimation(btn) {
+    const originalText = '処理中';
+    let dotCount = 0;
+    
+    const intervalId = setInterval(() => {
+        dotCount = (dotCount + 1) % 5; // 0から4までの数値を循環
+        btn.textContent = originalText + '.'.repeat(dotCount) + ' '.repeat(4 - dotCount);
+    }, 500); // 0.5秒ごとに更新
+    
+    // 新しいインターバルIDをデータ属性にセットする
+    btn.setAttribute('data-interval-id', intervalId.toString());
+}
+
+// 処理中アニメーションの停止
+function stopProcessingAnimation(btn) {
+    const intervalId = btn.getAttribute('data-interval-id');
+    if (intervalId) {
+        clearInterval(parseInt(intervalId, 10));
+        btn.removeAttribute('data-interval-id');
+    }
+    btn.textContent = '処理中....';
 }
 
 // ===========================================================================
@@ -364,7 +391,6 @@ rb_reset_btn.addEventListener('click', () => setupReset('rb'));
 // リセットボタンを押したときのロジック
 function setupReset(prefix) {
     isProcessing = false;
-
     document.querySelectorAll(`#${prefix} .preview`).forEach(img => img.remove());
 
     const inputElement = document.getElementById(`${prefix}_input`);
