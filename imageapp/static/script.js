@@ -33,6 +33,7 @@ let isProcessing = false; // 処理中かどうかの状態を保持
 
 // ページ読み込み時の処理
 document.addEventListener('DOMContentLoaded', () => {
+    // 既存のタブ切り替え機能
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', (event) => {
             event.preventDefault();
@@ -40,9 +41,17 @@ document.addEventListener('DOMContentLoaded', () => {
             changeTab(targetId);
         });
     });
+
+    // 新しいボタンのイベントリスナーを追加
+    const usiButton = document.getElementById('usi_btn');
+    if (usiButton) {
+        usiButton.addEventListener('click', () => {
+            changeTab('us');
+        });
+    }
     changeTab('home'); // デフォルトでホームタブを表示
+
     window.addEventListener('beforeunload', function (e) {
-        // 処理中の場合、警告メッセージを表示
         if (isProcessing) {
             var confirmationMessage = 'このページを離れると、処理が中止されます。本当にページを離れますか？';
             (e || window.event).returnValue = confirmationMessage;
@@ -51,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// タブ切替の処理
 function changeTab(targetId) {
     if (isProcessing) {
         // キャンセルを選択した場合、処理を続行
@@ -77,25 +87,29 @@ function changeTab(targetId) {
     }
 }
 
+document.getElementById('usi_btn').addEventListener('click', function() {
+    window.location.hash = '#us';
+});
+
 // ===========================================================================
 // スライダーの処理
 // ===========================================================================
 
 window.onload = function() {
-    initializeSlider('upscale-container', 'us');
-    initializeSlider('removebg-container', 'rb');
+    initializeSlider('us', 'upscale-container'); 
+    initializeSlider('rb', 'removebg-container');
 };
 
 function initializeSlider(prefix, containerClass) {
-    const container   = document.querySelector(`.${containerClass}`);
-    const slider      = container.querySelector(`#${prefix}_slider`);
+    const container = document.querySelector(`.${containerClass}`);
+    const slider = container.querySelector(`#${prefix}_slider`);
     const beforeImage = container.querySelector('.before-image');
-    const afterImage  = container.querySelector('.after-image');
+    const afterImage = container.querySelector('.after-image');
 
     slider.oninput = function() {
         const sliderValue = this.value;
         beforeImage.style.clipPath = `inset(0 ${100 - sliderValue}% 0 0)`;
-        afterImage.style.clipPath  = `inset(0 0 0 ${sliderValue}%)`;
+        afterImage.style.clipPath = `inset(0 0 0 ${sliderValue}%)`;
     };
 }
 
@@ -115,8 +129,8 @@ function btnDisplayUpdate(show, ...elements) {
 
 function ddzDisplayUpdate(ddzElement, imageSrc, prefix, buttonAddon) {
     ddzElement.querySelector('img.preview')?.remove();
-
     const imageElement = new Image();
+    
     imageElement.onload = function() {
         ddzElement.style.display = 'flex';
 

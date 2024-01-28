@@ -60,6 +60,8 @@ header {
 .tab .tab-left:hover,
 .tab .tab-right:hover {
   background-color: #848484;
+  transition: all 0.3s ease;
+  transform: scale(1.005) translateY(-1px);
 }
 
 /* ========================================== */
@@ -94,15 +96,42 @@ header {
 
 /* ========================================== */
 
+.home-layout {
+  display: flex;
+}
+
+.text-container {
+  flex: 1;
+  padding-right: 10px;
+}
+
+.button-container {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  padding-left: 10px;
+}
+
+.slider-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.upscale-container,
+.removebg-container {
+  flex: 1; /* それぞれのコンテナに同じスペースを与える */
+  margin: 50px; /* コンテナ間の余白を調整 */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
 .upscale-container {
-  margin-top: 50px;
   position: relative;
-  width: 562px;
-  height: 346px;
+  width: 609px;
+  height: 375px;
 }
 
 .removebg-container {
-  margin-top: 100px;
   position: relative;
   width: 562px;
   height: 375px;
@@ -115,11 +144,11 @@ header {
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 画像がコンテナサイズに合わせて調整されるように */
+  object-fit: cover;
 }
 
 .after-image {
-  clip-path: inset(0 0 0 50%); /* 初期状態で画像の右半分だけを表示 */
+  clip-path: inset(0 0 0 50%);
   background-size: cover;
   background-position: center;
 }
@@ -131,8 +160,8 @@ header {
   top: 45%;
   transform: translateX(-50%);
   appearance: none;
-  -webkit-appearance: none; /* ウェブキット用ベンダープレフィックス */
-  -moz-appearance: none; /* モジラ用ベンダープレフィックス */
+  -webkit-appearance: none;
+  -moz-appearance: none;
   background: transparent;
 }
 
@@ -141,12 +170,12 @@ header {
   appearance: none;
   width: 40px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.5); /* カーソルの背景色を半透明に */
+  background: rgba(255, 255, 255, 0.3);
   cursor: pointer;
-  border-radius: 50%; /* 円形に */
-  border: 2px solid #000000; /* ボーダーを追加 */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* 立体感を出すための影を追加 */
-  transition: transform 0.2s ease; /* 拡大時のアニメーション */
+  border-radius: 50%;
+  border: 2px solid #000000;
+  transition: transform 0.2s ease;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .slider::-webkit-slider-thumb:hover {
@@ -158,12 +187,12 @@ header {
   appearance: none;
   width: 40px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.5); /* カーソルの背景色を半透明に */
+  background: rgba(255, 255, 255, 0.3);
   cursor: pointer;
-  border-radius: 50%; /* 円形に */
-  border: 2px solid #000000; /* ボーダーを追加 */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* 立体感を出すための影を追加 */
-  transition: transform 0.2s ease; /* 拡大時のアニメーション */
+  border-radius: 50%;
+  border: 2px solid #000000;
+  transition: transform 0.2s ease;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .slider::-moz-range-thumb:hover {
@@ -174,45 +203,80 @@ header {
 
 .removebg-ddz,
 .upscale-ddz {
-  width: 600px; /* 幅を指定 */
-  height: 300px; /* 高さを指定 */
-  border: 2px dashed #b8b8b8; /* 点線のボーダー */
-  border-radius: 5px; /* 角丸の半径 */
-  margin: 20px auto; /* 上下にマージンを設定し、左右は中央揃え */
-  display: flex; /* Flexboxを使用 */
-  align-items: center; /* 中央揃え（垂直方向） */
-  justify-content: center; /* 中央揃え（水平方向） */
-  text-align: center; /* テキストを中央揃え */
-  cursor: pointer; /* カーソルをポインターに */
-  font-size: 1.1em; /* フォントサイズ */
-  background-color: #f8f8f8; /* 背景色 */
-  color: #b8b8b8; /* テキスト色 */
-  transition: border-color 0.3s, color 0.3s; /* ホバー時のアニメーション効果 */
+  width: 600px;
+  height: 300px;
+  color: #000000;
+  border: 2px dashed #000000;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  margin: 30px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .removebg-ddz:hover,
 .upscale-ddz:hover {
-  border-color: #000000; /* ホバー時のボーダー色 */
-  color: #000000; /* ホバー時のテキスト色 */
+  color: #000000;
+  border: 2px dashed #000000;
+  transition: all 0.3s ease;
+  transform: scale(1.01) translateY(-2px);
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* アイコンやテキストを追加する場合 */
 .removebg-ddz:before,
 .upscale-ddz:before {
-  content: '📂'; /* 例としてフォルダの絵文字を追加 */
-  font-size: 2em; /* アイコンサイズ */
+  content: '📂';
+  font-size: 5em;
   display: block;
-  margin-bottom: 10px; /* アイコンとテキストの間のマージン */
+  margin-right: 30px;
 }
 
-/* ドラッグ&ドロップ時のスタイル変更 */
+.upload-instructions {
+  font-size: 1.5em;
+  margin-right: 40px;
+}
+
 .removebg-ddz.dragover,
 .upscale-ddz.dragover {
-  border-color: #666666; /* ドラッグ時のボーダー色 */
-  color: #666666; /* ドラッグ時のテキスト色 */
+  border-color: #666666;
+  color: #666666;
+}
+
+.preview {
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+  margin-bottom: 3px;
 }
 
 /* ========================================== */
+
+.large-btn {
+  color: white;
+  background-color: #5B3EBC;
+  background-image: linear-gradient(to right top, #6B4ECC, #5B3EBC);
+  margin-left: 120px;
+  margin-right: auto;
+  text-align: center;
+  padding: 15px 30px;
+  text-decoration: none;
+  font-size: 1.3em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.large-btn:hover {
+  background-color: #4a31ad;
+  background-image: linear-gradient(to right top, #7C5EDC, #6B4ECC);
+  transition: all 0.3s ease;
+  transform: scale(1.01) translateY(-2px);
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+}
 
 .purple-btn,
 .gray-btn {
@@ -224,14 +288,22 @@ header {
   border-radius: 5px;
   font-size: 0.9em;
   cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .purple-btn {
   background-color: #5B3EBC;
+  background-image: linear-gradient(to right top, #6B4ECC, #5B3EBC);
 }
 
 .purple-btn:hover {
   background-color: #4a31ad;
+  background-image: linear-gradient(to right top, #7C5EDC, #6B4ECC);
+  transition: all 0.3s ease;
+  transform: scale(1.005) translateY(-1px);
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .gray-btn {
