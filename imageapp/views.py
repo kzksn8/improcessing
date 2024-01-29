@@ -13,10 +13,15 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+
+# urls.pyファイル内でindex.htmlをマッピング
 def index(request):
     return render(request, 'index.html')
 
+
+# cudaがあればGPUを使用する
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 # モデルの初期化
 model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
@@ -26,6 +31,8 @@ model.load_state_dict(checkpoint['params_ema'])
 model.to(device)
 model.eval()
 
+
+# 超解像モデルのロジック
 @csrf_exempt
 def upscale_image(request):
     if request.method == 'POST':
@@ -88,9 +95,11 @@ def upscale_image(request):
 
         # base64エンコードされた画像をJSONレスポンスとして返す
         return JsonResponse({'image': 'data:image/png;base64,' + image_base64})
+    
     else:
         # POSTリクエストでない場合はエラーを返す
         return JsonResponse({'error': 'POSTリクエストのみ受け付けます。'}, status=400)
+
 
 @csrf_exempt
 def remove_background(request):

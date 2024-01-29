@@ -38,11 +38,33 @@ header {
 }
 
 .tab .tab-logo img {
-  height: 40px;
+  height: 30px;
   width: auto;
   padding: auto;
   cursor: pointer;
+  margin-left: 20px;
   margin-right: 20px;
+  margin-bottom: 3px;
+}
+
+.tab .default-logo {
+  display: block;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+.tab .hover-logo {
+  display: none;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+.tab .tab-logo:hover .default-logo {
+  display: none;
+}
+
+.tab .tab-logo:hover .hover-logo {
+  display: block;
+  transform: scale(1.02);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
 }
 
 .tab .tab-left,
@@ -102,7 +124,13 @@ header {
 
 .text-container {
   flex: 1;
-  padding-right: 10px;
+  text-align: left;
+  margin-left: 50px;
+  margin-right: auto;
+}
+
+.text-container h1 {
+  line-height: 2.0;
 }
 
 .button-container {
@@ -110,6 +138,32 @@ header {
   display: flex;
   justify-content: flex-end;
   padding-left: 10px;
+}
+
+.large-btn {
+  color: white;
+  background-color: #5B3EBC;
+  background-image: linear-gradient(to right top, #6B4ECC, #5B3EBC);
+  margin-top: 30px;
+  margin-left: 120px;
+  margin-right: auto;
+  text-align: center;
+  height: 80px;
+  padding: 0px 40px;
+  text-decoration: none;
+  font-size: 1.3em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.large-btn:hover {
+  background-color: #4a31ad;
+  background-image: linear-gradient(to right top, #7C5EDC, #6B4ECC);
+  transition: all 0.3s ease;
+  transform: scale(1.01) translateY(-2px);
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .slider-wrapper {
@@ -127,14 +181,14 @@ header {
 
 .upscale-container {
   position: relative;
-  width: 609px;
-  height: 375px;
+  width: 500px;
+  height: 300px;
 }
 
 .removebg-container {
   position: relative;
-  width: 562px;
-  height: 375px;
+  width: 500px;
+  height: 300px;
 }
 
 .before-image,
@@ -233,12 +287,13 @@ header {
   content: '📂';
   font-size: 5em;
   display: block;
-  margin-right: 30px;
+  margin-right: 20px;
+  margin-bottom: 5px;
 }
 
 .upload-instructions {
-  font-size: 1.5em;
-  margin-right: 40px;
+  font-size: 1.3em;
+  margin-right: 50px;
 }
 
 .removebg-ddz.dragover,
@@ -253,30 +308,6 @@ header {
 }
 
 /* ========================================== */
-
-.large-btn {
-  color: white;
-  background-color: #5B3EBC;
-  background-image: linear-gradient(to right top, #6B4ECC, #5B3EBC);
-  margin-left: 120px;
-  margin-right: auto;
-  text-align: center;
-  padding: 15px 30px;
-  text-decoration: none;
-  font-size: 1.3em;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.large-btn:hover {
-  background-color: #4a31ad;
-  background-image: linear-gradient(to right top, #7C5EDC, #6B4ECC);
-  transition: all 0.3s ease;
-  transform: scale(1.01) translateY(-2px);
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-}
 
 .purple-btn,
 .gray-btn {
@@ -312,6 +343,25 @@ header {
 
 .gray-btn:hover {
   background-color: #a1a0a4;
+}
+
+/* ========================================== */
+
+#about p {
+  text-align: left;
+  width: 43em;
+  margin: 0 auto;
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
+.about-image {
+  width: 70%;
+  display: block;
+  margin: auto;
 }
 
 /* ========================================== */

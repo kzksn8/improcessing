@@ -4,11 +4,12 @@
     
 <head>
     <meta charset="UTF-8">
-    <title>Image Processing</title>
+    <title>ClearPx 画像の超解像変換サイト</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
 </head>
 
 <body>
@@ -16,13 +17,14 @@
         <div class="tab">
             <nav>
                 <a href="#home" data-target="home" class="tab-logo">
-                    <img src="{% static 'image/logo.png' %}" alt="Ostagram">
+                    <img src="{% static 'image/before-logo.png' %}" alt="ClearPx" class="default-logo">
+                    <img src="{% static 'image/after-logo.png' %}"  alt="ClearPx" class="hover-logo">
                 </a>
             </nav>
             <nav>
-                <a href="#us"   data-target="us"    class="tab-left">高画質化</a>
-                <a href="#rb"   data-target="rb"    class="tab-left">背景削除</a>
-                <a href="#about" data-target="about" class="tab-left">About</a>
+                <a href="#us" data-target="us" class="tab-left">画像の超解像変換</a>
+                <a href="#rb" data-target="rb" class="tab-left">背景削除</a>
+                <a href="#about" data-target="about" class="tab-left">このサイトについて</a>
             </nav>
         </div>
     </header>
@@ -31,30 +33,32 @@
         <section id="home" class="content-init content-update">
             <div class="home-layout">
                 <div class="text-container">
-                    <h1>高画質化</h1>
-                    <p>こちらはテキストが表示される領域です。</p>
+                    <h1>超解像モデル Real-ESRGAN</h1>
+                    <p> 高度なニューラルネットワークに基づいて開発された Real-ESRGAN は、<br>
+                        緻密なディテールを失うことなく、写真を鮮明にします。絵画、アニメ、<br>
+                        さらには古いファミリービデオまで、あらゆるメディアの可能性を広げます。
                 </div>
                 <div class="button-container">
-                    <button id="usi_btn" class="large-btn">画像を高画質にする</button>
+                    <button id="usi_btn" class="large-btn">画像を超解像変換する</button>
                 </div>
             </div>
             <div class="slider-wrapper">
                     <div class="upscale-container">
-                    <img src="{% static 'image/before-upscale.png' %}" class="before-image" alt="Before">
-                    <div class="after-image" style="background-image: url('{% static 'image/after-upscale.png' %}');"></div>
+                    <img src="{% static 'image/before-upscale_1.png' %}" class="before-image" alt="Before">
+                    <div class="after-image" style="background-image: url('{% static 'image/after-upscale_1.png' %}');"></div>
                     <input type="range" min="0" max="100" value="50" class="slider" id="us_slider">
                 </div>
                 <div class="removebg-container">
-                    <img src="{% static 'image/before-removebg.png' %}" class="before-image" alt="Before">
-                    <div class="after-image" style="background-image: url('{% static 'image/after-removebg.png' %}');"></div>
+                    <img src="{% static 'image/before-upscale_2.png' %}" class="before-image" alt="Before">
+                    <div class="after-image" style="background-image: url('{% static 'image/after-upscale_2.png' %}');"></div>
                     <input type="range" min="0" max="100" value="50" class="slider" id="rb_slider">
                 </div>
             </div>
         </section>
 
         <section id="us" class="content-init content-update">
-            <h1>高画質化</h1>
-            <p>高画質化</p>
+            <h1>画像の超解像変換</h1>
+            <p> &nbsp; &nbsp; 出力画像の1辺の最大値は3,000pxです。</p>
             <div id="us_input_ddz" class="upscale-ddz">
                 <input type="file" id="us_input" style="display: none;" accept="image/*">
                 <span class="upload-instructions">画像をドラッグ or<br><br>クリックで画像選択</span>
@@ -81,8 +85,20 @@
         </section>
 
         <section id="about" class="content-init content-update">
-            <h1>About</h1>
-            <p>About</p>
+            <h1>About</h1><br>
+            <p> &nbsp; &nbsp; &nbsp; 当Webサイトでは、画像超解像技術 Real-ESRGAN を使用し、ユーザーがアップロード<br>
+                &nbsp; &nbsp; &nbsp; した画像を高解像度に変換するサービスを提供しています。当プラットフォームを通じて、<br>
+                &nbsp; &nbsp; &nbsp; 画像の細部を鮮明に復元し、品質を大幅に向上させることができます。この技術を利用<br>
+                &nbsp; &nbsp; &nbsp; することで、写真愛好家やプロのクリエイターたちが、その作品の可能性を最大限に<br>
+                &nbsp; &nbsp; &nbsp; 引き出すことが可能になります。<br><br>
+
+                &nbsp; &nbsp; &nbsp; Real-ESRGANの開発者であるxinntao氏に感謝の意を表します。xinntao氏の研究と<br>
+                &nbsp; &nbsp; &nbsp; 開発により発展したこの技術は、画像処理の分野における革新的な進歩を実現しました。<br><br>
+
+                &nbsp; &nbsp; &nbsp; Real-ESRGANは、強化された SuperResolution Generative Adversarial Network<br>
+                &nbsp; &nbsp; &nbsp; (ESRGAN) に基づいています。大まかなロジックを以下のフロー図に示します。<br><br><br>
+                
+                <img src="{% static 'image/real-esrgan.png' %}" alt="Real-ESRGAN Image" class="about-image"><br><br><br>
         </section>
     </main>
     <script src="{% static 'script.js' %}"></script>

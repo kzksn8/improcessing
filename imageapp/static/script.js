@@ -109,7 +109,7 @@ function initializeSlider(prefix, containerClass) {
     slider.oninput = function() {
         const sliderValue = this.value;
         beforeImage.style.clipPath = `inset(0 ${100 - sliderValue}% 0 0)`;
-        afterImage.style.clipPath = `inset(0 0 0 ${sliderValue}%)`;
+        afterImage.style.clipPath  = `inset(0 0 0 ${sliderValue}%)`;
     };
 }
 
@@ -147,7 +147,7 @@ function ddzDisplayUpdate(ddzElement, imageSrc, prefix, buttonAddon) {
             newHeight = newWidth / aspectRatio;
         }
 
-        this.style.width  = newWidth + 'px';
+        this.style.width  = newWidth  + 'px';
         this.style.height = newHeight + 'px';
         this.className    = 'preview';
 
@@ -167,7 +167,7 @@ setupInputFiles(us_input_ddz, us_input, 'us');
 setupInputFiles(rb_input_ddz, rb_input, 'rb');
 
 function setupInputFiles(element, input, prefix) {
-    element.addEventListener('dragover', handleDragOver, false);
+    element.addEventListener('dragover',  handleDragOver, false);
     element.addEventListener('dragleave', handleDragLeave, false);
     element.addEventListener('drop', (e) => handleDrop(e, element, input, prefix), false);
     element.addEventListener('click', () => {
