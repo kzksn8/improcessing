@@ -2,8 +2,7 @@
 // HTML要素の参照
 // ===========================================================================
 
-const [us_input_ddz, us_reset_btn, us_process_btn, us_processing_btn, us_download_btn, us_downloading_btn] = getElements('us');
-const [rb_input_ddz, rb_reset_btn, rb_process_btn, rb_processing_btn, rb_download_btn, rb_downloading_btn] = getElements('rb');
+const [usi_input_ddz, usi_reset_btn, usi_process_btn, usi_processing_btn, usi_download_btn, usi_downloading_btn] = getElements('usi');
 
 function getElements(prefix) {
     const suffixes = ['input_ddz', 'reset_btn', 'process_btn', 'processing_btn', 'download_btn', 'downloading_btn'];
@@ -14,8 +13,7 @@ function getElements(prefix) {
 // 画像インプットの関数
 // ===========================================================================
 
-const us_input = setupInput('file', 'image/*', 'none');
-const rb_input = setupInput('file', 'image/*', 'none');
+const usi_input = setupInput('file', 'image/*', 'none');
 
 function setupInput(type, accept, display) {
     const input  = document.createElement('input');
@@ -46,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const usiButton = document.getElementById('usi_btn');
     if (usiButton) {
         usiButton.addEventListener('click', () => {
-            changeTab('us');
+            changeTab('usi');
         });
     }
     changeTab('home'); // デフォルトでホームタブを表示
@@ -68,11 +66,8 @@ function changeTab(targetId) {
             return;
         // OKを選択した場合、処理を中止
         } else {
-            if (document.getElementById('us_reset_btn')) {
-                setupReset('us');
-            }
-            if (document.getElementById('rb_reset_btn')) {
-                setupReset('rb');
+            if (document.getElementById('usi_reset_btn')) {
+                setupReset('usi');
             }
             isProcessing = false;
         }
@@ -88,7 +83,7 @@ function changeTab(targetId) {
 }
 
 document.getElementById('usi_btn').addEventListener('click', function() {
-    window.location.hash = '#us';
+    window.location.hash = '#usi';
 });
 
 // ===========================================================================
@@ -96,15 +91,15 @@ document.getElementById('usi_btn').addEventListener('click', function() {
 // ===========================================================================
 
 window.onload = function() {
-    initializeSlider('us', 'upscale-container'); 
-    initializeSlider('rb', 'removebg-container');
+    initializeSlider('upscale', 'usi', '1'); 
+    initializeSlider('upscale', 'usi', '2'); 
 };
 
-function initializeSlider(prefix, containerClass) {
-    const container = document.querySelector(`.${containerClass}`);
-    const slider = container.querySelector(`#${prefix}_slider`);
+function initializeSlider(prefix1, prefix2, number) {
+    const container   = document.querySelector(`.${prefix1}-container-${number}`);
+    const slider      = container.querySelector(`#${prefix2}_slider_${number}`);
     const beforeImage = container.querySelector('.before-image');
-    const afterImage = container.querySelector('.after-image');
+    const afterImage  = container.querySelector('.after-image');
 
     slider.oninput = function() {
         const sliderValue = this.value;
@@ -163,11 +158,10 @@ function ddzDisplayUpdate(ddzElement, imageSrc, prefix, buttonAddon) {
 // 画像アップロードの処理
 // ===========================================================================
 
-setupInputFiles(us_input_ddz, us_input, 'us');
-setupInputFiles(rb_input_ddz, rb_input, 'rb');
+setupInputFiles(usi_input_ddz, usi_input, 'usi');
 
 function setupInputFiles(element, input, prefix) {
-    element.addEventListener('dragover',  handleDragOver, false);
+    element.addEventListener('dragover',  handleDragOver,  false);
     element.addEventListener('dragleave', handleDragLeave, false);
     element.addEventListener('drop', (e) => handleDrop(e, element, input, prefix), false);
     element.addEventListener('click', () => {
@@ -245,9 +239,7 @@ function processImageFiles(file, prefix) {
 // 画像にviews.pyの処理を適用してダウンロード
 // ===========================================================================
 
-// 処理実行ボタンを押したときのロジック
-setupProcessButton('us', 'upscale-image/', us_input);
-setupProcessButton('rb', 'remove-background/', rb_input);
+setupProcessButton('usi', 'upscale-image/', usi_input);
 
 // 処理実行ボタンを押したときのロジック
 function setupProcessButton(prefix, url, input) {
@@ -399,8 +391,7 @@ function stopProcessingAnimation(btn) {
 // 初期状態に戻す処理
 // ===========================================================================
 
-us_reset_btn.addEventListener('click', () => setupReset('us'));
-rb_reset_btn.addEventListener('click', () => setupReset('rb'));
+us_reset_btn.addEventListener('click', () => setupReset('usi'));
 
 // リセットボタンを押したときのロジック
 function setupReset(prefix) {

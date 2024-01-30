@@ -18,12 +18,11 @@
             <nav>
                 <a href="#home" data-target="home" class="tab-logo">
                     <img src="{% static 'image/before-logo.png' %}" alt="ClearPx" class="default-logo">
-                    <img src="{% static 'image/after-logo.png' %}"  alt="ClearPx" class="hover-logo">
+                    <img src="{% static 'image/after-logo.png'  %}" alt="ClearPx" class="hover-logo">
                 </a>
             </nav>
             <nav>
-                <a href="#us" data-target="us" class="tab-left">画像の超解像変換</a>
-                <a href="#rb" data-target="rb" class="tab-left">背景削除</a>
+                <a href="#usi"   data-target="usi"   class="tab-left">画像の超解像変換</a>
                 <a href="#about" data-target="about" class="tab-left">このサイトについて</a>
             </nav>
         </div>
@@ -43,51 +42,37 @@
                 </div>
             </div>
             <div class="slider-wrapper">
-                    <div class="upscale-container">
-                    <img src="{% static 'image/before-upscale_1.png' %}" class="before-image" alt="Before">
-                    <div class="after-image" style="background-image: url('{% static 'image/after-upscale_1.png' %}');"></div>
-                    <input type="range" min="0" max="100" value="50" class="slider" id="us_slider">
+                <div class="upscale-container-1">
+                    <img src="{% static 'image/before-upscale-1.png' %}" class="before-image" alt="Before">
+                    <div class="after-image" style="background-image: url('{% static 'image/after-upscale-1.png' %}');"></div>
+                    <input type="range" min="0" max="100" value="50" class="slider" id="usi_slider_1">
                 </div>
-                <div class="removebg-container">
-                    <img src="{% static 'image/before-upscale_2.png' %}" class="before-image" alt="Before">
-                    <div class="after-image" style="background-image: url('{% static 'image/after-upscale_2.png' %}');"></div>
-                    <input type="range" min="0" max="100" value="50" class="slider" id="rb_slider">
+                <div class="upscale-container-2">
+                    <img src="{% static 'image/before-upscale-2.png' %}" class="before-image" alt="Before">
+                    <div class="after-image" style="background-image: url('{% static 'image/after-upscale-2.png' %}');"></div>
+                    <input type="range" min="0" max="100" value="50" class="slider" id="usi_slider_2">
                 </div>
             </div>
         </section>
 
-        <section id="us" class="content-init content-update">
+        <section id="usi" class="content-init content-update">
             <h1>画像の超解像変換</h1>
             <p> &nbsp; &nbsp; 出力画像の1辺の最大値は3,000pxです。</p>
-            <div id="us_input_ddz" class="upscale-ddz">
-                <input type="file" id="us_input" style="display: none;" accept="image/*">
+            <div id="usi_input_ddz" class="upscale-ddz">
+                <input type="file" id="usi_input" style="display: none;" accept="image/*">
                 <span class="upload-instructions">画像をドラッグ or<br><br>クリックで画像選択</span>
             </div>
-            <button id="us_process_btn"     class="purple-btn" style="display:none;">高画質化</button>
-            <button id="us_processing_btn"  class="gray-btn"   style="display:none;">処理中....</button>
-            <button id="us_download_btn"    class="purple-btn" style="display:none;">ダウンロード</button>
-            <button id="us_downloading_btn" class="gray-btn"   style="display:none;">ダウンロード中...</button>
-            <button id="us_reset_btn"       class="purple-btn" style="display:none;">リセット</button>
-        </section>
-    
-        <section id="rb" class="content-init content-update">
-            <h1>背景削除</h1>
-            <p>背景削除</p>
-            <div id="rb_input_ddz" class="removebg-ddz">
-                <input type="file" id="rb_input" style="display: none;" accept="image/*">
-                <span class="upload-instructions">画像をドラッグ or<br><br>クリックで画像選択</span>
-            </div>
-            <button id="rb_process_btn"     class="purple-btn" style="display:none;">背景削除</button>
-            <button id="rb_processing_btn"  class="gray-btn"   style="display:none;">処理中....</button>
-            <button id="rb_download_btn"    class="purple-btn" style="display:none;">ダウンロード</button>
-            <button id="rb_downloading_btn" class="gray-btn"   style="display:none;">ダウンロード中...</button>
-            <button id="rb_reset_btn"       class="purple-btn" style="display:none;">リセット</button>
+            <button id="usi_process_btn"     class="purple-btn" style="display:none;">高画質化</button>
+            <button id="usi_processing_btn"  class="gray-btn"   style="display:none;">処理中....</button>
+            <button id="usi_download_btn"    class="purple-btn" style="display:none;">ダウンロード</button>
+            <button id="usi_downloading_btn" class="gray-btn"   style="display:none;">ダウンロード中...</button>
+            <button id="usi_reset_btn"       class="purple-btn" style="display:none;">リセット</button>
         </section>
 
         <section id="about" class="content-init content-update">
             <h1>About</h1><br>
-            <p> &nbsp; &nbsp; &nbsp; 当Webサイトでは、画像超解像技術 Real-ESRGAN を使用し、ユーザーがアップロード<br>
-                &nbsp; &nbsp; &nbsp; した画像を高解像度に変換するサービスを提供しています。当プラットフォームを通じて、<br>
+            <p> &nbsp; &nbsp; &nbsp; ClearPx では、超解像モデル Real-ESRGAN を使用し、ユーザーがアップロードした<br>
+                &nbsp; &nbsp; &nbsp; 画像を高解像度に変換するサービスを提供しています。当プラットフォームを通じて、<br>
                 &nbsp; &nbsp; &nbsp; 画像の細部を鮮明に復元し、品質を大幅に向上させることができます。この技術を利用<br>
                 &nbsp; &nbsp; &nbsp; することで、写真愛好家やプロのクリエイターたちが、その作品の可能性を最大限に<br>
                 &nbsp; &nbsp; &nbsp; 引き出すことが可能になります。<br><br>

@@ -172,20 +172,11 @@ header {
   align-items: center;
 }
 
-.upscale-container,
-.removebg-container {
+.upscale-container-1,
+.upscale-container-2 {
   flex: 1; /* それぞれのコンテナに同じスペースを与える */
   margin: 50px; /* コンテナ間の余白を調整 */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-.upscale-container {
-  position: relative;
-  width: 500px;
-  height: 300px;
-}
-
-.removebg-container {
   position: relative;
   width: 500px;
   height: 300px;
@@ -255,7 +246,6 @@ header {
 
 /* ========================================== */
 
-.removebg-ddz,
 .upscale-ddz {
   width: 600px;
   height: 300px;
@@ -273,7 +263,6 @@ header {
   box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.removebg-ddz:hover,
 .upscale-ddz:hover {
   color: #000000;
   border: 2px dashed #000000;
@@ -282,7 +271,6 @@ header {
   box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.removebg-ddz:before,
 .upscale-ddz:before {
   content: '📂';
   font-size: 5em;
@@ -296,7 +284,6 @@ header {
   margin-right: 50px;
 }
 
-.removebg-ddz.dragover,
 .upscale-ddz.dragover {
   border-color: #666666;
   color: #666666;
