@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 新しいボタンのイベントリスナーを追加
     const usiButton = document.getElementById('usi_btn');
     if (usiButton) {
-        usiButton.addEventListener('click', () => {
+        usiButton.addEventListener('click', (event) => {
+            event.preventDefault();
             changeTab('usi');
         });
     }
@@ -52,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('beforeunload', function (e) {
         if (isProcessing) {
             var confirmationMessage = 'このページを離れると、処理が中止されます。本当にページを離れますか？';
-            (e || window.event).returnValue = confirmationMessage;
+            e.returnValue = confirmationMessage;
             return confirmationMessage;
         }
     });
@@ -213,12 +214,14 @@ function processFiles(files, input, prefix) {
 
         if (fileType === 'image/avif' || !fileType.match('image.*')) {
             alert('サポートされていないファイル形式です。別の画像ファイルを選択してください。');
+            setupReset(prefix);
         } else {
             processImageFiles(files[0], prefix);
             input.files = createFileList(files[0]);
         }
     } else {
         alert('アップロードできる画像は1つです。');
+        setupReset(prefix);
     }
 }
 
@@ -251,6 +254,7 @@ function setupProcessButton(prefix, url, input) {
         const file = input ? input.files[0] : null;
         if (!file) {
             alert('画像のアップロードが必要です。');
+            setupReset(prefix);
             return;
         }
         btnDisplayUpdate(false, process_btn, reset_btn);
@@ -391,7 +395,7 @@ function stopProcessingAnimation(btn) {
 // 初期状態に戻す処理
 // ===========================================================================
 
-us_reset_btn.addEventListener('click', () => setupReset('usi'));
+usi_reset_btn.addEventListener('click', () => setupReset('usi'));
 
 // リセットボタンを押したときのロジック
 function setupReset(prefix) {
