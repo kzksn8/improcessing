@@ -352,3 +352,18 @@ header {
 }
 
 /* ========================================== */
+
+footer {
+  text-align: center;
+  padding: 15px;
+  background-color: #000000;
+}
+
+footer p {
+  margin: 0;
+  font-size: 1em;
+  color: white;
+  background-color: #000000;
+}
+
+/* ========================================== */
