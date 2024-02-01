@@ -1,10 +1,9 @@
 Django>=3.2,<4.0
-
 python-dotenv
 numpy
 torch
 Pillow
 rembg
-
 basicsr
 opencv-python
+gunicorn
