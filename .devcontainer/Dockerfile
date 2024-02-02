@@ -1,5 +1,5 @@
-# Pythonのスリムイメージを使用
-FROM python:3.10-slim
+# FROM python:3.10-slim
+FROM python:3.7
 
 # pipをアップグレード
 RUN pip install --upgrade pip
