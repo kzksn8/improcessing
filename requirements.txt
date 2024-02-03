@@ -6,4 +6,3 @@ Pillow
 rembg
 basicsr
 opencv-python
-gunicorn
