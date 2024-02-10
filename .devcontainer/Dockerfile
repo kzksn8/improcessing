@@ -8,6 +8,9 @@ RUN pip install --upgrade pip
 RUN apt-get update && apt-get install -y libgl1-mesa-glx
 RUN apt-get update && apt-get install -y libglib2.0-0
 
+# OpenCVのheadlessモードのインストール
+RUN pip install opencv-python-headless
+
 # 作業ディレクトリの設定
 WORKDIR /workspace
 

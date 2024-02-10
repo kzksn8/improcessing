@@ -24,7 +24,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # モデルの初期化
 model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
-model_path = os.path.join(settings.BASE_DIR, 'imageapp', 'pretrained', 'RealESRGAN_x4plus.pth')
+model_path = os.path.join(settings.BASE_DIR, 'pretrained', 'RealESRGAN_x4plus.pth')
 checkpoint = torch.load(model_path, map_location=device)
 model.load_state_dict(checkpoint['params_ema'])
 model.to(device)

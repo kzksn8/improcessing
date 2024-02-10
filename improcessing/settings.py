@@ -31,7 +31,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # ALLOWED_HOSTS = []
 
 DEBUG = False  # 本番環境
-ALLOWED_HOSTS = ['162.43.18.77', 'clearpx.com']  # 本番環境
+ALLOWED_HOSTS = ['162.43.18.77', 'clearpx.com', 'www.clearpx.com', '172.18.0.2', 'localhost', '127.0.0.1']  # 本番環境
 
 
 # Application definition
@@ -110,9 +110,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ja'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tokyo'
 
 USE_I18N = True
 
@@ -125,8 +125,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'imageapp', 'static'),
+    os.path.join(BASE_DIR, 'static'),
 ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -134,3 +136,7 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+# SECURE_SSL_REDIRECT = True

@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  django-app:
+    build: .
+    volumes:
+      - /var/www/improcessing:/app  # アプリケーションソースをコンテナにマウント
+      - static-data:/app/staticfiles  # Djangoのcollectstaticによって生成される静的ファイルを保持
+    ports:
+      - "8000:8000"  # ホストとコンテナのポートをマッピング
+    environment:
+      - SECRET_KEY=django-insecure-+w^m2@n#z0!ds5croe8!lyhes%w&rde^8an&siv6^gz-pm(uno
+      - DEBUG=False
+      - ALLOWED_HOSTS="162.43.18.77,clearpx.com"
+    command: ["uwsgi", "--http", "0.0.0.0:8000", "--module", "improcessing.wsgi:application", "--master"]
+
+volumes:
+  static-data:

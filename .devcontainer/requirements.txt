@@ -1,8 +1,7 @@
 Django>=3.2,<4.0
+torchvision
+torch
 python-dotenv
 numpy
-torch
 Pillow
-rembg
 basicsr
-opencv-python
