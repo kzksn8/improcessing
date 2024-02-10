@@ -272,25 +272,22 @@ function setupProcessButton(prefix, url, input) {
                 'X-CSRFToken': csrftoken
             }
         })
-        .then(handleErrors)
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok.');
-            return response.json();
+            return response.blob();
         })
-        .then(data => {
-            if (data && data.image) {
-                const base64Data = data.image.startsWith('data:image/png;base64,') ?data.image : 'data:image/png;base64,' + data.image;
-                ddzDisplayUpdate(input_ddz, base64Data, prefix, () => {
-                    btnDisplayUpdate(false, processing_btn);
-                    btnDisplayUpdate(true,  download_btn, reset_btn);
-                });
-                download_btn.onclick = () => startDownload(base64Data, prefix, () => {
-                    btnDisplayUpdate(false, download_btn, reset_btn);
-                    btnDisplayUpdate(true,  downloading_btn);
-                });
-            } else {
-                throw new Error(data && data.error ? data.error : "不明なエラーが発生しました。");
-            }
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            ddzDisplayUpdate(input_ddz, url, prefix, () => {
+                btnDisplayUpdate(false, processing_btn);
+                btnDisplayUpdate(true,  download_btn, reset_btn);
+                download_btn.onclick = () => {
+                    startDownload(url, prefix, () => {
+                        btnDisplayUpdate(false, download_btn, reset_btn);
+                        btnDisplayUpdate(true,  downloading_btn);
+                    });
+                };
+            });
         })
         .catch(error => {
             console.error('Error:', error);
@@ -334,36 +331,25 @@ function handleErrors(response) {
 }
 
 // ダウンロードボタンを押したときのロジック
-function startDownload(base64Data, prefix, buttonAddon) {
-    if (base64Data) {
+function startDownload(blobUrl, prefix, buttonAddon) {
+    if (blobUrl) {
         buttonAddon();
-        // Base64データをBlobに変換
-        const byteCharacters = atob(base64Data.split(',')[1]);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], {type: 'image/png'});
-
-        // Blobを使用してObject URLを作成
-        const url = URL.createObjectURL(blob);
 
         // ダウンロードリンクを設定
         const link = document.createElement('a');
-        link.href = url;
+        // Blob URLを直接href属性に設定
+        link.href = blobUrl;
         link.download = 'processed_image.png';
-        link.addEventListener('click', () => {
-            setTimeout(() => {
-                URL.revokeObjectURL(url); // メモリリークを防ぐために使用後にURLを解放
-                setupReset(prefix);
-            }, 500);
-        });
-
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+
+        // 使用後にBlob URLを解放してメモリリークを防止
+        URL.revokeObjectURL(blobUrl);
+
+        setTimeout(() => {
+            setupReset(prefix);
+        }, 300);
     }
 }
 

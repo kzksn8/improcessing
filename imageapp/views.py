@@ -1,6 +1,5 @@
 import os
 import io
-from base64 import b64encode
 
 import torch
 import numpy as np
@@ -10,6 +9,7 @@ from basicsr.archs.rrdbnet_arch import RRDBNet
 from django.shortcuts import render
 from django.conf import settings
 from django.http import JsonResponse
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -87,14 +87,12 @@ def upscale_image(request):
         # スケールアップされた画像をPILイメージに変換する
         output_image = Image.fromarray(sr_img)
 
-        # 結果をバイト配列に変換してbase64エンコードする
+        # バイナリデータとして画像をクライアントに送信
         buffer = io.BytesIO()
         output_image.save(buffer, format="PNG")
-        image_base64 = b64encode(buffer.getvalue()).decode('utf-8')
-
-        # base64エンコードされた画像をJSONレスポンスとして返す
-        return JsonResponse({'image': 'data:image/png;base64,' + image_base64})
+        buffer.seek(0)
+        
+        return HttpResponse(buffer, content_type="image/png")
     
     else:
-        # POSTリクエストでない場合はエラーを返す
         return JsonResponse({'error': 'POSTリクエストのみ受け付けます。'}, status=400)
