@@ -2,10 +2,11 @@
 // HTML要素の参照
 // ===========================================================================
 
-const [usi_input_ddz, usi_reset_btn, usi_process_btn, usi_processing_btn, usi_download_btn, usi_downloading_btn] = getElements('usi');
+const [usi_input_ddz, usi_reset_btn, usi_process_btn_strong, usi_process_btn_medium, usi_processing_btn, usi_download_btn, usi_downloading_btn] = getElements('usi');
 
 function getElements(prefix) {
-    const suffixes = ['input_ddz', 'reset_btn', 'process_btn', 'processing_btn', 'download_btn', 'downloading_btn'];
+    const suffixes = ['input_ddz', 'reset_btn', 'process_btn_strong', 'process_btn_medium', 'processing_btn', 'download_btn', 'downloading_btn'];
+
     return suffixes.map(suffix => document.getElementById(`${prefix}_${suffix}`));
 }
 
@@ -40,14 +41,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 新しいボタンのイベントリスナーを追加
     const usiButton = document.getElementById('usi_btn');
     if (usiButton) {
         usiButton.addEventListener('click', (event) => {
             event.preventDefault();
             changeTab('usi');
+            
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         });
     }
+
     changeTab('home'); // デフォルトでホームタブを表示
 
     window.addEventListener('beforeunload', function (e) {
@@ -204,17 +210,22 @@ function handleFileSelect(e, input, prefix) {
 function processFiles(files, input, prefix) {
     if (files.length === 1) {
         const fileType = files[0].type;
-        
-        // createFileListをprocessFiles内に移動
+        const maxFileSize = 5 * 1024 * 1024;
+
         const createFileList = (file) => {
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(file);
             return dataTransfer.files;
         };
 
-        if (fileType === 'image/avif' || !fileType.match('image.*')) {
+        if (files[0].size > maxFileSize) {
+            alert('ファイルサイズの上限は5MBです。');
+            setupReset(prefix);
+            return;
+        } else if (fileType === 'image/avif' || !fileType.match('image.*')) {
             alert('サポートされていないファイル形式です。別の画像ファイルを選択してください。');
             setupReset(prefix);
+            return;
         } else {
             processImageFiles(files[0], prefix);
             input.files = createFileList(files[0]);
@@ -230,9 +241,9 @@ function processImageFiles(file, prefix) {
     const reader = new FileReader();
     reader.onload = (e) => {
         const imageSrc = e.target.result;
-        const [input_ddz, reset_btn, process_btn, , , ] = getElements(prefix);
+        const [input_ddz, reset_btn, process_btn_strong, process_btn_medium, , , ] = getElements(prefix);
         ddzDisplayUpdate(input_ddz, imageSrc, prefix, function() {
-            btnDisplayUpdate(true, process_btn, reset_btn);
+            btnDisplayUpdate(true, process_btn_strong, process_btn_medium, reset_btn);
         });
     };
     reader.readAsDataURL(file);
@@ -242,11 +253,12 @@ function processImageFiles(file, prefix) {
 // 画像にviews.pyの処理を適用してダウンロード
 // ===========================================================================
 
-setupProcessButton('usi', 'upscale-image/', usi_input);
+setupProcessButton('usi', 'upscale-image_x4/', usi_process_btn_strong, usi_input);
+setupProcessButton('usi', 'upscale-image_x2/', usi_process_btn_medium, usi_input);
 
 // 処理実行ボタンを押したときのロジック
-function setupProcessButton(prefix, url, input) {
-    const [input_ddz, reset_btn, process_btn, processing_btn, download_btn, downloading_btn] = getElements(prefix);
+function setupProcessButton(prefix, url, process_btn, input) {
+    const [input_ddz, reset_btn, process_btn_strong, process_btn_medium, processing_btn, download_btn, downloading_btn] = getElements(prefix);
     
     process_btn.addEventListener('click', () => {
         isProcessing = true;
@@ -257,7 +269,7 @@ function setupProcessButton(prefix, url, input) {
             setupReset(prefix);
             return;
         }
-        btnDisplayUpdate(false, process_btn, reset_btn);
+        btnDisplayUpdate(false, process_btn_strong, process_btn_medium, reset_btn);
         btnDisplayUpdate(true,  processing_btn);
         startProcessingAnimation(processing_btn);
 
@@ -400,7 +412,8 @@ function setupReset(prefix) {
 
     const buttonsAndIndicators = [
         `${prefix}_reset_btn`,
-        `${prefix}_process_btn`,
+        `${prefix}_process_btn_strong`,
+        `${prefix}_process_btn_medium`,
         `${prefix}_processing_btn`,
         `${prefix}_download_btn`,
         `${prefix}_downloading_btn`

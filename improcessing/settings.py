@@ -134,8 +134,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
-
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 # SECURE_SSL_REDIRECT = True

@@ -19,5 +19,5 @@ from .views import index, upscale_image
 
 urlpatterns = [
     path('', index, name='index'),
-    path('upscale-image/', upscale_image, name='upscale_image'),
+    path('upscale-image_x<int:scale>/', upscale_image, name='upscale_image'),
 ]

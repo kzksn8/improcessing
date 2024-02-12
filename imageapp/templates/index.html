@@ -35,7 +35,7 @@
                     <h1>超解像モデル Real-ESRGAN</h1>
                     <p> 高度なニューラルネットワークに基づいて開発された Real-ESRGAN は、<br>
                         緻密なディテールを失うことなく、写真を鮮明にします。絵画、アニメ、<br>
-                        さらには古いファミリービデオまで、あらゆるメディアの可能性を広げます。
+                        古い家族ビデオの1シーンまで、あらゆるメディアの可能性を広げます。
                 </div>
                 <div class="button-container">
                     <button id="usi_btn" class="large-btn">画像を超解像変換する</button>
@@ -57,16 +57,17 @@
 
         <section id="usi" class="content-init content-update">
             <h1>画像の超解像変換</h1>
-            <p> &nbsp; &nbsp; 出力画像の1辺の最大値は3,000pxです。</p>
+            <p> &nbsp; &nbsp; 画像のアップロード上限サイズは5MBです。</p>
             <div id="usi_input_ddz" class="upscale-ddz">
                 <input type="file" id="usi_input" style="display: none;" accept="image/*">
                 <span class="upload-instructions">画像をドラッグ or<br><br>クリックで画像選択</span>
             </div>
-            <button id="usi_process_btn"     class="purple-btn" style="display:none;">高画質化</button>
-            <button id="usi_processing_btn"  class="gray-btn"   style="display:none;">処理中....</button>
-            <button id="usi_download_btn"    class="purple-btn" style="display:none;">ダウンロード</button>
-            <button id="usi_downloading_btn" class="gray-btn"   style="display:none;">ダウンロード中...</button>
-            <button id="usi_reset_btn"       class="purple-btn" style="display:none;">リセット</button>
+            <button id="usi_process_btn_strong" class="purple-btn" style="display:none;">高画質化 Strong</button>
+            <button id="usi_process_btn_medium" class="purple-btn" style="display:none;">高画質化 Medium</button>
+            <button id="usi_processing_btn"     class="gray-btn"   style="display:none;">処理中....</button>
+            <button id="usi_download_btn"       class="purple-btn" style="display:none;">ダウンロード</button>
+            <button id="usi_downloading_btn"    class="gray-btn"   style="display:none;">ダウンロード中...</button>
+            <button id="usi_reset_btn"          class="purple-btn" style="display:none;">リセット</button>
             <br><br><br><br><br>
         </section>
 
