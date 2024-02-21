@@ -7,10 +7,11 @@ For more information on this file, see
 https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 """
 
+import sys
 import os
-
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'improcessing.settings')
 
+sys.path.append('/var/www/improcessing')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'improcessing.settings')
 application = get_wsgi_application()

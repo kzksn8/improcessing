@@ -2,10 +2,12 @@
 // HTML要素の参照
 // ===========================================================================
 
-const [usi_input_ddz, usi_reset_btn, usi_process_btn_strong, usi_process_btn_medium, usi_processing_btn, usi_download_btn, usi_downloading_btn] = getElements('usi');
+const [usi_input_ddz, usi_reset_btn, usi_process_btn_strong, usi_process_btn_medium, 
+    usi_processing_btn, usi_download_btn, usi_downloading_btn] = getElements('usi');
 
 function getElements(prefix) {
-    const suffixes = ['input_ddz', 'reset_btn', 'process_btn_strong', 'process_btn_medium', 'processing_btn', 'download_btn', 'downloading_btn'];
+    const suffixes = ['input_ddz', 'reset_btn', 'process_btn_strong', 'process_btn_medium', 
+    'processing_btn', 'download_btn', 'downloading_btn'];
 
     return suffixes.map(suffix => document.getElementById(`${prefix}_${suffix}`));
 }
@@ -32,33 +34,20 @@ let isProcessing = false; // 処理中かどうかの状態を保持
 
 // ページ読み込み時の処理
 document.addEventListener('DOMContentLoaded', () => {
-    // 既存のタブ切り替え機能
-    document.querySelectorAll('nav a').forEach(link => {
+    document.querySelectorAll('nav a, #usi_btn').forEach(link => {
         link.addEventListener('click', (event) => {
-            event.preventDefault();
-            const targetId = link.getAttribute('data-target');
+            event.preventDefault(); // デフォルトのアンカー動作を防止
+            const targetId = link.getAttribute('data-target') || 'usi';
             changeTab(targetId);
+            window.scrollTo({top: 0, behavior: 'smooth'});
         });
     });
 
-    const usiButton = document.getElementById('usi_btn');
-    if (usiButton) {
-        usiButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            changeTab('usi');
-            
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-    }
-
     changeTab('home'); // デフォルトでホームタブを表示
 
-    window.addEventListener('beforeunload', function (e) {
+    window.addEventListener('beforeunload', (e) => {
         if (isProcessing) {
-            var confirmationMessage = 'このページを離れると、処理が中止されます。本当にページを離れますか？';
+            const confirmationMessage = 'このページを離れると、処理が中止されます。本当にページを離れますか？';
             e.returnValue = confirmationMessage;
             return confirmationMessage;
         }
@@ -89,8 +78,21 @@ function changeTab(targetId) {
     }
 }
 
-document.getElementById('usi_btn').addEventListener('click', function() {
-    window.location.hash = '#usi';
+document.getElementById('usi_btn').addEventListener('click', function(event) {
+    event.preventDefault();
+    changeTab('usi');
+
+    // URLのハッシュを追加せずに履歴を更新
+    if (history.pushState) {
+        history.pushState(null, null, window.location.pathname);
+    } else {
+        location.hash = '';
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
 });
 
 // ===========================================================================

@@ -27,10 +27,10 @@ load_dotenv()
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = []
-# DEBUG = False
-# ALLOWED_HOSTS = ['162.43.18.77', 'clearpx.com', 'www.clearpx.com', '172.17.0.2', '172.18.0.2', 'localhost', '127.0.0.1']
+# DEBUG = True
+# ALLOWED_HOSTS = []
+DEBUG = False
+ALLOWED_HOSTS = ['162.43.18.77', 'clearpx.com', 'www.clearpx.com', '172.17.0.2', '172.18.0.2', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -136,4 +136,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-# SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False

@@ -1,18 +1,21 @@
-version: '3.8'
+version: "3.8"
+
+networks:
+  app-network:
+    driver: bridge
 
 services:
   django-app:
+    networks:
+      - app-network
     build: .
     volumes:
-      - /var/www/improcessing:/app  # アプリケーションソースをコンテナにマウント
-      - static-data:/app/staticfiles  # Djangoのcollectstaticによって生成される静的ファイルを保持
+      - /var/www/improcessing:/app
+      - /var/www/improcessing/staticfiles:/app/staticfiles
     ports:
-      - "8000:8000"  # ホストとコンテナのポートをマッピング
+      - "8000:8000"
     environment:
-      - SECRET_KEY=django-insecure-+w^m2@n#z0!ds5croe8!lyhes%w&rde^8an&siv6^gz-pm(uno
+      - SECRET_KEY="kpa47r4opon77gbxlvtfray2ksiyusowc2f8f7rspnv"
       - DEBUG=False
-      - ALLOWED_HOSTS="162.43.18.77,clearpx.com"
+      - ALLOWED_HOSTS="162.43.18.77,clearpx.com,www.clearpx.com,172.17.0.2,172.18.0.2,localhost,127.0.0.1"
     command: ["uwsgi", "--http", "0.0.0.0:8000", "--module", "improcessing.wsgi:application", "--master"]
-
-volumes:
-  static-data:

@@ -59,7 +59,10 @@ def upscale_image(request, scale):
     model.eval()
 
     image = Image.open(file).convert('RGB')
-    limit_size = 500 if scale == 4 else 750
+    if scale == 4:
+        limit_size = 600
+    else:
+        limit_size = 1000
     new_width, new_height = image_adjustment(image.size, limit_size)
     image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
