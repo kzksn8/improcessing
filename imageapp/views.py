@@ -60,7 +60,7 @@ def upscale_image(request, scale):
 
     image = Image.open(file).convert('RGB')
     if scale == 4:
-        limit_size = 1000
+        limit_size = 750
     else:
         limit_size = 1500
     new_width, new_height = image_adjustment(image.size, limit_size)
